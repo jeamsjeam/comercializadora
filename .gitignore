@@ -1,0 +1,6 @@
+.vscode/solution-explorer/
+*/bin/
+*/obj/
+/.vs
+/Deploy/
+/deploy-graphql/
