@@ -19,11 +19,8 @@
         $db = new Conexion();
         
         try{
-
-            $datosProcesados = procesarDatos($datos);
-
             // Consulta a la base de datos
-            $sql = "SELECT * FROM categorias WHERE id = ".$datosProcesados['id'];
+            $sql = "SELECT * FROM categorias WHERE id = ".$datos['id'];
             $consulta = $db->consulta($sql);
         
             $resultado = null;
@@ -130,11 +127,9 @@
         // Crear instancia de la clase Conexion
         $db = new Conexion();
         try {
-            $datosProcesados = procesarDatos($datos);
-
             // Consulta a la base de datos
             $sql = "INSERT INTO categorias (nombre, fecha_creacion) VALUES ";
-            $sql .= "('".$datosProcesados['nombre']."', NOW())";
+            $sql .= "('".$datos['nombre']."', NOW())";
     
             $resultado = $db->consulta($sql);
     
@@ -384,16 +379,24 @@
 
     // Verificar si se ha enviado el formulario
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $accion= $_POST['accion'] ?? null;
+
+        $datosRecibidos = $_POST['datos'] ?? null;
+        if($datosRecibidos === null){
+            echo json_encode(['error' => 'No se envio datos']);
+            return;
+        }
+
+        $data = json_decode($datosRecibidos, true);
+
+        $accion= $data['accion'] ?? null;
 
         switch ($accion){
             case "obtenerPorId":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-
                 echo json_encode(ObtenerPorId($datos));
 
                 break;
@@ -403,7 +406,7 @@
 
                 break;
             case "insertar":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -412,7 +415,7 @@
 
                 break;
             case "insertarLista":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -421,7 +424,7 @@
 
                 break;
             case "actualizar":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -430,7 +433,7 @@
 
                 break;
             case "actualizarLista":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -439,7 +442,7 @@
 
                 break;
             case "eliminar":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -448,7 +451,7 @@
 
                 break;
             case "eliminarLista":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;

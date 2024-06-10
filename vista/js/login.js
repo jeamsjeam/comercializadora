@@ -27,19 +27,18 @@ async function mostrarResultado() {
 		const resultadoDiv = document.getElementById('resultado');
 
 		let datos = {
-			accion: 'eliminarLista',
-			datos2: {
-				id: 26,
+			accion: 'insertar',
+			datos: {
+				id: 1,
 				nombre: 'Prueba26'
 			},
-			datos: [
+			datos2: [
 				{id: 22,nombre: 'Prueba2'},
 				{id: 25,nombre: 'Prueba2'},
 				{id: 27,nombre: 'Prueba2'}
 			]
 		};
 
-		console.log(datos)
 		let data = await consultar('categorias',datos);
 		resultadoDiv.innerHTML = '';
 

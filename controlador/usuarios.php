@@ -36,10 +36,10 @@
                 $resultado = [
                     'id' => $fila["id"],
                     'usuario' => $fila["usuario"],
-                    'correo' => $fila["correo"]
+                    'correo' => $fila["correo"],
                     'clave' => $fila["clave"],
                     'rol_id' => $fila["rol_id"],
-                    'fecha_creacion' => $fila["fecha_creacion"]
+                    'fecha_creacion' => $fila["fecha_creacion"],
                     'estado' => $fila["estado"]
                 ];
             }
@@ -79,10 +79,10 @@
                 $resultado = [
                     'id' => $fila["id"],
                     'usuario' => $fila["usuario"],
-                    'correo' => $fila["correo"]
+                    'correo' => $fila["correo"],
                     'clave' => $fila["clave"],
                     'rol_id' => $fila["rol_id"],
-                    'fecha_creacion' => $fila["fecha_creacion"]
+                    'fecha_creacion' => $fila["fecha_creacion"],
                     'estado' => $fila["estado"]
                 ];
             }
@@ -122,10 +122,10 @@
                 $resultado = [
                     'id' => $fila["id"],
                     'usuario' => $fila["usuario"],
-                    'correo' => $fila["correo"]
+                    'correo' => $fila["correo"],
                     'clave' => $fila["clave"],
                     'rol_id' => $fila["rol_id"],
-                    'fecha_creacion' => $fila["fecha_creacion"]
+                    'fecha_creacion' => $fila["fecha_creacion"],
                     'estado' => $fila["estado"]
                 ];
             }
@@ -161,10 +161,10 @@
                     $resultado = [
                         'id' => $fila["id"],
                         'usuario' => $fila["usuario"],
-                        'correo' => $fila["correo"]
+                        'correo' => $fila["correo"],
                         'clave' => $fila["clave"],
                         'rol_id' => $fila["rol_id"],
-                        'fecha_creacion' => $fila["fecha_creacion"]
+                        'fecha_creacion' => $fila["fecha_creacion"],
                         'estado' => $fila["estado"]
                     ];
                 }
@@ -204,10 +204,10 @@
                     $resultado = [
                         'id' => $fila["id"],
                         'usuario' => $fila["usuario"],
-                        'correo' => $fila["correo"]
+                        'correo' => $fila["correo"],
                         'clave' => $fila["clave"],
                         'rol_id' => $fila["rol_id"],
-                        'fecha_creacion' => $fila["fecha_creacion"]
+                        'fecha_creacion' => $fila["fecha_creacion"],
                         'estado' => $fila["estado"]
                     ];
                 }
