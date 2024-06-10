@@ -97,9 +97,9 @@ CREATE TABLE roles (
 -- Tabla para almacenar información sobre los usuarios del sistema.
 CREATE TABLE usuarios (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL, -- Nombre del usuario
-    email VARCHAR(100) UNIQUE NOT NULL, -- Correo electrónico del usuario
-    password VARCHAR(255) NOT NULL, -- Contraseña del usuario
+    usuario VARCHAR(100) NOT NULL, -- Nombre del usuario
+    correo VARCHAR(100) UNIQUE NOT NULL, -- Correo electrónico del usuario
+    clave VARCHAR(255) NOT NULL, -- Contraseña del usuario
     rol_id BIGINT NOT NULL, -- Referencia al rol del usuario
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación del usuario
     estado VARCHAR(20) DEFAULT 'Activo' -- Estado del usuario (Activo/Inactivo)
@@ -298,12 +298,12 @@ INSERT INTO roles (nombre, descripcion) VALUES
 ('Gerente', 'Supervisa y administra las operaciones');
 
 -- Insertar en la tabla usuarios
-INSERT INTO usuarios (nombre, email, password, rol_id, estado) VALUES
-('Admin', 'admin@correo.com', 'password1', 1, 'Activo'),
-('Vendedor1', 'vendedor1@correo.com', 'password2', 2, 'Activo'),
-('Vendedor2', 'vendedor2@correo.com', 'password3', 2, 'Activo'),
-('Almacenista1', 'almacenista1@correo.com', 'password4', 3, 'Activo'),
-('Contador1', 'contador1@correo.com', 'password5', 4, 'Activo');
+INSERT INTO usuarios (usuario, correo, clave, rol_id, estado) VALUES
+('Admin', 'admin@correo.com', '1234', 1, 'Activo'),
+('Vendedor1', 'vendedor1@correo.com', '1234', 2, 'Activo'),
+('Vendedor2', 'vendedor2@correo.com', '1234', 2, 'Activo'),
+('Almacenista1', 'almacenista1@correo.com', '1234', 3, 'Activo'),
+('Contador1', 'contador1@correo.com', '1234', 4, 'Activo');
 
 -- Insertar en la tabla monedas
 INSERT INTO monedas (nombre, simbolo) VALUES
