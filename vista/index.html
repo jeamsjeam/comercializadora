@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/toastify.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-5/css/bootstrap.min.css">
+    <title>Index</title>
+</head>
+<body>
+    <script>
+        let dataUsuario = JSON.parse(sessionStorage.getItem('usuario'))
+            if(dataUsuario.rol === 'Asistencial'){
+                window.location.href = "asistencial.html";
+            }else if(dataUsuario.rol === 'Recursos Humanos'){
+                window.location.href = "recursoshumanos.html";
+            }else if(dataUsuario.rol === 'Central de Citas'){
+                window.location.href = "citas.html";
+            }else if(dataUsuario.rol === 'Paciente'){
+                window.location.href = "menuPaciente.html";
+
+            }
+    </script>
+    hola mundo
+
+    <script src="js/toastify.js"></script>
+	<script src="js/utilidades.js"></script>
+	<script src="bootstrap-5/js/bootstrap.min.js"></script>
+</body>
+</html>

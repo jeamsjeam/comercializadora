@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', async function() {
+	sessionStorage.removeItem('usuario');
+});
+
 (function () {
 	'use strict'
 
@@ -18,35 +22,40 @@
 		})
 })()
 
-document.addEventListener('DOMContentLoaded', async function() {
-
-});
-
 async function verificarUsuario() {
 	try{
-		const resultadoDiv = document.getElementById('resultado');
-
 		let datos = {
-			accion: 'obtenerPorUsuarioClave',
+			accion: "obtenerPorUsuarioClave",
 			datos: {
 				usuario: document.getElementById("usuario").value,
 				clave: document.getElementById("clave").value
 			}
 		};
 
-		let data = await consultar('usuarios',datos);
+		document.getElementById("usuario").value = ''
+		document.getElementById("clave").value = ''
+
+		let data = await consultar("usuarios",datos);
 		if(data !== null && typeof data !== 'undefined'){
 			if (data.message) {
-				resultadoDiv.innerHTML = `<p>${data.message}</p>`;
+				mostrarNotificacion(data.message,"#FF0000") 
 			} else if (data.error) {
-				resultadoDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+				mostrarNotificacion(data.erro,"#FF0000") 
 			} else {
-				resultadoDiv.innerHTML = 'Usuario: ' + data.usuario;
+				mostrarNotificacion("Usuario: " + data.usuario,"linear-gradient(to right, #00b09b, #96c93d)") 
+				let usuario = {
+					usuario: data.usuario,
+					rol: data.rolnombre,
+					rolId: data.rol_id
+				}
+				sessionStorage.setItem('usuario', JSON.stringify(usuario))
+				window.location.href = "index.html";
 			}
 		}else{
-			resultadoDiv.innerHTML = 'No se encontro ningun usuario';
+			mostrarNotificacion("No se encontro ningun usuario","#FF0000") 
 		}
 	}catch(e){
+		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
 	}
 	
