@@ -388,7 +388,7 @@
 
         $data = json_decode($datosRecibidos, true);
 
-        $accion= $data['accion'] ?? null;
+        $accion = $data['accion'] ?? null;
 
         switch ($accion){
             case "obtenerPorId":

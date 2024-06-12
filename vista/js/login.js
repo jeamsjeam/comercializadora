@@ -19,41 +19,32 @@
 })()
 
 document.addEventListener('DOMContentLoaded', async function() {
-    await mostrarResultado();
+
 });
 
-async function mostrarResultado() {
+async function verificarUsuario() {
 	try{
 		const resultadoDiv = document.getElementById('resultado');
 
 		let datos = {
-			accion: 'insertar',
+			accion: 'obtenerPorUsuarioClave',
 			datos: {
-				id: 1,
-				nombre: 'Prueba26'
-			},
-			datos2: [
-				{id: 22,nombre: 'Prueba2'},
-				{id: 25,nombre: 'Prueba2'},
-				{id: 27,nombre: 'Prueba2'}
-			]
+				usuario: document.getElementById("usuario").value,
+				clave: document.getElementById("clave").value
+			}
 		};
 
-		let data = await consultar('categorias',datos);
-		resultadoDiv.innerHTML = '';
-
-		if (data.message) {
-			resultadoDiv.innerHTML = `<p>${data.message}</p>`;
-		} else if (data.error) {
-			resultadoDiv.innerHTML = `<p>Error: ${data.error}</p>`;
-		} else {
-			const lista = document.createElement('ul');
-			data.forEach(categoria => {
-				const item = document.createElement('li');
-				item.textContent = `ID: ${categoria.id} - Nombre: ${categoria.nombre} - Fecha de Creación: ${categoria.fecha_creacion}`;
-				lista.appendChild(item);
-			});
-			resultadoDiv.appendChild(lista);
+		let data = await consultar('usuarios',datos);
+		if(data !== null && typeof data !== 'undefined'){
+			if (data.message) {
+				resultadoDiv.innerHTML = `<p>${data.message}</p>`;
+			} else if (data.error) {
+				resultadoDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+			} else {
+				resultadoDiv.innerHTML = 'Usuario: ' + data.usuario;
+			}
+		}else{
+			resultadoDiv.innerHTML = 'No se encontro ningun usuario';
 		}
 	}catch(e){
 		console.error('Error:', e);

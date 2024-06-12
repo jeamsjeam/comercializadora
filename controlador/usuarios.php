@@ -23,7 +23,9 @@
             $datosProcesados = procesarDatos($datos);
 
             // Consulta a la base de datos
-            $sql = "SELECT * FROM usuarios WHERE id = ".$datosProcesados['id'];
+            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
+            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
+            $sql .= " WHERE us.id = ".$datosProcesados['id'];
             $consulta = $db->consulta($sql);
         
             $resultado = null;
@@ -40,7 +42,8 @@
                     'clave' => $fila["clave"],
                     'rol_id' => $fila["rol_id"],
                     'fecha_creacion' => $fila["fecha_creacion"],
-                    'estado' => $fila["estado"]
+                    'estado' => $fila["estado"],
+                    'rolnombre' => $fila["rolnombre"]
                 ];
             }
         
@@ -66,7 +69,9 @@
             $datosProcesados = procesarDatos($datos);
 
             // Consulta a la base de datos
-            $sql = "SELECT * FROM usuarios WHERE usuario = ".$datosProcesados['usuario'];
+            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
+            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
+            $sql .= " WHERE usuario = '".$datosProcesados['usuario']."'";
             $consulta = $db->consulta($sql);
         
             $resultado = null;
@@ -83,7 +88,8 @@
                     'clave' => $fila["clave"],
                     'rol_id' => $fila["rol_id"],
                     'fecha_creacion' => $fila["fecha_creacion"],
-                    'estado' => $fila["estado"]
+                    'estado' => $fila["estado"],
+                    'rolnombre' => $fila["rolnombre"]
                 ];
             }
         
@@ -109,7 +115,9 @@
             $datosProcesados = procesarDatos($datos);
 
             // Consulta a la base de datos
-            $sql = "SELECT * FROM usuarios WHERE usuario = ".$datosProcesados['usuario']." AND clave = ".$datosProcesados['usuario'];
+            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
+            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
+            $sql .= " WHERE usuario = '".$datosProcesados['usuario']."' AND clave = '".$datosProcesados['clave']."'";
             $consulta = $db->consulta($sql);
         
             $resultado = null;
@@ -126,7 +134,8 @@
                     'clave' => $fila["clave"],
                     'rol_id' => $fila["rol_id"],
                     'fecha_creacion' => $fila["fecha_creacion"],
-                    'estado' => $fila["estado"]
+                    'estado' => $fila["estado"],
+                    'rolnombre' => $fila["rolnombre"]
                 ];
             }
         
@@ -149,7 +158,8 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT * FROM usuarios";
+            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
+            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
             $consulta = $db->consulta($sql);
 
             $resultado = null;
@@ -158,14 +168,15 @@
                 // Almacenar la consulta en un diccionario
                 while($fila = $consulta->fetch_assoc()) {
                     // Almacenar la consulta en un diccionario
-                    $resultado = [
+                    $resultado[] = [
                         'id' => $fila["id"],
                         'usuario' => $fila["usuario"],
                         'correo' => $fila["correo"],
                         'clave' => $fila["clave"],
                         'rol_id' => $fila["rol_id"],
                         'fecha_creacion' => $fila["fecha_creacion"],
-                        'estado' => $fila["estado"]
+                        'estado' => $fila["estado"],
+                        'rolnombre' => $fila["rolnombre"]
                     ];
                 }
             }
@@ -208,7 +219,8 @@
                         'clave' => $fila["clave"],
                         'rol_id' => $fila["rol_id"],
                         'fecha_creacion' => $fila["fecha_creacion"],
-                        'estado' => $fila["estado"]
+                        'estado' => $fila["estado"],
+                        'rolnombre' => $fila["rolnombre"]
                     ];
                 }
             }
@@ -494,36 +506,42 @@
 
     // Verificar si se ha enviado el formulario
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $accion= $_POST['accion'] ?? null;
+
+        $datosRecibidos = $_POST['datos'] ?? null;
+        if($datosRecibidos === null){
+            echo json_encode(['error' => 'No se envio datos']);
+            return;
+        }
+
+        $data = json_decode($datosRecibidos, true);
+
+        $accion = $data['accion'] ?? null;
 
         switch ($accion){
             case "obtenerPorId":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-
                 echo json_encode(ObtenerPorId($datos));
 
                 break;
             case "obtenerPorUsuario":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-
                 echo json_encode(obtenerPorUsuario($datos));
 
                 break;
             case "obtenerPorUsuarioClave":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-
                 echo json_encode(obtenerPorUsuarioClave($datos));
 
                 break;
@@ -533,7 +551,7 @@
 
                 break;
             case "insertar":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -542,7 +560,7 @@
 
                 break;
             case "insertarLista":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -551,7 +569,7 @@
 
                 break;
             case "actualizar":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -560,7 +578,7 @@
 
                 break;
             case "actualizarLista":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -569,7 +587,7 @@
 
                 break;
             case "eliminar":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
@@ -578,7 +596,7 @@
 
                 break;
             case "eliminarLista":
-                $datos = $_POST['datos'] ?? null;
+                $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
