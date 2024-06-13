@@ -20,9 +20,7 @@
         
         try{
             // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE us.id = ".$datos['id'];
+            $sql = "SELECT * FROM roles WHERE id = ".$datos['id'];
             $consulta = $db->consulta($sql);
         
             $resultado = null;
@@ -34,99 +32,8 @@
                 // Almacenar la consulta en un diccionario
                 $resultado = [
                     'id' => $fila["id"],
-                    'usuario' => $fila["usuario"],
-                    'correo' => $fila["correo"],
-                    'clave' => $fila["clave"],
-                    'rol_id' => $fila["rol_id"],
-                    'fecha_creacion' => $fila["fecha_creacion"],
-                    'estado' => $fila["estado"],
-                    'rolnombre' => $fila["rolnombre"]
-                ];
-            }
-        
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-        
-            return $resultado;
-        }catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
-
-            // Código que se ejecuta si se lanza una excepción
-            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
-        }   
-    }
-
-    function obtenerPorUsuario($datos) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-        
-        try{
-            // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE usuario = '".$datos['usuario']."'";
-            $consulta = $db->consulta($sql);
-        
-            $resultado = null;
-        
-            if ($consulta !== null && $consulta->num_rows > 0) {
-                // Obtener el primer resultado
-                $fila = $consulta->fetch_assoc();
-                
-                // Almacenar la consulta en un diccionario
-                $resultado = [
-                    'id' => $fila["id"],
-                    'usuario' => $fila["usuario"],
-                    'correo' => $fila["correo"],
-                    'clave' => $fila["clave"],
-                    'rol_id' => $fila["rol_id"],
-                    'fecha_creacion' => $fila["fecha_creacion"],
-                    'estado' => $fila["estado"],
-                    'rolnombre' => $fila["rolnombre"]
-                ];
-            }
-        
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-        
-            return $resultado;
-        }catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
-
-            // Código que se ejecuta si se lanza una excepción
-            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
-        }   
-    }
-
-    function obtenerPorUsuarioClave($datos) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-        
-        try{
-            // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE usuario = '".$datos['usuario']."' AND clave = '".$datos['clave']."'";
-            $consulta = $db->consulta($sql);
-        
-            $resultado = null;
-        
-            if ($consulta !== null && $consulta->num_rows > 0) {
-                // Obtener el primer resultado
-                $fila = $consulta->fetch_assoc();
-                
-                // Almacenar la consulta en un diccionario
-                $resultado = [
-                    'id' => $fila["id"],
-                    'usuario' => $fila["usuario"],
-                    'correo' => $fila["correo"],
-                    'clave' => $fila["clave"],
-                    'rol_id' => $fila["rol_id"],
-                    'fecha_creacion' => $fila["fecha_creacion"],
-                    'estado' => $fila["estado"],
-                    'rolnombre' => $fila["rolnombre"]
+                    'nombre' => $fila["nombre"],
+                    'descripcion' => $fila["fecha_creacion"]
                 ];
             }
         
@@ -149,8 +56,7 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM usuarios us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
+            $sql = "SELECT * FROM roles";
             $consulta = $db->consulta($sql);
 
             $resultado = null;
@@ -158,16 +64,10 @@
             if ($consulta !== null && $consulta->num_rows > 0) {
                 // Almacenar la consulta en un diccionario
                 while($fila = $consulta->fetch_assoc()) {
-                    // Almacenar la consulta en un diccionario
                     $resultado[] = [
                         'id' => $fila["id"],
-                        'usuario' => $fila["usuario"],
-                        'correo' => $fila["correo"],
-                        'clave' => $fila["clave"],
-                        'rol_id' => $fila["rol_id"],
-                        'fecha_creacion' => $fila["fecha_creacion"],
-                        'estado' => $fila["estado"],
-                        'rolnombre' => $fila["rolnombre"]
+                        'nombre' => $fila["nombre"],
+                        'descripcion' => $fila["fecha_creacion"]
                     ];
                 }
             }
@@ -190,7 +90,7 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM usuarios WHERE id in (";
+            $sql = "SELECT * FROM roles WHERE id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
@@ -203,15 +103,10 @@
             if ($consulta !== null && $consulta->num_rows > 0) {
                 // Almacenar la consulta en un diccionario
                 while($fila = $consulta->fetch_assoc()) {
-                    $resultado = [
+                    $resultado[] = [
                         'id' => $fila["id"],
-                        'usuario' => $fila["usuario"],
-                        'correo' => $fila["correo"],
-                        'clave' => $fila["clave"],
-                        'rol_id' => $fila["rol_id"],
-                        'fecha_creacion' => $fila["fecha_creacion"],
-                        'estado' => $fila["estado"],
-                        'rolnombre' => $fila["rolnombre"]
+                        'nombre' => $fila["nombre"],
+                        'descripcion' => $fila["fecha_creacion"]
                     ];
                 }
             }
@@ -232,20 +127,9 @@
         // Crear instancia de la clase Conexion
         $db = new Conexion();
         try {
-            $datosAdministrador = [
-                'usuario' => $datos["usuarioAdministrador"],
-                'clave' => $datos["claveAdministrador"],
-            ];
-
-            $usuarioAdministrador = obtenerPorUsuarioClave($datosAdministrador);
-
-            if($usuarioAdministrador == null){
-                return ['error' => 'No se encontro usuario administrador'];
-            }
-
             // Consulta a la base de datos
-            $sql = "INSERT INTO usuarios (usuario, correo, clave, rol_id, fecha_creacion, estado) VALUES ";
-            $sql .= "('".$datos['usuario']."', '".$datos['correo']."','".$datos['clave']."', ".$datos['rol_id'].", NOW(), '".$datos['estado']."')";
+            $sql = "INSERT INTO roles (nombre, fecha_creacion) VALUES ";
+            $sql .= "('".$datos['nombre']."', NOW())";
     
             $resultado = $db->consulta($sql);
     
@@ -275,24 +159,13 @@
         $db = new Conexion();
 
         try {
-            $datosAdministrador = [
-                'usuario' => $datos[0]["usuarioAdministrador"],
-                'clave' => $datos[0]["claveAdministrador"],
-            ];
-
-            $usuarioAdministrador = obtenerPorUsuarioClave($datos);
-
-            if($usuarioAdministrador == null){
-                return ['error' => 'No se encontro usuario administrador'];
-            }
-
             // Consulta a la base de datos
-            $sql = "INSERT INTO usuarios (usuario, correo, clave, rol_id, fecha_creacion, estado) VALUES ";
+            $sql = "INSERT INTO roles (nombre, fecha_creacion) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
             for ($i = 0; $i < count($datos); $i++){
 
-                $sql .= "('".$datos[$i]['usuario']."', '".$datos[$i]['correo']."','".$datos[$i]['clave']."', ".$datos[$i]['rol_id'].", NOW(), '".$datos[$i]['estado']."')";
+                $sql .= "('".$datos[$i]['nombre']."', NOW()),";
             }
 
             $resultado = $db->consulta(rtrim($sql, ','));
@@ -327,12 +200,8 @@
     
         try {
             // Consulta a la base de datos
-            $sql = "UPDATE usuarios SET ";
-            $sql .= "usuario = '".$datos['usuario']."', ";
-            $sql .= "correo = '".$datos['correo']."', ";
-            $sql .= "clave = '".$datos['clave']."', ";
-            $sql .= "rol_id = '".$datos['rol_id']."', ";
-            $sql .= "estado = '".$datos['estado']."' ";
+            $sql = "UPDATE roles SET ";
+            $sql .= "nombre = '".$datos['nombre']."' ";
             $sql .= "WHERE id = ".$datos['id'];
             
             $resultado = $db->consulta($sql);
@@ -365,7 +234,7 @@
         try {
             // Iniciar transacción
             $db->consulta("START TRANSACTION");
-            
+
             // Lista para almacenar los IDs actualizados
             $listaIds = [];
     
@@ -383,15 +252,8 @@
                 }
     
                 // Consulta a la base de datos para actualizar el registro
-       
-                $sql = "UPDATE usuarios SET ";
-                $sql .= "usuario = '".$dato['usuario']."', ";
-                $sql .= "correo = '".$dato['correo']."', ";
-                $sql .= "clave = '".$dato['clave']."', ";
-                $sql .= "rol_id = '".$dato['rol_id']."', ";
-                $sql .= "estado = '".$dato['estado']."' ";
-                $sql .= "WHERE id = ".$dato['id'];
-                $resultado_update = $db->consulta($sql);
+                $sql_update = "UPDATE roles SET nombre = '".$dato['nombre']."' WHERE id = ".$dato['id'];
+                $resultado_update = $db->consulta($sql_update);
     
                 // Verificar si la consulta de actualización se ejecutó correctamente
                 if ($resultado_update !== true) {
@@ -429,7 +291,7 @@
             $registro = obtenerPorId($datos);
 
             // Consulta a la base de datos
-            $sql = "DELETE FROM usuarios WHERE id = ".$datos['id'];
+            $sql = "DELETE FROM roles WHERE id = ".$datos['id'];
             
             $resultado = $db->consulta($sql);
     
@@ -464,7 +326,7 @@
             $listaIds = [];
             // Se recorre el objeto procesado y se construye la query
 
-            $sql = "DELETE FROM usuarios WHERE id IN (";
+            $sql = "DELETE FROM roles WHERE id IN (";
 
             for ($i = 0; $i < count($datos); $i++){
                 // Consulta a la base de datos
@@ -523,24 +385,6 @@
                     break;
                 }
                 echo json_encode(ObtenerPorId($datos));
-
-                break;
-            case "obtenerPorUsuario":
-                $datos = $data['datos'] ?? null;
-                if($datos === null){
-                    echo json_encode(['error' => 'No se envio datos']);
-                    break;
-                }
-                echo json_encode(obtenerPorUsuario($datos));
-
-                break;
-            case "obtenerPorUsuarioClave":
-                $datos = $data['datos'] ?? null;
-                if($datos === null){
-                    echo json_encode(['error' => 'No se envio datos']);
-                    break;
-                }
-                echo json_encode(obtenerPorUsuarioClave($datos));
 
                 break;
             case "obtenerTodos":

@@ -97,7 +97,7 @@ CREATE TABLE roles (
 -- Tabla para almacenar información sobre los usuarios del sistema.
 CREATE TABLE usuarios (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
-    usuario VARCHAR(100) NOT NULL, -- Nombre del usuario
+    usuario VARCHAR(100) UNIQUE NOT NULL, -- Nombre del usuario
     correo VARCHAR(100) UNIQUE NOT NULL, -- Correo electrónico del usuario
     clave VARCHAR(255) NOT NULL, -- Contraseña del usuario
     rol_id BIGINT NOT NULL, -- Referencia al rol del usuario

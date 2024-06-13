@@ -159,16 +159,13 @@
         $db = new Conexion();
 
         try {
-            // Se procesan los datos
-            $datosProcesados = procesarDatos($datos);
-
             // Consulta a la base de datos
             $sql = "INSERT INTO categorias (nombre, fecha_creacion) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
-            for ($i = 0; $i < count($datosProcesados); $i++){
+            for ($i = 0; $i < count($datos); $i++){
 
-                $sql .= "('".$datosProcesados[$i]['nombre']."', NOW()),";
+                $sql .= "('".$datos[$i]['nombre']."', NOW()),";
             }
 
             $resultado = $db->consulta(rtrim($sql, ','));
@@ -178,7 +175,7 @@
                 // Obtener el rango de IDs asignados a los registros insertados
                 $primer_id = $db->getConexion()->insert_id;
                 $db->cerrar();
-                $ultimo_id = $primer_id + count($datosProcesados) - 1;
+                $ultimo_id = $primer_id + count($datos) - 1;
 
                 // Consultar y devolver los registros insertados
                 $ids_insertados = range($primer_id, $ultimo_id);
@@ -202,12 +199,10 @@
         $db = new Conexion();
     
         try {
-            $datosProcesados = procesarDatos($datos);
-    
             // Consulta a la base de datos
             $sql = "UPDATE categorias SET ";
-            $sql .= "nombre = '".$datosProcesados['nombre']."' ";
-            $sql .= "WHERE id = ".$datosProcesados['id'];
+            $sql .= "nombre = '".$datos['nombre']."' ";
+            $sql .= "WHERE id = ".$datos['id'];
             
             $resultado = $db->consulta($sql);
     
@@ -239,15 +234,12 @@
         try {
             // Iniciar transacción
             $db->consulta("START TRANSACTION");
-    
-            // Se procesan los datos
-            $datosProcesados = procesarDatos($datos);
-    
+
             // Lista para almacenar los IDs actualizados
             $listaIds = [];
     
             // Se recorre el objeto procesado y se construye la query
-            foreach ($datosProcesados as $dato) {
+            foreach ($datos as $dato) {
                 // Consulta a la base de datos para verificar si el ID existe
                 $resultadoExiste = obtenerPorId($dato);
 
@@ -296,12 +288,10 @@
         $db = new Conexion();
     
         try {
-            $datosProcesados = procesarDatos($datos);
-            
             $registro = obtenerPorId($datos);
 
             // Consulta a la base de datos
-            $sql = "DELETE FROM categorias WHERE id = ".$datosProcesados['id'];
+            $sql = "DELETE FROM categorias WHERE id = ".$datos['id'];
             
             $resultado = $db->consulta($sql);
     
@@ -331,9 +321,6 @@
         $db = new Conexion();
 
         try {
-            // Se procesan los datos
-            $datosProcesados = procesarDatos($datos);
-
             // Consulta a la base de datos
             $sql = "";
             $listaIds = [];
@@ -341,10 +328,10 @@
 
             $sql = "DELETE FROM categorias WHERE id IN (";
 
-            for ($i = 0; $i < count($datosProcesados); $i++){
+            for ($i = 0; $i < count($datos); $i++){
                 // Consulta a la base de datos
-                $sql .= $datosProcesados[$i]['id'].",";
-                $listaIds[$i] = $datosProcesados[$i]['id'];
+                $sql .= $datos[$i]['id'].",";
+                $listaIds[$i] = $datos[$i]['id'];
             }
             $sql = rtrim($sql, ',').")";
 
