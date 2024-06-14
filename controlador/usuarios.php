@@ -171,7 +171,7 @@
             $sql .= "WHERE id = ".$datos['id'];
             
             return actualizarUno($datos,$tabla,$sql);
-            
+
         } catch (Exception $e) {
             // Cerrar la conexión manualmente
             $db->cerrar();
@@ -222,25 +222,11 @@
         $db = new Conexion();
     
         try {
-            $registro = obtenerPorId($datos,$tabla);
-
             // Consulta a la base de datos
             $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
             
-            $resultado = $db->consulta($sql);
-    
-            // Verificar si la consulta se ejecutó correctamente
-            if ($resultado === true) {
-                $db->cerrar();
+            return eliminarUno($datos,$tabla,$sql);
 
-                // Consultar y devolver el registro actualizado
-                return $registro;
-            } else {
-                $db->cerrar();
-
-                // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Error al eliminar el registro'];
-            }
         } catch (Exception $e) {
             // Cerrar la conexión manualmente
             $db->cerrar();
@@ -269,26 +255,8 @@
             }
             $sql = rtrim($sql, ',').")";
 
-            $registros = obtenerPorListaId($listaIds,$tabla);
+            return eliminarLista($listaIds,$tabla,$sql);
 
-            if($registros === null || $registros[0] === null || $registros[0]['id']=== null){
-                return ['error' => 'Al eliminar los registros, no se encontraron registros'];
-            }
-
-            $resultado = $db->consulta(rtrim($sql, ','));
-    
-            /// Verificar si la consulta se ejecutó correctamente
-            if ($resultado === true) {
-                $db->cerrar();
-
-                // Consultar y devolver los registros insertados
-                return $registros;
-            } else {
-                $db->cerrar();
-
-                // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Al eliminar los registros'];
-            }
         } catch (Exception $e) {
              // Cerrar la conexión manualmente
              $db->cerrar();

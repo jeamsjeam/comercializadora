@@ -160,7 +160,7 @@
         }
     }
     
-    function actualizarVarios($datos,$tabla,$sql) {
+    function actualizarVarios($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();        
     
@@ -214,7 +214,7 @@
         }
     }   
 
-    function eliminarUno($datos,$tabla) {
+    function eliminar($datos,$tabla,$sql) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
@@ -244,24 +244,12 @@
         }
     }
     
-    function eliminarVarios($datos,$tabla) {
+    function eliminarLista($datos,$tabla,$sql) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try {
-            // Consulta a la base de datos
-            $sql = "";
             $listaIds = [];
-            // Se recorre el objeto procesado y se construye la query
-
-            $sql = "DELETE FROM ".$tabla." WHERE id IN (";
-
-            for ($i = 0; $i < count($datos); $i++){
-                // Consulta a la base de datos
-                $sql .= $datos[$i]['id'].",";
-                $listaIds[$i] = $datos[$i]['id'];
-            }
-            $sql = rtrim($sql, ',').")";
 
             $registros = obtenerPorListaId($listaIds,$tabla);
 
@@ -269,7 +257,7 @@
                 return ['error' => 'Al eliminar los registros, no se encontraron registros'];
             }
 
-            $resultado = $db->consulta(rtrim($sql, ','));
+            $resultado = $db->consulta($sql);
     
             /// Verificar si la consulta se ejecutó correctamente
             if ($resultado === true) {
