@@ -238,11 +238,11 @@ CALL ObtenerPrecioProducto(1, NULL, NULL); -- Producto ID 1, Todas las monedas, 
 
 -- Inserción de datos en la tabla categorias
 INSERT INTO categorias (nombre) VALUES
-('Electrónica'),
-('Hogar'),
-('Ropa'),
-('Deportes'),
-('Juguetes');
+('Frutas'),
+('Verduras'),
+('Carnes'),
+('Lácteos'),
+('Granos');
 
 -- Inserción de datos en la tabla tipo_persona
 INSERT INTO tipo_persona (nombre) VALUES
@@ -276,37 +276,37 @@ INSERT INTO usuarios (usuario, correo, clave, rol_id) VALUES
 ('vendedor2', 'vendedor2@example.com', '1234', 2);
 
 -- Inserción de datos en la tabla personas
-INSERT INTO personas (nombre, cedula, telefono, direccion, tipo_persona_id) VALUES
-('Juan Pérez', '12345678', '04141234567', 'Calle Falsa 123', 1),
-('María López', '87654321', '04247654321', 'Avenida Siempre Viva 456', 1),
-('Carlos Sánchez', '11223344', '04121122334', 'Bulevar del Sol 789', 2),
-('Ana Gómez', '55667788', '04165566778', 'Calle Luna 101', 1),
-('Pedro Fernández', '99887766', '04269988776', 'Calle Sol 202', 3);
+INSERT INTO personas (nombre, cedula, extrangero, telefono, direccion, tipo_persona_id) VALUES
+('Juan Pérez', '12345678', 0, '04141234567', 'Calle Falsa 123', 1),
+('María López', '87654321', 0, '04247654321', 'Avenida Siempre Viva 456', 1),
+('Carlos Sánchez', '11223344', 1, '04121122334', 'Bulevar del Sol 789', 2),
+('Ana Gómez', '55667788', 0, '04165566778', 'Calle Luna 101', 1),
+('Pedro Fernández', '99887766', 0, '04269988776', 'Calle Sol 202', 3);
 
 -- Inserción de datos en la tabla productos
-INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id) VALUES
-('Laptop', 'Laptop de alta gama', 1200.50, 10, 1),
-('Teléfono', 'Smartphone última generación', 800.75, 15, 1),
-('Sofá', 'Sofá de cuero', 500.00, 5, 2),
-('Camiseta', 'Camiseta deportiva', 25.00, 50, 3),
-('Bicicleta', 'Bicicleta de montaña', 300.00, 7, 4);
+INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, estado) VALUES
+('Manzanas', 'Manzanas frescas', 1.50, 100, 1, 'Activo'),
+('Plátanos', 'Plátanos maduros', 0.80, 200, 1, 'Activo'),
+('Tomates', 'Tomates rojos', 1.20, 150, 2, 'Activo'),
+('Lechuga', 'Lechuga fresca', 0.90, 80, 2, 'Activo'),
+('Pollo', 'Pollo entero', 5.00, 50, 3, 'Activo');
 
 -- Inserción de datos en la tabla facturas
-INSERT INTO facturas (persona_id, estado, total, moneda_id, usuario_id, tipo_factura_id) VALUES
-(1, 'Pagada', 1225.50, 1, 2, 1),
-(2, 'Pendiente', 800.75, 1, 2, 1),
-(3, 'Cancelada', 500.00, 2, 1, 2),
-(4, 'Pagada', 50.00, 3, 2, 1),
-(5, 'Pendiente', 300.00, 1, 2, 1);
+INSERT INTO facturas (persona_id, estado, total, moneda_id, tasa_cambio, usuario_id, tipo_factura_id) VALUES
+(1, 'Pagada', 150.00, 1, 1, 2, 1),
+(2, 'Pendiente', 80.00, 1, 1, 2, 1),
+(3, 'Cancelada', 120.00, 2, 250000.0000, 1, 2),
+(4, 'Pagada', 90.00, 3, 3800.0000, 2, 1),
+(5, 'Pendiente', 50.00, 1, 1, 2, 1);
 
 -- Inserción de datos en la tabla detalles_factura
 INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario) VALUES
-(1, 1, 1, 1200.50),
-(1, 2, 1, 25.00),
-(2, 2, 1, 800.75),
-(3, 3, 1, 500.00),
-(4, 4, 2, 25.00),
-(5, 5, 1, 300.00);
+(1, 1, 50, 1.50),
+(1, 3, 50, 1.20),
+(2, 2, 100, 0.80),
+(3, 5, 20, 5.00),
+(4, 4, 100, 0.90),
+(5, 1, 30, 1.50);
 
 -- Inserción de datos en la tabla historial_tasas_cambio
 INSERT INTO historial_tasas_cambio (moneda_id, tasa_cambio, fecha, usuario_id) VALUES
@@ -315,6 +315,3 @@ INSERT INTO historial_tasas_cambio (moneda_id, tasa_cambio, fecha, usuario_id) V
 (2, 260000.0000, '2023-06-02', 1),
 (3, 3850.0000, '2023-06-02', 1),
 (2, 255000.0000, '2023-06-03', 1);
-
-
-
