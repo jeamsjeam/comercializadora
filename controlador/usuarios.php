@@ -170,20 +170,8 @@
             $sql .= "estado = '".$datos['estado']."' ";
             $sql .= "WHERE id = ".$datos['id'];
             
-            $resultado = $db->consulta($sql);
-    
-            // Verificar si la consulta se ejecutó correctamente
-            if ($resultado === true) {
-                $db->cerrar();
-                
-                // Consultar y devolver el registro actualizado
-                return obtenerPorId($datos,$tabla);
-            } else {
-                $db->cerrar();
-
-                // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Error al actualizar el registro'];
-            }
+            return actualizarUno($datos,$tabla,$sql);
+            
         } catch (Exception $e) {
             // Cerrar la conexión manualmente
             $db->cerrar();

@@ -131,7 +131,7 @@
         }
     }
 
-    function actualizarUno($sql,$tabla) {
+    function actualizarUno($datos,$tabla,$sql) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
@@ -160,7 +160,7 @@
         }
     }
     
-    function actualizarVarios($datos,$tabla) {
+    function actualizarVarios($datos,$tabla,$sql) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();        
     
@@ -214,7 +214,7 @@
         }
     }   
 
-    function eliminarUno($sql,$tabla) {
+    function eliminarUno($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
