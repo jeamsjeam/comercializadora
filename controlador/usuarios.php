@@ -198,27 +198,12 @@
         $db = new Conexion();        
     
         try {
-            // Iniciar transacción
-            $db->consulta("START TRANSACTION");
-            
-            // Lista para almacenar los IDs actualizados
-            $listaIds = [];
+            $listaSQL = null;
     
             // Se recorre el objeto procesado y se construye la query
             foreach ($datos as $dato) {
-                // Consulta a la base de datos para verificar si el ID existe
-                $resultadoExiste = obtenerPorId($dato);
 
-                // Verificar si el ID existe en la base de datos
-                if ($resultadoExiste === null || $resultadoExiste["id"] === null) {
-                    // Si el ID no existe, hacer rollback y devolver un mensaje de error
-                    $db->consulta("ROLLBACK");
-                    $db->cerrar();
-                    return ['error' => 'El ID '.$dato['id'].' no existe en la base de datos'];
-                }
-    
                 // Consulta a la base de datos para actualizar el registro
-       
                 $sql = "UPDATE ".$tabla." SET ";
                 $sql .= "usuario = '".$dato['usuario']."', ";
                 $sql .= "correo = '".$dato['correo']."', ";
@@ -226,26 +211,14 @@
                 $sql .= "rol_id = '".$dato['rol_id']."', ";
                 $sql .= "estado = '".$dato['estado']."' ";
                 $sql .= "WHERE id = ".$dato['id'];
-                $resultado_update = $db->consulta($sql);
-    
-                // Verificar si la consulta de actualización se ejecutó correctamente
-                if ($resultado_update !== true) {
-                    // Si la consulta falla, hacer rollback y devolver un mensaje de error
-                    $db->consulta("ROLLBACK");
-                    $db->cerrar();
-                    return ['error' => 'Error al actualizar el registro con ID '.$dato['id']];
-                }
-                
-                // Agregar el ID a la lista de IDs actualizados
-                $listaIds[] = $dato['id'];
+                $listaSQL[] = [
+                    'id' => $dato['id'],
+                    'sql' => $sql
+                ];
             }
     
-            // Si todas las actualizaciones fueron exitosas, realizar el commit
-            $db->consulta("COMMIT");
-            $db->cerrar();
-    
             // Consultar y devolver los registros actualizados
-            return obtenerPorListaId($listaIds,$tabla);
+            return actualizarVarios($listaSQL,$tabla);
     
         } catch (Exception $e) {
             // Cerrar la conexión manualmente
