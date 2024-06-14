@@ -69,4 +69,33 @@
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }   
     }
+
+    function insertarUno($sql,$tabla) {
+        // Crear instancia de la clase Conexion
+        $db = new Conexion();
+        try {
+
+            $resultado = $db->consulta($sql);
+    
+            // Verificar si la consulta se ejecutó correctamente
+            if ($resultado === true) {
+                // Obtener el ID del nuevo registro insertado
+                $id_insertado['id'] = $db->getConexion()->insert_id;
+                $db->cerrar();
+
+                // Consultar y devolver el registro insertado
+                return obtenerPorId($id_insertado,$tabla);
+            } else {
+                $db->cerrar();
+                // Si la consulta falla, devolver un mensaje de error
+                return ['error' => 'Error al insertar el registro'];
+            }
+        } catch (Exception $e) {
+             // Cerrar la conexión manualmente
+             $db->cerrar();
+
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }
+    }
 ?>

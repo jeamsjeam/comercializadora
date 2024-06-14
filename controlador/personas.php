@@ -1,31 +1,16 @@
 <?php
 
-    include 'utilidades/utilidades.php';
     include 'utilidades/Conexion.php';
+    include 'utilidades/utilidades.php';
 
-    function obtenerPorId($datos) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-        
+    function obtenerPorId($datos,$tabla) {
+
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM personas WHERE id = ".$datos['id'];
-            $consulta = $db->consulta($sql);
-        
-            $resultado = null;
-        
-            if ($consulta !== null && $consulta->num_rows > 0) {
-                // Obtener el primer resultado
-                $fila = $consulta->fetch_assoc();
-                
-                // Almacenar la consulta en un diccionario
-                $resultado = $fila;
-            }
-        
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-        
-            return $resultado;
+            $sql = "SELECT * FROM ".$tabla." WHERE id = ".$datos['id'];
+
+            return obtenerUno($sql);
+
         }catch (Exception $e) {
              // Cerrar la conexión manualmente
              $db->cerrar();
@@ -35,43 +20,28 @@
         }   
     }
 
-    function ObtenerTodos() {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
+    function ObtenerTodos($tabla) {
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT * FROM personas";
-            $consulta = $db->consulta($sql);
+            $sql = "SELECT * FROM ".$tabla;
+       
+            return ObtenerVarios($sql);
 
-            $resultado = null;
-
-            if ($consulta !== null && $consulta->num_rows > 0) {
-                // Almacenar la consulta en un diccionario
-                while($fila = $consulta->fetch_assoc()) {
-                    $resultado[] = $fila;
-                }
-            }
-
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-            return $resultado;
         }catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }   
     }
 
-    function ObtenerPorListaId($datos) {
+    function ObtenerPorListaId($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM personas WHERE id in (";
+            $sql = "SELECT * FROM ".$tabla." WHERE id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
@@ -100,13 +70,21 @@
         }  
     }
 
-    function insertar($datos) {
+    function insertar($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO personas (nombre, fecha_creacion) VALUES ";
-            $sql .= "('".$datos['nombre']."', NOW())";
+            // Consulta a la base de datos
+            $sql = "INSERT INTO ".$tabla." (nombre, cedula, extrangero, telefono, direccion, fecha_creacion, estado, tipo_persona_id) VALUES ";
+            $sql .= "('".$datos['nombre']."', ";
+            $sql .= "'".$datos['cedula']."', ";
+            $sql .= $datos['extrangero'].", ";
+            $sql .= "'".$datos['telefono']."', ";
+            $sql .= "'".$datos['direccion']."', ";
+            $sql .= "NOW(), ";
+            $sql .= "'".$datos['estado']."', ";
+            $sql .= $datos['tipo_persona_id'].") ";
     
             $resultado = $db->consulta($sql);
     
@@ -131,18 +109,25 @@
         }
     }
 
-    function insertarLista($datos) {
+    function insertarLista($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO personas (nombre, fecha_creacion) VALUES ";
+            $sql = "INSERT INTO ".$tabla." (nombre, cedula, extrangero, telefono, direccion, fecha_creacion, estado, tipo_persona_id) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
             for ($i = 0; $i < count($datos); $i++){
 
-                $sql .= "('".$datos[$i]['nombre']."', NOW()),";
+                $sql .= "'".$datos[$i]['nombre']."', ";
+                $sql .= "'".$datos[$i]['cedula']."', ";
+                $sql .= $datos[$i]['extrangero'].", ";
+                $sql .= "'".$datos[$i]['telefono']."', ";
+                $sql .= "'".$datos[$i]['direccion']."', ";
+                $sql .= "NOW(), ";
+                $sql .= "'".$datos[$i]['estado']."', ";
+                $sql .= $datos[$i]['tipo_persona_id']."), ";
             }
 
             $resultado = $db->consulta(rtrim($sql, ','));
@@ -156,7 +141,7 @@
 
                 // Consultar y devolver los registros insertados
                 $ids_insertados = range($primer_id, $ultimo_id);
-                return ObtenerPorListaId($ids_insertados);
+                return ObtenerPorListaId($ids_insertados,$tabla);
             } else {
                 $db->cerrar();
                 // Si la consulta falla, devolver un mensaje de error
@@ -171,14 +156,20 @@
         }
     }
 
-    function actualizar($datos) {
+    function actualizar($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
         try {
             // Consulta a la base de datos
-            $sql = "UPDATE personas SET ";
-            $sql .= "nombre = '".$datos['nombre']."' ";
+            $sql = "UPDATE ".$tabla." SET ";
+            $sql .= "nombre = '".$datos['nombre']."', ";
+            $sql .= "cedula = '".$datos['cedula']."', ";
+            $sql .= "extrangero = ".$datos['extrangero'].", ";
+            $sql .= "telefono = '".$datos['telefono']."', ";
+            $sql .= "direccion = '".$datos['direccion']."', ";
+            $sql .= "estado = '".$datos['estado']."', ";
+            $sql .= "tipo_persona_id = ".$datos['tipo_persona_id']." ";
             $sql .= "WHERE id = ".$datos['id'];
             
             $resultado = $db->consulta($sql);
@@ -188,7 +179,7 @@
                 $db->cerrar();
                 
                 // Consultar y devolver el registro actualizado
-                return obtenerPorId($datos);
+                return obtenerPorId($datos,$tabla);
             } else {
                 $db->cerrar();
 
@@ -204,7 +195,7 @@
         }
     }
     
-    function actualizarLista($datos) {
+    function actualizarLista($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();        
     
@@ -229,7 +220,15 @@
                 }
     
                 // Consulta a la base de datos para actualizar el registro
-                $sql_update = "UPDATE personas SET nombre = '".$dato['nombre']."' WHERE id = ".$dato['id'];
+                $sql_update = "UPDATE ".$tabla." SET "
+                $sql_update .= "nombre = '".$dato['nombre']."', ";
+                $sql_update .= "cedula = '".$dato['cedula']."', ";
+                $sql_update .= "extrangero = ".$dato['extrangero'].", ";
+                $sql_update .= "telefono = '".$dato['telefono']."', ";
+                $sql_update .= "direccion = '".$dato['direccion']."', ";
+                $sql_update .= "estado = '".$dato['estado']."', ";
+                $sql_update .= "tipo_persona_id = ".$dato['tipo_persona_id']." ";
+                $sql_update .= " WHERE id = ".$dato['id'];
                 $resultado_update = $db->consulta($sql_update);
     
                 // Verificar si la consulta de actualización se ejecutó correctamente
@@ -249,7 +248,7 @@
             $db->cerrar();
     
             // Consultar y devolver los registros actualizados
-            return obtenerPorListaId($listaIds);
+            return obtenerPorListaId($listaIds,$tabla);
     
         } catch (Exception $e) {
             // Cerrar la conexión manualmente
@@ -260,15 +259,15 @@
         }
     }    
     
-    function eliminar($datos) {
+    function eliminar($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
         try {
-            $registro = obtenerPorId($datos);
+            $registro = obtenerPorId($datos,$tabla);
 
             // Consulta a la base de datos
-            $sql = "DELETE FROM personas WHERE id = ".$datos['id'];
+            $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
             
             $resultado = $db->consulta($sql);
     
@@ -293,7 +292,7 @@
         }
     }
     
-    function eliminarLista($datos) {
+    function eliminarLista($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
@@ -303,7 +302,7 @@
             $listaIds = [];
             // Se recorre el objeto procesado y se construye la query
 
-            $sql = "DELETE FROM personas WHERE id IN (";
+            $sql = "DELETE FROM ".$tabla." WHERE id IN (";
 
             for ($i = 0; $i < count($datos); $i++){
                 // Consulta a la base de datos
@@ -312,7 +311,7 @@
             }
             $sql = rtrim($sql, ',').")";
 
-            $registros = ObtenerPorListaId($listaIds);
+            $registros = obtenerPorListaId($listaIds,$tabla);
 
             if($registros === null || $registros[0] === null || $registros[0]['id']=== null){
                 return ['error' => 'Al eliminar los registros, no se encontraron registros'];
@@ -350,6 +349,8 @@
             return;
         }
 
+        $tabla = "personas";
+        
         $data = json_decode($datosRecibidos, true);
 
         $accion = $data['accion'] ?? null;
@@ -361,12 +362,12 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(ObtenerPorId($datos));
+                echo json_encode(ObtenerPorId($datos,$tabla));
 
                 break;
             case "obtenerTodos":
 
-                echo json_encode(ObtenerTodos());
+                echo json_encode(ObtenerTodos($tabla));
 
                 break;
             case "insertar":
@@ -375,7 +376,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(insertar($datos));
+                echo json_encode(insertar($datos,$tabla));
 
                 break;
             case "insertarLista":
@@ -384,7 +385,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(insertarLista($datos));
+                echo json_encode(insertarLista($datos,$tabla));
 
                 break;
             case "actualizar":
@@ -393,7 +394,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(actualizar($datos));
+                echo json_encode(actualizar($datos,$tabla));
 
                 break;
             case "actualizarLista":
@@ -402,7 +403,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(actualizarLista($datos));
+                echo json_encode(actualizarLista($datos,$tabla));
 
                 break;
             case "eliminar":
@@ -411,7 +412,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(eliminar($datos));
+                echo json_encode(eliminar($datos,$tabla));
 
                 break;
             case "eliminarLista":
@@ -420,7 +421,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(eliminarLista($datos));
+                echo json_encode(eliminarLista($datos,$tabla));
 
                 break;
             default:

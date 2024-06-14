@@ -1,15 +1,15 @@
 <?php
 
-    include 'utilidades/utilidades.php';
     include 'utilidades/Conexion.php';
+    include 'utilidades/utilidades.php';
 
-    function obtenerPorId($datos) {
+    function obtenerPorId($datos,$tabla) {
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM roles WHERE id = ".$datos['id'];
+            $sql = "SELECT * FROM ".$tabla." WHERE id = ".$datos['id'];
 
-            return $resultado = obtenerUno($sql);
+            return obtenerUno($sql);
 
         }catch (Exception $e) {
              // Cerrar la conexión manualmente
@@ -20,13 +20,13 @@
         }   
     }
 
-    function ObtenerTodos() {
+    function ObtenerTodos($tabla) {
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT * FROM roles";
+            $sql = "SELECT * FROM ".$tabla;
        
-            return $resultado = ObtenerVarios($sql);
+            return ObtenerVarios($sql);
 
         }catch (Exception $e) {
 
@@ -35,13 +35,13 @@
         }   
     }
 
-    function ObtenerPorListaId($datos) {
+    function ObtenerPorListaId($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM roles WHERE id in (";
+            $sql = "SELECT * FROM ".$tabla." WHERE id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
@@ -70,12 +70,12 @@
         }  
     }
 
-    function insertar($datos) {
+    function insertar($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO roles (nombre, fecha_creacion) VALUES ";
+            $sql = "INSERT INTO ".$tabla." (nombre, fecha_creacion) VALUES ";
             $sql .= "('".$datos['nombre']."', NOW())";
     
             $resultado = $db->consulta($sql);
@@ -101,13 +101,13 @@
         }
     }
 
-    function insertarLista($datos) {
+    function insertarLista($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO roles (nombre, fecha_creacion) VALUES ";
+            $sql = "INSERT INTO ".$tabla." (nombre, fecha_creacion) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
             for ($i = 0; $i < count($datos); $i++){
@@ -126,7 +126,7 @@
 
                 // Consultar y devolver los registros insertados
                 $ids_insertados = range($primer_id, $ultimo_id);
-                return ObtenerPorListaId($ids_insertados);
+                return ObtenerPorListaId($ids_insertados,$tabla);
             } else {
                 $db->cerrar();
                 // Si la consulta falla, devolver un mensaje de error
@@ -141,13 +141,13 @@
         }
     }
 
-    function actualizar($datos) {
+    function actualizar($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
         try {
             // Consulta a la base de datos
-            $sql = "UPDATE roles SET ";
+            $sql = "UPDATE ".$tabla." SET ";
             $sql .= "nombre = '".$datos['nombre']."' ";
             $sql .= "WHERE id = ".$datos['id'];
             
@@ -158,7 +158,7 @@
                 $db->cerrar();
                 
                 // Consultar y devolver el registro actualizado
-                return obtenerPorId($datos);
+                return obtenerPorId($datos,$tabla);
             } else {
                 $db->cerrar();
 
@@ -174,7 +174,7 @@
         }
     }
     
-    function actualizarLista($datos) {
+    function actualizarLista($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();        
     
@@ -199,7 +199,7 @@
                 }
     
                 // Consulta a la base de datos para actualizar el registro
-                $sql_update = "UPDATE roles SET nombre = '".$dato['nombre']."' WHERE id = ".$dato['id'];
+                $sql_update = "UPDATE ".$tabla." SET nombre = '".$dato['nombre']."' WHERE id = ".$dato['id'];
                 $resultado_update = $db->consulta($sql_update);
     
                 // Verificar si la consulta de actualización se ejecutó correctamente
@@ -219,7 +219,7 @@
             $db->cerrar();
     
             // Consultar y devolver los registros actualizados
-            return obtenerPorListaId($listaIds);
+            return obtenerPorListaId($listaIds,$tabla);
     
         } catch (Exception $e) {
             // Cerrar la conexión manualmente
@@ -230,15 +230,15 @@
         }
     }    
     
-    function eliminar($datos) {
+    function eliminar($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
         try {
-            $registro = obtenerPorId($datos);
+            $registro = obtenerPorId($datos,$tabla);
 
             // Consulta a la base de datos
-            $sql = "DELETE FROM roles WHERE id = ".$datos['id'];
+            $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
             
             $resultado = $db->consulta($sql);
     
@@ -263,7 +263,7 @@
         }
     }
     
-    function eliminarLista($datos) {
+    function eliminarLista($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
@@ -273,7 +273,7 @@
             $listaIds = [];
             // Se recorre el objeto procesado y se construye la query
 
-            $sql = "DELETE FROM roles WHERE id IN (";
+            $sql = "DELETE FROM ".$tabla." WHERE id IN (";
 
             for ($i = 0; $i < count($datos); $i++){
                 // Consulta a la base de datos
@@ -282,7 +282,7 @@
             }
             $sql = rtrim($sql, ',').")";
 
-            $registros = ObtenerPorListaId($listaIds);
+            $registros = obtenerPorListaId($listaIds,$tabla);
 
             if($registros === null || $registros[0] === null || $registros[0]['id']=== null){
                 return ['error' => 'Al eliminar los registros, no se encontraron registros'];
@@ -320,6 +320,8 @@
             return;
         }
 
+        $tabla = "roles";
+        
         $data = json_decode($datosRecibidos, true);
 
         $accion = $data['accion'] ?? null;
@@ -331,12 +333,12 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(ObtenerPorId($datos));
+                echo json_encode(ObtenerPorId($datos,$tabla));
 
                 break;
             case "obtenerTodos":
 
-                echo json_encode(ObtenerTodos());
+                echo json_encode(ObtenerTodos($tabla));
 
                 break;
             case "insertar":
@@ -345,7 +347,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(insertar($datos));
+                echo json_encode(insertar($datos,$tabla));
 
                 break;
             case "insertarLista":
@@ -354,7 +356,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(insertarLista($datos));
+                echo json_encode(insertarLista($datos,$tabla));
 
                 break;
             case "actualizar":
@@ -363,7 +365,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(actualizar($datos));
+                echo json_encode(actualizar($datos,$tabla));
 
                 break;
             case "actualizarLista":
@@ -372,7 +374,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(actualizarLista($datos));
+                echo json_encode(actualizarLista($datos,$tabla));
 
                 break;
             case "eliminar":
@@ -381,7 +383,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(eliminar($datos));
+                echo json_encode(eliminar($datos,$tabla));
 
                 break;
             case "eliminarLista":
@@ -390,7 +392,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(eliminarLista($datos));
+                echo json_encode(eliminarLista($datos,$tabla));
 
                 break;
             default:
