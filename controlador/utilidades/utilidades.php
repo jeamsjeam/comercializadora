@@ -98,4 +98,37 @@
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
     }
+
+    function insertarVarios($datos,$tabla) {
+        // Crear instancia de la clase Conexion
+        $db = new Conexion();
+
+        try {
+
+            $resultado = $db->consulta(rtrim($sql, ','));
+    
+            /// Verificar si la consulta se ejecutó correctamente
+            if ($resultado === true) {
+                // Obtener el rango de IDs asignados a los registros insertados
+                $primer_id = $db->getConexion()->insert_id;
+                $db->cerrar();
+                $ultimo_id = $primer_id + count($datos) - 1;
+
+                // Consultar y devolver los registros insertados
+                $ids_insertados = range($primer_id, $ultimo_id);
+                return ObtenerPorListaId($ids_insertados,$tabla);
+            } else {
+                $db->cerrar();
+                // Si la consulta falla, devolver un mensaje de error
+                return ['error' => 'Error al insertar los registros'];
+            }
+        } catch (Exception $e) {
+             // Cerrar la conexión manualmente
+             $db->cerrar();
+
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }
+    }
+
 ?>
