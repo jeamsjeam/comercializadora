@@ -1,18 +1,7 @@
 <?php
 
-    // Permitir solicitudes desde cualquier origen
-    header("Access-Control-Allow-Origin: *");
-    // Permitir los métodos de solicitud especificados
-    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-    // Permitir los encabezados especificados
-    header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-    // Permitir que las cookies se incluyan en las solicitudes (si es necesario)
-    header("Access-Control-Allow-Credentials: true");
-    // Establecer el tipo de contenido de la respuesta como JSON
-    header("Content-Type: application/json");
-
-    include 'utilidades.php';
-    include 'Conexion.php';
+    include 'utilidades/utilidades.php';
+    include 'utilidades/Conexion.php';
 
     function obtenerPorId($datos) {
         // Crear instancia de la clase Conexion
@@ -30,11 +19,7 @@
                 $fila = $consulta->fetch_assoc();
                 
                 // Almacenar la consulta en un diccionario
-                $resultado = [
-                    'id' => $fila["id"],
-                    'nombre' => $fila["nombre"],
-                    'fecha_creacion' => $fila["fecha_creacion"]
-                ];
+                $resultado = $fila;
             }
         
             // Cerrar la conexión manualmente
@@ -64,11 +49,7 @@
             if ($consulta !== null && $consulta->num_rows > 0) {
                 // Almacenar la consulta en un diccionario
                 while($fila = $consulta->fetch_assoc()) {
-                    $resultado[] = [
-                        'id' => $fila["id"],
-                        'nombre' => $fila["nombre"],
-                        'fecha_creacion' => $fila["fecha_creacion"]
-                    ];
+                    $resultado[] = $fila;
                 }
             }
 
@@ -103,11 +84,7 @@
             if ($consulta !== null && $consulta->num_rows > 0) {
                 // Almacenar la consulta en un diccionario
                 while($fila = $consulta->fetch_assoc()) {
-                    $resultado[] = [
-                        'id' => $fila["id"],
-                        'nombre' => $fila["nombre"],
-                        'fecha_creacion' => $fila["fecha_creacion"]
-                    ];
+                    $resultado[] = $fila;
                 }
             }
 

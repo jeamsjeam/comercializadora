@@ -19,28 +19,45 @@ CREATE TABLE productos (
     estado VARCHAR(20) DEFAULT 'Activo' -- Estado del producto (Activo/Inactivo)
 );
 
--- Tabla para almacenar información sobre los clientes que realizan compras en el negocio.
-CREATE TABLE clientes (
+-- Tabla para almacenar las categorías de productos.
+CREATE TABLE tipo_persona (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL, -- Nombre del cliente
-    cedula VARCHAR(20) UNIQUE, -- Cédula del cliente (se asume como única)
-    telefono VARCHAR(20), -- Número de teléfono del cliente
-    direccion TEXT, -- Dirección del cliente
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación del cliente
-    estado VARCHAR(20) DEFAULT 'Activo' -- Estado del cliente (Activo/Inactivo)
+    nombre VARCHAR(100) NOT NULL, -- Nombre de la categoría de producto
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación de la categoría
 );
 
--- Tabla para registrar las facturas generadas para las ventas a los clientes.
+-- Tabla para almacenar información sobre los personas que realizan compras en el negocio.
+CREATE TABLE personas (
+    id BIGINT AUTO_INCREMENT  PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL, -- Nombre del persona
+    cedula VARCHAR(20) UNIQUE, -- Cédula del persona (se asume como única)
+	extrangero TINYINT(1) NOT NULL DEFAULT 0, -- Indica si es extrangero (0: No, 1: Sí)
+    telefono VARCHAR(20), -- Número de teléfono del persona
+    direccion TEXT, -- Dirección del persona
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación del persona
+    estado VARCHAR(20) DEFAULT 'Activo', -- Estado del persona (Activo/Inactivo)
+    tipo_persona_id BIGINT NOT NULL -- Referencia al persona asociado a la factura
+);
+
+-- Tabla para almacenar las categorías de productos.
+CREATE TABLE tipo_factura (
+    id BIGINT AUTO_INCREMENT  PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL, -- Nombre de la categoría de producto
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación de la categoría
+);
+
+-- Tabla para registrar las facturas generadas para las ventas a los personas.
 CREATE TABLE facturas (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
-    cliente_id BIGINT NOT NULL, -- Referencia al cliente asociado a la factura
+    persona_id BIGINT NOT NULL, -- Referencia al persona asociado a la factura
     fecha_factura TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Fecha de emisión de la factura
     estado VARCHAR(20) NOT NULL, -- Estado de la factura (Por ejemplo: Pendiente, Pagada, Cancelada)
     total DECIMAL(10,2) NOT NULL, -- Total de la factura
     moneda_id BIGINT NOT NULL, -- Referencia a la moneda usada en la factura
     tasa_cambio DECIMAL(10, 4) NOT NULL DEFAULT 1, -- Tasa de cambio usada en la factura
     usuario_id BIGINT NOT NULL, -- Referencia al usuario que creó la factura
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación de la factura
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación de la factura
+    tipo_factura_id BIGINT NOT NULL -- Referencia al persona asociado a la factura
 );
 
 -- Tabla para almacenar los detalles de las facturas, como los productos vendidos, la cantidad y el precio unitario.
@@ -51,39 +68,6 @@ CREATE TABLE detalles_factura (
     cantidad INT NOT NULL, -- Cantidad de productos vendidos
     precio_unitario DECIMAL(10,2) NOT NULL, -- Precio unitario del producto
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación del detalle de factura
-);
-
--- Tabla para almacenar información sobre los proveedores de los productos.
-CREATE TABLE proveedores (
-    id BIGINT AUTO_INCREMENT  PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL, -- Nombre del proveedor
-    telefono VARCHAR(20), -- Número de teléfono del proveedor
-    direccion TEXT, -- Dirección del proveedor
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación del proveedor
-    estado VARCHAR(20) DEFAULT 'Activo' -- Estado del proveedor (Activo/Inactivo)
-);
-
--- Tabla para registrar las compras realizadas por el negocio a los proveedores.
-CREATE TABLE compras (
-    id BIGINT AUTO_INCREMENT  PRIMARY KEY,
-    proveedor_id BIGINT NOT NULL, -- Referencia al proveedor asociado a la compra
-    fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Fecha de la compra
-    total DECIMAL(10,2) NOT NULL, -- Total de la compra
-    moneda_id BIGINT NOT NULL, -- Referencia a la moneda usada en la compra
-    tasa_cambio DECIMAL(10, 4) NOT NULL DEFAULT 1, -- Tasa de cambio usada en la compra
-    usuario_id BIGINT NOT NULL, -- Referencia al usuario que creó la compra
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación de la compra
-    estado VARCHAR(20) DEFAULT 'Activo' -- Estado de la compra (Activo/Inactivo)
-);
-
--- Tabla para almacenar los detalles de las compras, como los productos comprados, la cantidad y el precio unitario.
-CREATE TABLE detalles_compra (
-    id BIGINT AUTO_INCREMENT  PRIMARY KEY,
-    compra_id BIGINT NOT NULL, -- Referencia a la compra asociada
-    producto_id BIGINT NOT NULL, -- Referencia al producto comprado
-    cantidad INT NOT NULL, -- Cantidad de productos comprados
-    precio_unitario DECIMAL(10,2) NOT NULL, -- Precio unitario del producto
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación del detalle de compra
 );
 
 -- Tabla para almacenar roles de usuarios.
@@ -131,9 +115,15 @@ REFERENCES categorias(id);
 
 -- Agregar clave foránea a la tabla facturas
 ALTER TABLE facturas
-ADD CONSTRAINT fk_facturas_clientes
-FOREIGN KEY (cliente_id)
-REFERENCES clientes(id);
+ADD CONSTRAINT fk_tipo_facturas
+FOREIGN KEY (tipo_factura_id)
+REFERENCES tipo_factura(id);
+
+-- Agregar clave foránea a la tabla facturas
+ALTER TABLE facturas
+ADD CONSTRAINT fk_facturas_personas
+FOREIGN KEY (persona_id)
+REFERENCES personas(id);
 
 -- Agregar clave foránea a la tabla detalles_factura
 ALTER TABLE detalles_factura
@@ -147,33 +137,9 @@ ADD CONSTRAINT fk_detalles_factura_productos
 FOREIGN KEY (producto_id)
 REFERENCES productos(id);
 
--- Agregar clave foránea a la tabla compras
-ALTER TABLE compras
-ADD CONSTRAINT fk_compras_proveedores
-FOREIGN KEY (proveedor_id)
-REFERENCES proveedores(id);
-
--- Agregar clave foránea a la tabla detalles_compra
-ALTER TABLE detalles_compra
-ADD CONSTRAINT fk_detalles_compra_compras
-FOREIGN KEY (compra_id)
-REFERENCES compras(id);
-
--- Agregar clave foránea a la tabla detalles_compra
-ALTER TABLE detalles_compra
-ADD CONSTRAINT fk_detalles_compra_productos
-FOREIGN KEY (producto_id)
-REFERENCES productos(id);
-
 -- Agregar clave foránea a la tabla facturas
 ALTER TABLE facturas
 ADD CONSTRAINT fk_facturas_usuarios
-FOREIGN KEY (usuario_id)
-REFERENCES usuarios(id);
-
--- Agregar clave foránea a la tabla compras
-ALTER TABLE compras
-ADD CONSTRAINT fk_compras_usuarios
 FOREIGN KEY (usuario_id)
 REFERENCES usuarios(id);
 
@@ -195,6 +161,11 @@ ADD CONSTRAINT fk_historial_tasas_cambio_monedas
 FOREIGN KEY (moneda_id)
 REFERENCES monedas(id);
 
+-- Agregar clave foránea a la tabla facturas
+ALTER TABLE personas
+ADD CONSTRAINT fk_tipo_persona
+FOREIGN KEY (tipo_persona_id)
+REFERENCES tipo_persona(id);
 
 -- Procedimientos almacenados
 DELIMITER $$
@@ -265,98 +236,85 @@ CALL ObtenerPrecioProducto(1, NULL, NULL); -- Producto ID 1, Todas las monedas, 
 
 -- Insert
 
--- Insertar en la tabla categorias
+-- Inserción de datos en la tabla categorias
 INSERT INTO categorias (nombre) VALUES
-('Bebidas'),
-('Snacks'),
-('Lácteos'),
-('Carnes'),
-('Frutas y Vegetales');
+('Electrónica'),
+('Hogar'),
+('Ropa'),
+('Deportes'),
+('Juguetes');
 
--- Insertar en la tabla productos
-INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, estado) VALUES
-('Coca Cola', 'Bebida gaseosa 1L', 1.50, 100, 1, 'Activo'),
-('Pepsi', 'Bebida gaseosa 1L', 1.45, 80, 1, 'Activo'),
-('Doritos', 'Snacks de maíz', 2.00, 50, 2, 'Activo'),
-('Yogurt', 'Yogurt natural 500ml', 3.00, 60, 3, 'Activo'),
-('Manzana', 'Manzana roja', 0.75, 200, 5, 'Activo');
+-- Inserción de datos en la tabla tipo_persona
+INSERT INTO tipo_persona (nombre) VALUES
+('Cliente'),
+('Proveedor'),
+('Empleado');
 
--- Insertar en la tabla clientes
-INSERT INTO clientes (nombre, cedula, telefono, direccion, estado) VALUES
-('Juan Perez', 'V-12345678', '04141234567', 'Calle 1, Ciudad', 'Activo'),
-('Maria Lopez', 'V-87654321', '04149876543', 'Calle 2, Ciudad', 'Activo'),
-('Carlos Martinez', 'V-23456789', '04141239876', 'Calle 3, Ciudad', 'Activo'),
-('Ana Gomez', 'V-98765432', '04149988776', 'Calle 4, Ciudad', 'Activo'),
-('Luis Rodriguez', 'V-34567890', '04142345678', 'Calle 5, Ciudad', 'Activo');
+-- Inserción de datos en la tabla tipo_factura
+INSERT INTO tipo_factura (nombre) VALUES
+('Venta'),
+('Compra');
 
--- Insertar en la tabla roles
+-- Inserción de datos en la tabla roles
 INSERT INTO roles (nombre, descripcion) VALUES
-('Administrador', 'Administra el sistema'),
-('Vendedor', 'Realiza ventas y gestiona clientes'),
-('Almacenista', 'Gestiona el inventario'),
-('Contador', 'Gestiona la contabilidad'),
-('Gerente', 'Supervisa y administra las operaciones');
+('Administrador', 'Usuario con acceso completo al sistema'),
+('Vendedor', 'Usuario que puede gestionar ventas'),
+('Cliente', 'Usuario que puede realizar compras');
 
--- Insertar en la tabla usuarios
-INSERT INTO usuarios (usuario, correo, clave, rol_id, estado) VALUES
-('Admin', 'admin@correo.com', '1234', 1, 'Activo'),
-('Vendedor1', 'vendedor1@correo.com', '1234', 2, 'Activo'),
-('Vendedor2', 'vendedor2@correo.com', '1234', 2, 'Activo'),
-('Almacenista1', 'almacenista1@correo.com', '1234', 3, 'Activo'),
-('Contador1', 'contador1@correo.com', '1234', 4, 'Activo');
-
--- Insertar en la tabla monedas
+-- Inserción de datos en la tabla monedas
 INSERT INTO monedas (nombre, simbolo) VALUES
 ('Dólar', '$'),
 ('Bolívar', 'Bs'),
-('Peso Colombiano', 'COL$'),
-('Euro', '€'),
-('Libra Esterlina', '£');
+('Peso Colombiano', 'COL$');
 
--- Insertar en la tabla facturas
-INSERT INTO facturas (cliente_id, fecha_factura, estado, total, moneda_id, tasa_cambio, usuario_id) VALUES
-(1, '2024-06-01 10:00:00', 'Pagada', 15.50, 1, 1, 1),
-(2, '2024-06-02 11:00:00', 'Pendiente', 30.00, 1, 1, 2),
-(3, '2024-06-03 12:00:00', 'Cancelada', 20.00, 1, 1, 3),
-(4, '2024-06-04 13:00:00', 'Pagada', 45.00, 1, 1, 4),
-(5, '2024-06-05 14:00:00', 'Pendiente', 50.00, 1, 1, 5);
+-- Inserción de datos en la tabla usuarios
+INSERT INTO usuarios (usuario, correo, clave, rol_id) VALUES
+('admin', 'admin@example.com', '1234', 1),
+('vendedor1', 'vendedor1@example.com', '1234', 2),
+('cliente1', 'cliente1@example.com', '1234', 3),
+('cliente2', 'cliente2@example.com', '1234', 3),
+('vendedor2', 'vendedor2@example.com', '1234', 2);
 
--- Insertar en la tabla detalles_factura
+-- Inserción de datos en la tabla personas
+INSERT INTO personas (nombre, cedula, telefono, direccion, tipo_persona_id) VALUES
+('Juan Pérez', '12345678', '04141234567', 'Calle Falsa 123', 1),
+('María López', '87654321', '04247654321', 'Avenida Siempre Viva 456', 1),
+('Carlos Sánchez', '11223344', '04121122334', 'Bulevar del Sol 789', 2),
+('Ana Gómez', '55667788', '04165566778', 'Calle Luna 101', 1),
+('Pedro Fernández', '99887766', '04269988776', 'Calle Sol 202', 3);
+
+-- Inserción de datos en la tabla productos
+INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id) VALUES
+('Laptop', 'Laptop de alta gama', 1200.50, 10, 1),
+('Teléfono', 'Smartphone última generación', 800.75, 15, 1),
+('Sofá', 'Sofá de cuero', 500.00, 5, 2),
+('Camiseta', 'Camiseta deportiva', 25.00, 50, 3),
+('Bicicleta', 'Bicicleta de montaña', 300.00, 7, 4);
+
+-- Inserción de datos en la tabla facturas
+INSERT INTO facturas (persona_id, estado, total, moneda_id, usuario_id, tipo_factura_id) VALUES
+(1, 'Pagada', 1225.50, 1, 2, 1),
+(2, 'Pendiente', 800.75, 1, 2, 1),
+(3, 'Cancelada', 500.00, 2, 1, 2),
+(4, 'Pagada', 50.00, 3, 2, 1),
+(5, 'Pendiente', 300.00, 1, 2, 1);
+
+-- Inserción de datos en la tabla detalles_factura
 INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario) VALUES
-(1, 1, 5, 1.50),
-(1, 2, 5, 1.45),
-(2, 3, 10, 2.00),
-(2, 4, 10, 3.00),
-(3, 5, 20, 0.75);
+(1, 1, 1, 1200.50),
+(1, 2, 1, 25.00),
+(2, 2, 1, 800.75),
+(3, 3, 1, 500.00),
+(4, 4, 2, 25.00),
+(5, 5, 1, 300.00);
 
--- Insertar en la tabla proveedores
-INSERT INTO proveedores (nombre, telefono, direccion, estado) VALUES
-('Proveedor A', '04141112222', 'Avenida 1, Ciudad', 'Activo'),
-('Proveedor B', '04142223333', 'Avenida 2, Ciudad', 'Activo'),
-('Proveedor C', '04143334444', 'Avenida 3, Ciudad', 'Activo'),
-('Proveedor D', '04144445555', 'Avenida 4, Ciudad', 'Activo'),
-('Proveedor E', '04145556666', 'Avenida 5, Ciudad', 'Activo');
-
--- Insertar en la tabla compras
-INSERT INTO compras (proveedor_id, fecha_compra, total, moneda_id, tasa_cambio, usuario_id, estado) VALUES
-(1, '2024-06-01 10:00:00', 100.00, 1, 1, 1, 'Activo'),
-(2, '2024-06-02 11:00:00', 200.00, 1, 1, 2, 'Activo'),
-(3, '2024-06-03 12:00:00', 300.00, 1, 1, 3, 'Activo'),
-(4, '2024-06-04 13:00:00', 400.00, 1, 1, 4, 'Activo'),
-(5, '2024-06-05 14:00:00', 500.00, 1, 1, 5, 'Activo');
-
--- Insertar en la tabla detalles_compra
-INSERT INTO detalles_compra (compra_id, producto_id, cantidad, precio_unitario) VALUES
-(1, 1, 100, 1.50),
-(1, 2, 100, 1.45),
-(2, 3, 50, 2.00),
-(2, 4, 60, 3.00),
-(3, 5, 200, 0.75);
-
--- Insertar en la tabla historial_tasas_cambio
+-- Inserción de datos en la tabla historial_tasas_cambio
 INSERT INTO historial_tasas_cambio (moneda_id, tasa_cambio, fecha, usuario_id) VALUES
-(1, 1.0000, '2024-06-01', 1),
-(2, 4.0000, '2024-06-01', 1),
-(3, 4000.0000, '2024-06-01', 1),
-(4, 0.8500, '2024-06-01', 1),
-(5, 0.7500, '2024-06-01', 1);
+(2, 250000.0000, '2023-06-01', 1),
+(3, 3800.0000, '2023-06-01', 1),
+(2, 260000.0000, '2023-06-02', 1),
+(3, 3850.0000, '2023-06-02', 1),
+(2, 255000.0000, '2023-06-03', 1);
+
+
+

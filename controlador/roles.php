@@ -1,46 +1,16 @@
 <?php
 
-    // Permitir solicitudes desde cualquier origen
-    header("Access-Control-Allow-Origin: *");
-    // Permitir los métodos de solicitud especificados
-    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-    // Permitir los encabezados especificados
-    header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-    // Permitir que las cookies se incluyan en las solicitudes (si es necesario)
-    header("Access-Control-Allow-Credentials: true");
-    // Establecer el tipo de contenido de la respuesta como JSON
-    header("Content-Type: application/json");
-
-    include 'utilidades.php';
-    include 'Conexion.php';
+    include 'utilidades/utilidades.php';
+    include 'utilidades/Conexion.php';
 
     function obtenerPorId($datos) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-        
+
         try{
             // Consulta a la base de datos
             $sql = "SELECT * FROM roles WHERE id = ".$datos['id'];
-            $consulta = $db->consulta($sql);
-        
-            $resultado = null;
-        
-            if ($consulta !== null && $consulta->num_rows > 0) {
-                // Obtener el primer resultado
-                $fila = $consulta->fetch_assoc();
-                
-                // Almacenar la consulta en un diccionario
-                $resultado = [
-                    'id' => $fila["id"],
-                    'nombre' => $fila["nombre"],
-                    'descripcion' => $fila["fecha_creacion"]
-                ];
-            }
-        
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-        
-            return $resultado;
+
+            return $resultado = obtenerUno($sql);
+
         }catch (Exception $e) {
              // Cerrar la conexión manualmente
              $db->cerrar();
@@ -51,33 +21,14 @@
     }
 
     function ObtenerTodos() {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
 
         try{         
             // Consulta a la base de datos
             $sql = "SELECT * FROM roles";
-            $consulta = $db->consulta($sql);
+       
+            return $resultado = ObtenerVarios($sql);
 
-            $resultado = null;
-
-            if ($consulta !== null && $consulta->num_rows > 0) {
-                // Almacenar la consulta en un diccionario
-                while($fila = $consulta->fetch_assoc()) {
-                    $resultado[] = [
-                        'id' => $fila["id"],
-                        'nombre' => $fila["nombre"],
-                        'descripcion' => $fila["fecha_creacion"]
-                    ];
-                }
-            }
-
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-            return $resultado;
         }catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
@@ -103,11 +54,7 @@
             if ($consulta !== null && $consulta->num_rows > 0) {
                 // Almacenar la consulta en un diccionario
                 while($fila = $consulta->fetch_assoc()) {
-                    $resultado[] = [
-                        'id' => $fila["id"],
-                        'nombre' => $fila["nombre"],
-                        'descripcion' => $fila["fecha_creacion"]
-                    ];
+                    $resultado[] = $fila;
                 }
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 class Conexion {
     private $servidor = "localhost";
     private $usuario = "root";
