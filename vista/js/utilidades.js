@@ -19,19 +19,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
             let tasaRegistrada = JSON.parse(localStorage.getItem('tasa'))
             if(typeof tasaRegistrada !== 'undefined' &&  tasaRegistrada !== null && typeof tasaRegistrada.tasa !== 'undefined' && tasaRegistrada.tasa !== null){
-                mostrarNotificacion("Tasa Registrada con valor " + tasaRegistrada.tasa ,"linear-gradient(to right, #00b09b, #96c93d)") 
+                mostrarNotificacion("Tasas Registradas" ,"linear-gradient(to right, #00b09b, #96c93d)") 
             }
         }
         localStorage.removeItem('usuarioLogeado');
         localStorage.removeItem('tasa');
 
         // Se consulta si existe una tasa actual, si no se abre un modal para registrarla
-        let tasa = await consultar('tasas_cambio', { accion: "obtenerPorUltimaFecha", datos: {}});
-        if(typeof tasa === 'undefined' || tasa === null){
-            await ObtenerSelect("monedas", "tasas-select", "moneda");
-            var myModal = new bootstrap.Modal(document.getElementById('ModalTasa'));
-            myModal.show();
-        }
+        await VerificarTasa();
         
         /*let dataUsuario = JSON.parse(sessionStorage.getItem('usuario'))
             if(dataUsuario.rol === 'Asistencial'){
@@ -47,6 +42,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         sessionStorage.removeItem('usuario');
     }
 });
+
+var monedas = null;
+var tasas = [];
 
 async function consultar(tabla,datos) {
     try {
@@ -129,47 +127,106 @@ async function ObtenerSelect(tabla, idSelect, error) {
 	}
 }
 
-async function registrarTasa(){
+async function registrarVerificarTasa(){
     let usuario = JSON.parse(sessionStorage.getItem('usuario'))
+    let exitoVerificarTasas = false;
+    
     try{
-		let datos = {
-			accion: "insertar",
-			datos: {
-				tasa: parseFloat(document.getElementById("ModalTasaInput").value),
-                //tasa: parseFloat(parseFloat(document.getElementById("ModalTasaInput").value).toFixed(2)),
-				usuario_id: usuario.usuarioId,
-				moneda_id: document.querySelector('select[name="ModalMoneda"]').selectedOptions[0].value
-			}
-		};
+        for(let i = 0; i < this.monedas.length; i++){
+            if(this.monedas[i].nombre !== 'Dólar'){
+                let datos = {
+                    accion: "insertar",
+                    datos: {
+                        tasa: parseFloat(document.getElementById("ModalTasaInput" + this.monedas[i].nombre).value),
+                        usuario_id: usuario.usuarioId,
+                        moneda_id: this.monedas[i].id
+                    }
+                };
+    
+                document.getElementById("ModalTasaInput" + this.monedas[i].nombre).value = '';
+        
+                let data = await consultar("tasas_cambio",datos);
+        
+                if(data !== null && typeof data !== 'undefined'){
+                    if (data.message) {
+                        mostrarNotificacion(data.message,"#FF0000") 
+                    } else if (data.error) {
+                        if(typeof data[0] !== 'undefined' && data[0] !== null){
+                            mostrarNotificacion(data.error + " " + data[0] ,"#FF0000") 
+                        }else{
+                            mostrarNotificacion(data.error,"#FF0000") 
+                        }
+                    } else {
+                        let tasa = {
+                            tasa: data.tasa
+                        }
+                        localStorage.setItem('tasa', JSON.stringify(tasa))
+                        exitoVerificarTasas = true;
+                    }
+                }else{
+                    mostrarNotificacion("No se pudo registrar","#FF0000") 
+                }
+            }
+        }
 
-		document.getElementById("ModalTasa").value = '',
-		document.querySelector('select[name="ModalMoneda"]').value = 1;
+        if(exitoVerificarTasas){
+            window.location.href = "index.html";
+        }else{
+            mostrarNotificacion("No se pudo registrar","#FF0000") 
+        }
+    }catch(e){
+        mostrarNotificacion("Error:", e,"#FF0000") 
+        console.error('Error:', e);
+    }
+    
+}
 
-		let data = await consultar("tasas_cambio",datos);
+async function VerificarTasa(){
 
-		if(data !== null && typeof data !== 'undefined'){
-			if (data.message) {
-				mostrarNotificacion(data.message,"#FF0000") 
-			} else if (data.error) {
-				if(typeof data[0] !== 'undefined' && data[0] !== null){
-					mostrarNotificacion(data.error + " " + data[0] ,"#FF0000") 
-				}else{
-					mostrarNotificacion(data.error,"#FF0000") 
-				}
-			} else {
-				let tasa = {
-					tasa: data.tasa
-				}
-				localStorage.setItem('tasa', JSON.stringify(tasa))
-				window.location.href = "index.html";
-			}
-		}else{
-			mostrarNotificacion("No se pudo registrar","#FF0000") 
-		}
-	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
-		console.error('Error:', e);
-	}
+    this.monedas = await consultar('monedas', { accion: "obtenerTodos", datos: {}});
+    let contenido = ``;
+
+    for(let i = 0; i < this.monedas.length; i++){
+        if(this.monedas[i].nombre !== 'Dólar'){
+            let tasa = await consultar('tasas_cambio', { accion: "obtenerPorUltimaFecha", datos: {moneda_id: this.monedas[i].id}});
+            if(typeof tasa !== 'undefined' && tasa !== null){
+                this.tasas.push(tasa)
+            }else{
+                let nombre = "ModalTasaInput" + this.monedas[i].nombre;
+                let etiquera = "Tasa para " + this.monedas[i].nombre;
+                contenido += `
+                <div class="row">
+                    <div class="col-12 mb-2">
+                        <label class="mb-2 text-muted" for="${nombre}">${etiquera}</label>
+                        <input id="${nombre}" type="text" class="form-control" name="${nombre}" value="" pattern ="^[0-9]+(,[0-9]+)?$" required autofocus>
+                    </div>  
+                </div> `;
+            }
+        }
+    }
+
+    if(contenido !== ''){
+        document.getElementById("modalComprobarTasas").innerHTML = `
+                    <div class="modal fade" id="ModalTasa" tabindex="-1" aria-labelledby="ModalTasaLabel" aria-hidden="true" data-bs-backdrop="static">
+                        <div class="modal-dialog modal-ls">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <form name="formularioComprobarTasas" id="formularioComprobarTasas" method="post" class="m-3" action="#" onsubmit="event.preventDefault(); registrarVerificarTasa()">
+                                        ${contenido}
+                                        <div class="row mt-4 mb-3">
+                                            <!-- Boton Registrar -->
+                                            <div class="col-6">
+                                                <button type="submit" name="botonRegistrarModalTasa" value="1" class="btn btn-primary">Registrar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+        var myModal = new bootstrap.Modal(document.getElementById('ModalTasa'));
+        myModal.show();
+    }
 }
 
 

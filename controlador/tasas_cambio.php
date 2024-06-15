@@ -23,14 +23,14 @@
         }   
     }
 
-    function ObtenerPorUltimaFecha($tabla) {
+    function ObtenerPorUltimaFecha($datos,$tabla) {
         try{         
             // Consulta a la base de datos
             $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
             $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
             $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
-            $sql .= " WHERE fecha = CURDATE()";
-            $sql .= " ORDER BY t.id DESC LIMIT 1";
+            $sql .= " WHERE fecha = CURDATE() AND t.moneda_id = ".$datos['moneda_id'];
+            $sql .= " ORDER BY t.fecha_creacion DESC LIMIT 1";
        
             return ObtenerUno($sql);
 
@@ -275,7 +275,7 @@
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(ObtenerPorUltimaFecha($tabla));
+                echo json_encode(ObtenerPorUltimaFecha($datos,$tabla));
 
                 break;
             case "obtenerTodos":

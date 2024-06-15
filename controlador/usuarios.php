@@ -45,7 +45,7 @@
             // Consulta a la base de datos
             $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
             $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE us.usuario = '".$datos['usuario']."' AND ys.clave = '".$datos['clave']."'";
+            $sql .= " WHERE us.usuario = '".$datos['usuario']."' AND us.clave = '".$datos['clave']."'";
        
             return ObtenerUno($sql);
 

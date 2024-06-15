@@ -32,46 +32,11 @@
             <a type="button" class="btn btn-dark" href="login.html">Cerrar Sesion</a>
           </div>
         </div>
-      </nav>
+    </nav>
 
-    <section>
-        <div class="modal fade" id="ModalTasa" tabindex="-1" aria-labelledby="ModalTasaLabel" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog modal-ls">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <form name="formulario" method="post" class="m-3" action="#" onsubmit="event.preventDefault(); registrarTasa()">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <label class="mb-2 text-muted" for="ModalTasaInput">Tasa</label>
-                                        <input id="ModalTasaInput" type="text" class="form-control" name="ModalTasaInput" value="" required autofocus>
-                                    </div>	
-                                    <div class="mb-3">
-                                        <label class="mb-2 text-muted" for="ModalMoneda">Moneda</label>
-                                        <select name="ModalMoneda" class="form-select" aria-label="Default select example" id="tasas-select">
-                                            <!-- Agrega opciones del select si es necesario -->
-                                        </select>
-                                    </div>	
-                                </div>  
-                            </div> 
-
-                            <div class="row mt-4 mb-3">
-                                <!-- Boton Registrar -->
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-3">
-                                            <button type="submit" name="botonRegistrarModalTasa" value="1" class="btn btn-primary">Registrar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+    
+    <section id="modalComprobarTasas">
     </section>
-
 	<script src="bootstrap-5/js/bootstrap.min.js"></script>
     <script src="js/toastify.js"></script>
 	<script src="js/utilidades.js"></script>
