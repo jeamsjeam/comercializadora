@@ -3,14 +3,14 @@
     include 'utilidades/Conexion.php';
     include 'utilidades/utilidades.php';
 
-    function obtenerPorId($datos,$tabla) {
+    function ObtenerPorId($datos,$tabla) {
 
         try{
             // Consulta a la base de datos
             $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
             $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
             $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
-            $sql .= " WHERE id = ".$datos['id'];
+            $sql .= " WHERE t.id = ".$datos['id'];
 
             return obtenerUno($sql);
 
@@ -30,7 +30,7 @@
             $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
             $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
             $sql .= " WHERE fecha = CURDATE()";
-            $sql .= " ORDER BY id DESC LIMIT 1";
+            $sql .= " ORDER BY t.id DESC LIMIT 1";
        
             return ObtenerUno($sql);
 
@@ -65,7 +65,7 @@
         try{
             // Consulta a la base de datos
             $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
-            $sql .= " JOIN usuarios us ON us.id = t.usuario_id WHERE id in (";
+            $sql .= " JOIN usuarios us ON us.id = t.usuario_id WHERE t.id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
@@ -97,31 +97,20 @@
     function insertar($datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
+        $sql = "";
         try {
             // Consulta a la base de datos
             $sql = "INSERT INTO ".$tabla." (moneda_id, tasa, fecha, usuario_id, fecha_creacion) VALUES ";
             $sql .= "(".$datos['moneda_id'].",".$datos['tasa'].", CURDATE(),".$datos['usuario_id'].", NOW())";
-    
-            $resultado = $db->consulta($sql);
-    
-            // Verificar si la consulta se ejecutó correctamente
-            if ($resultado === true) {
-                // Obtener el ID del nuevo registro insertado
-                $id_insertado['id'] = $db->getConexion()->insert_id;
-                $db->cerrar();
-                // Consultar y devolver el registro insertado
-                return obtenerPorId($id_insertado);
-            } else {
-                $db->cerrar();
-                // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Error al insertar el registro'];
-            }
+
+            return insertarUno($sql,$tabla);
+
         } catch (Exception $e) {
              // Cerrar la conexión manualmente
              $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
-            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+            return ['error' => 'Excepción capturada: ',  $sql, "\n"];
         }
     }
 
@@ -139,23 +128,7 @@
                 $sql .= "(".$datos['moneda_id'].",".$datos['tasa'].", CURDATE(),".$datos['usuario_id'].", NOW()),";
             }
 
-            $resultado = $db->consulta(rtrim($sql, ','));
-    
-            /// Verificar si la consulta se ejecutó correctamente
-            if ($resultado === true) {
-                // Obtener el rango de IDs asignados a los registros insertados
-                $primer_id = $db->getConexion()->insert_id;
-                $db->cerrar();
-                $ultimo_id = $primer_id + count($datos) - 1;
-
-                // Consultar y devolver los registros insertados
-                $ids_insertados = range($primer_id, $ultimo_id);
-                return ObtenerPorListaId($ids_insertados,$tabla);
-            } else {
-                $db->cerrar();
-                // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Error al insertar los registros'];
-            }
+            return insertaxrVarios($sql,$datos,$tabla);
         } catch (Exception $e) {
              // Cerrar la conexión manualmente
              $db->cerrar();

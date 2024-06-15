@@ -3,7 +3,7 @@
     include 'utilidades/Conexion.php';
     include 'utilidades/utilidades.php';
 
-    function obtenerPorId($datos,$tabla) {
+    function ObtenerPorId($datos,$tabla) {
 
         try{
             // Consulta a la base de datos
@@ -86,7 +86,7 @@
                 $id_insertado['id'] = $db->getConexion()->insert_id;
                 $db->cerrar();
                 // Consultar y devolver el registro insertado
-                return obtenerPorId($id_insertado);
+                return ObtenerPorId($id_insertado,$tabla);
             } else {
                 $db->cerrar();
                 // Si la consulta falla, devolver un mensaje de error

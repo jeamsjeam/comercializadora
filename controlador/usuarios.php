@@ -3,7 +3,7 @@
     include 'utilidades/Conexion.php';
     include 'utilidades/utilidades.php';
 
-    function obtenerPorId($datos,$tabla) {
+    function ObtenerPorId($datos,$tabla) {
 
         try{
             // Consulta a la base de datos
@@ -28,7 +28,7 @@
             // Consulta a la base de datos
             $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
             $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE usuario = '".$datos['usuario']."'";
+            $sql .= " WHERE us.usuario = '".$datos['usuario']."'";
        
             return ObtenerUno($sql);
 
@@ -45,7 +45,7 @@
             // Consulta a la base de datos
             $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
             $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE usuario = '".$datos['usuario']."' AND clave = '".$datos['clave']."'";
+            $sql .= " WHERE us.usuario = '".$datos['usuario']."' AND ys.clave = '".$datos['clave']."'";
        
             return ObtenerUno($sql);
 
@@ -147,7 +147,7 @@
                 $sql .= "('".$datos[$i]['usuario']."', '".$datos[$i]['correo']."','".$datos[$i]['clave']."', ".$datos[$i]['rol_id'].", NOW(), '".$datos[$i]['estado']."')";
             }
 
-            return insertarVarios(rtrim($sql, ','), $tabla);
+            return insertarVarios(rtrim($sql, ','),$datos, $tabla);
     
         } catch (Exception $e) {
 

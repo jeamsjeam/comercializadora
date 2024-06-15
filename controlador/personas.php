@@ -3,13 +3,13 @@
     include 'utilidades/Conexion.php';
     include 'utilidades/utilidades.php';
 
-    function obtenerPorId($datos,$tabla) {
+    function ObtenerPorId($datos,$tabla) {
 
         try{
             // Consulta a la base de datos
             $sql = "SELECT p.*, tp.nombre as tipopersona FROM ".$tabla." p";
             $sql .= " JOIN tipo_persona tp on tp.id = p.tipo_persona_id ";
-            $sql .= " WHERE id = ".$datos['id'];
+            $sql .= " WHERE p.id = ".$datos['id'];
 
             return obtenerUno($sql);
 
@@ -45,7 +45,7 @@
         try{
             // Consulta a la base de datos
             $sql = "SELECT p.*, tp.nombre as tipopersona FROM ".$tabla." p";
-            $sql .=" JOIN tipo_persona tp on tp.id = p.tipo_persona_id  WHERE id in (";
+            $sql .=" JOIN tipo_persona tp on tp.id = p.tipo_persona_id WHERE p.id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
@@ -98,7 +98,7 @@
                 $id_insertado['id'] = $db->getConexion()->insert_id;
                 $db->cerrar();
                 // Consultar y devolver el registro insertado
-                return obtenerPorId($id_insertado);
+                return ObtenerPorId($id_insertado,$tabla);
             } else {
                 $db->cerrar();
                 // Si la consulta falla, devolver un mensaje de error
@@ -230,7 +230,7 @@
         $db = new Conexion();
     
         try {
-            $registro = obtenerPorId($datos,$tabla);
+            $registro = ObtenerPorId($datos,$tabla);
 
             // Consulta a la base de datos
             $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];

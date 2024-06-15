@@ -79,15 +79,15 @@
         try {
 
             $resultado = $db->consulta($sql);
-    
+
             // Verificar si la consulta se ejecutó correctamente
             if ($resultado === true) {
                 // Obtener el ID del nuevo registro insertado
                 $id_insertado['id'] = $db->getConexion()->insert_id;
                 $db->cerrar();
-
+                
                 // Consultar y devolver el registro insertado
-                return obtenerPorId($id_insertado,$tabla);
+                return ObtenerPorId($id_insertado,$tabla);
             } else {
                 $db->cerrar();
                 // Si la consulta falla, devolver un mensaje de error
@@ -102,7 +102,7 @@
         }
     }
 
-    function insertarVarios($datos,$tabla) {
+    function insertarVarios($sql,$datos,$tabla) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
@@ -147,7 +147,7 @@
                 $db->cerrar();
                 
                 // Consultar y devolver el registro actualizado
-                return obtenerPorId($datos,$tabla);
+                return ObtenerPorId($datos,$tabla);
             } else {
                 $db->cerrar();
 
@@ -177,7 +177,7 @@
             // Se recorre el objeto procesado y se construye la query
             foreach ($datos as $dato) {
                 // Consulta a la base de datos para verificar si el ID existe
-                $resultadoExiste = obtenerPorId($dato,$tabla);
+                $resultadoExiste = ObtenerPorId($dato,$tabla);
 
                 // Verificar si el ID existe en la base de datos
                 if ($resultadoExiste === null || $resultadoExiste["id"] === null) {
@@ -222,7 +222,7 @@
         $db = new Conexion();
     
         try {
-            $registro = obtenerPorId($datos,$tabla);
+            $registro = ObtenerPorId($datos,$tabla);
 
             $resultado = $db->consulta($sql);
     

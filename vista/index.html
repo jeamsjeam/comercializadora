@@ -8,23 +8,72 @@
     <title>Index</title>
 </head>
 <body>
-    <script>
-        let dataUsuario = JSON.parse(sessionStorage.getItem('usuario'))
-            if(dataUsuario.rol === 'Asistencial'){
-                window.location.href = "asistencial.html";
-            }else if(dataUsuario.rol === 'Recursos Humanos'){
-                window.location.href = "recursoshumanos.html";
-            }else if(dataUsuario.rol === 'Central de Citas'){
-                window.location.href = "citas.html";
-            }else if(dataUsuario.rol === 'Paciente'){
-                window.location.href = "menuPaciente.html";
+    <nav class="navbar navbar-expand-lg navbar-dark ht bg-dark">
+        <div class="container-fluid">
+          <div class="navbar-brand">Comercializadora</div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" href="index.html">Inicio</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="productos.html">Registrar Productos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="personas.html">Registrar Personas</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="factura.html">Registrar Factura</a>
+              </li>
+            </ul>
+            <a type="button" class="btn btn-dark" href="login.html">Cerrar Sesion</a>
+          </div>
+        </div>
+      </nav>
 
-            }
-    </script>
-    hola mundo
+    <section>
+        <div class="modal fade" id="ModalTasa" tabindex="-1" aria-labelledby="ModalTasaLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-ls">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <form name="formulario" method="post" class="m-3" action="#" onsubmit="event.preventDefault(); registrarTasa()">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="ModalTasaInput">Tasa</label>
+                                        <input id="ModalTasaInput" type="text" class="form-control" name="ModalTasaInput" value="" required autofocus>
+                                    </div>	
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="ModalMoneda">Moneda</label>
+                                        <select name="ModalMoneda" class="form-select" aria-label="Default select example" id="tasas-select">
+                                            <!-- Agrega opciones del select si es necesario -->
+                                        </select>
+                                    </div>	
+                                </div>  
+                            </div> 
 
+                            <div class="row mt-4 mb-3">
+                                <!-- Boton Registrar -->
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <button type="submit" name="botonRegistrarModalTasa" value="1" class="btn btn-primary">Registrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+	<script src="bootstrap-5/js/bootstrap.min.js"></script>
     <script src="js/toastify.js"></script>
 	<script src="js/utilidades.js"></script>
-	<script src="bootstrap-5/js/bootstrap.min.js"></script>
 </body>
 </html>

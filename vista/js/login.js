@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async function() {
 	if (window.location.href.indexOf('registro.html') !== -1) {
-        await ObtenerRoles("roles", "roles-select", "rol");
+        await ObtenerSelect("roles", "roles-select", "rol");
     }else if (window.location.href.indexOf('login.html') !== -1){
 		let usuarioRegistrado = JSON.parse(localStorage.getItem('usuarioRegistrado'))
 		if(typeof usuarioRegistrado !== 'undefined' &&  usuarioRegistrado !== null && typeof usuarioRegistrado.usuario !== 'undefined' && usuarioRegistrado.usuario !== null){
@@ -56,10 +56,12 @@ async function verificarUsuario() {
 			} else {
 				mostrarNotificacion("Usuario: " + data.usuario,"linear-gradient(to right, #00b09b, #96c93d)") 
 				let usuario = {
+					usuarioId: data.id,
 					usuario: data.usuario,
 					rol: data.rolnombre,
 					rolId: data.rol_id
 				}
+
 				sessionStorage.setItem('usuario', JSON.stringify(usuario))
 				localStorage.setItem('usuarioLogeado', JSON.stringify(usuario))
 				window.location.href = "index.html";

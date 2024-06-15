@@ -3,7 +3,7 @@
     include 'utilidades/Conexion.php';
     include 'utilidades/utilidades.php';
 
-    function obtenerPorId($datos,$tabla) {
+    function ObtenerPorId($datos,$tabla) {
 
         try{
             // Consulta a la base de datos
@@ -86,7 +86,7 @@
                 $id_insertado['id'] = $db->getConexion()->insert_id;
                 $db->cerrar();
                 // Consultar y devolver el registro insertado
-                return obtenerPorId($id_insertado);
+                return ObtenerPorId($id_insertado,$tabla);
             } else {
                 $db->cerrar();
                 // Si la consulta falla, devolver un mensaje de error
@@ -158,7 +158,7 @@
                 $db->cerrar();
                 
                 // Consultar y devolver el registro actualizado
-                return obtenerPorId($datos,$tabla);
+                return ObtenerPorId($datos,$tabla);
             } else {
                 $db->cerrar();
 
@@ -188,7 +188,7 @@
             // Se recorre el objeto procesado y se construye la query
             foreach ($datos as $dato) {
                 // Consulta a la base de datos para verificar si el ID existe
-                $resultadoExiste = obtenerPorId($dato);
+                $resultadoExiste = ObtenerPorId($dato);
 
                 // Verificar si el ID existe en la base de datos
                 if ($resultadoExiste === null || $resultadoExiste["id"] === null) {
