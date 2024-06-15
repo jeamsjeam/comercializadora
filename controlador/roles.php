@@ -268,7 +268,7 @@
             }
             $sql = rtrim($sql, ',').")";
 
-            return eliminarLista($listaIds,$tabla,$sql);
+            return eliminarVarios($listaIds,$tabla,$sql);
 
         } catch (Exception $e) {
              // Cerrar la conexión manualmente

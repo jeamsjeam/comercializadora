@@ -97,11 +97,11 @@ CREATE TABLE monedas (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación del registro
 );
 
--- Tabla para almacenar el historial de tasas de cambio.
-CREATE TABLE historial_tasas_cambio (
+-- Tabla para almacenar tasas de cambio.
+CREATE TABLE tasas_cambio (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
     moneda_id BIGINT NOT NULL, -- Referencia a la moneda
-    tasa_cambio DECIMAL(10, 4) NOT NULL, -- Tasa de cambio respecto al dólar
+    tasa DECIMAL(10, 4) NOT NULL, -- Tasa de cambio respecto al dólar
     fecha DATE NOT NULL, -- Fecha de la tasa de cambio
     usuario_id BIGINT NOT NULL, -- Referencia al usuario que agregó la tasa de cambio
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación del registro
@@ -149,15 +149,15 @@ ADD CONSTRAINT fk_usuarios_roles
 FOREIGN KEY (rol_id)
 REFERENCES roles(id);
 
--- Agregar clave foránea a la tabla historial_tasas_cambio
-ALTER TABLE historial_tasas_cambio
-ADD CONSTRAINT fk_historial_tasas_cambio_usuarios
+-- Agregar clave foránea a la tabla tasas_cambio
+ALTER TABLE tasas_cambio
+ADD CONSTRAINT fk_tasas_cambio_usuarios
 FOREIGN KEY (usuario_id)
 REFERENCES usuarios(id);
 
--- Agregar clave foránea a la tabla historial_tasas_cambio
-ALTER TABLE historial_tasas_cambio
-ADD CONSTRAINT fk_historial_tasas_cambio_monedas
+-- Agregar clave foránea a la tabla tasas_cambio
+ALTER TABLE tasas_cambio
+ADD CONSTRAINT fk_tasas_cambio_monedas
 FOREIGN KEY (moneda_id)
 REFERENCES monedas(id);
 
@@ -168,7 +168,7 @@ FOREIGN KEY (tipo_persona_id)
 REFERENCES tipo_persona(id);
 
 -- Procedimientos almacenados
-DELIMITER $$
+/*DELIMITER $$
 
 CREATE PROCEDURE ObtenerPrecioProducto(
     IN producto_id BIGINT,
@@ -191,14 +191,14 @@ BEGIN
         FROM 
             productos p
         JOIN 
-            historial_tasas_cambio h ON h.moneda_id IN (SELECT id FROM monedas)
+            tasas_cambio h ON h.moneda_id IN (SELECT id FROM monedas)
         JOIN 
             monedas m ON h.moneda_id = m.id
         WHERE 
             p.id = producto_id
             AND h.fecha = (
                 SELECT MAX(fecha)
-                FROM historial_tasas_cambio
+                FROM tasas_cambio
                 WHERE moneda_id = h.moneda_id
                 AND fecha <= fecha
             );
@@ -213,14 +213,14 @@ BEGIN
         FROM 
             productos p
         JOIN 
-            historial_tasas_cambio h ON h.moneda_id = moneda_id
+            tasas_cambio h ON h.moneda_id = moneda_id
         JOIN 
             monedas m ON h.moneda_id = m.id
         WHERE 
             p.id = producto_id
             AND h.fecha = (
                 SELECT MAX(fecha)
-                FROM historial_tasas_cambio
+                FROM tasas_cambio
                 WHERE moneda_id = moneda_id
                 AND fecha <= fecha
             );
@@ -232,7 +232,7 @@ DELIMITER ;
 CALL ObtenerPrecioProducto(1, 2, '2024-06-01'); -- Producto ID 1, Moneda ID 2 (Dólar), Fecha '2024-06-01'
 CALL ObtenerPrecioProducto(1, NULL, '2024-06-01'); -- Producto ID 1, Todas las monedas, Fecha '2024-06-01'
 CALL ObtenerPrecioProducto(1, NULL, NULL); -- Producto ID 1, Todas las monedas, Fecha actual
-
+*/
 
 -- Insert
 
@@ -308,8 +308,8 @@ INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario
 (4, 4, 100, 0.90),
 (5, 1, 30, 1.50);
 
--- Inserción de datos en la tabla historial_tasas_cambio
-INSERT INTO historial_tasas_cambio (moneda_id, tasa_cambio, fecha, usuario_id) VALUES
+-- Inserción de datos en la tabla tasas_cambio
+INSERT INTO tasas_cambio (moneda_id, tasa, fecha, usuario_id) VALUES
 (2, 250000.0000, '2023-06-01', 1),
 (3, 3800.0000, '2023-06-01', 1),
 (2, 260000.0000, '2023-06-02', 1),

@@ -32,6 +32,7 @@
             $db->cerrar();
         
             return $resultado;
+
         }catch (Exception $e) {
              // Cerrar la conexión manualmente
              $db->cerrar();
@@ -60,7 +61,9 @@
 
             // Cerrar la conexión manualmente
             $db->cerrar();
+
             return $resultado;
+            
         }catch (Exception $e) {
              // Cerrar la conexión manualmente
              $db->cerrar();
@@ -149,7 +152,7 @@
                 $db->cerrar();
 
                 // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Error al actualizar el registro'];
+                return ['error' => 'Error al actualizar el registro con ID '.$datos['id']];
             }
         } catch (Exception $e) {
             // Cerrar la conexión manualmente
@@ -214,7 +217,7 @@
         }
     }   
 
-    function eliminar($datos,$tabla,$sql) {
+    function eliminarUno($datos,$tabla,$sql) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
@@ -244,7 +247,7 @@
         }
     }
     
-    function eliminarLista($datos,$tabla,$sql) {
+    function eliminarVarios($datos,$tabla,$sql) {
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 

@@ -7,7 +7,9 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM ".$tabla." WHERE id = ".$datos['id'];
+            $sql = "SELECT p.*, tp.nombre as tipopersona FROM ".$tabla." p";
+            $sql .= " JOIN tipo_persona tp on tp.id = p.tipo_persona_id ";
+            $sql .= " WHERE id = ".$datos['id'];
 
             return obtenerUno($sql);
 
@@ -24,7 +26,8 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT * FROM ".$tabla;
+            $sql = "SELECT p.*, tp.nombre as tipopersona FROM ".$tabla." p";
+            $sql .= " JOIN tipo_persona tp on tp.id = p.tipo_persona_id ";
        
             return ObtenerVarios($sql);
 
@@ -41,7 +44,8 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM ".$tabla." WHERE id in (";
+            $sql = "SELECT p.*, tp.nombre as tipopersona FROM ".$tabla." p";
+            $sql .=" JOIN tipo_persona tp on tp.id = p.tipo_persona_id  WHERE id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
@@ -194,7 +198,7 @@
             foreach ($datos as $dato) {
 
                 // Consulta a la base de datos para actualizar el registro
-                $$sql = "UPDATE ".$tabla." SET "
+                $sql = "UPDATE ".$tabla." SET ";
                 $sql .= "nombre = '".$dato['nombre']."', ";
                 $sql .= "cedula = '".$dato['cedula']."', ";
                 $sql .= "extrangero = ".$dato['extrangero'].", ";

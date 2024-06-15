@@ -7,9 +7,10 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE us.id = ".$datos['id'];
+            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
+            $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
+            $sql .= " WHERE id = ".$datos['id'];
 
             return obtenerUno($sql);
 
@@ -22,30 +23,14 @@
         }   
     }
 
-    function obtenerPorUsuario($datos,$tabla) {
-
+    function ObtenerPorUltimaFecha($tabla) {
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE usuario = '".$datos['usuario']."'";
-       
-            return ObtenerUno($sql);
-
-        }catch (Exception $e) {
-
-            // Código que se ejecuta si se lanza una excepción
-            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
-        }   
-    }
-
-    function obtenerPorUsuarioClave($datos,$tabla) {
-
-        try{         
-            // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
-            $sql .= " WHERE usuario = '".$datos['usuario']."' AND clave = '".$datos['clave']."'";
+            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
+            $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
+            $sql .= " WHERE fecha = CURDATE()";
+            $sql .= " ORDER BY id DESC LIMIT 1";
        
             return ObtenerUno($sql);
 
@@ -60,8 +45,9 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id ";
+            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
+            $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
        
             return ObtenerVarios($sql);
 
@@ -78,17 +64,30 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
-            $sql .= " JOIN roles ro ON ro.id = us.rol_id WHERE us.id in (";
-
+            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql .= " JOIN usuarios us ON us.id = t.usuario_id WHERE id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
             $sql = rtrim($sql, ',').")";
 
-            return ObtenerVarios($sql);
+            $consulta = $db->consulta($sql);
 
+            $resultado = null;
+
+            if ($consulta !== null && $consulta->num_rows > 0) {
+                // Almacenar la consulta en un diccionario
+                while($fila = $consulta->fetch_assoc()) {
+                    $resultado[] = $fila;
+                }
+            }
+
+            // Cerrar la conexión manualmente
+            $db->cerrar();
+            return $resultado;
         }catch (Exception $e) {
+             // Cerrar la conexión manualmente
+             $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
@@ -99,23 +98,27 @@
         // Crear instancia de la clase Conexion
         $db = new Conexion();
         try {
-            $datosAdministrador = [
-                'usuario' => $datos["usuarioAdministrador"],
-                'clave' => $datos["claveAdministrador"],
-            ];
-
-            $usuarioAdministrador = obtenerPorUsuarioClave($datosAdministrador,$tabla);
-
-            if($usuarioAdministrador == null || $usuarioAdministrador["rolnombre"] == null || $usuarioAdministrador["rolnombre"] != "Administrador"){
-                return ['error' => 'No se encontro usuario administrador'];
-            }
-
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (usuario, correo, clave, rol_id, fecha_creacion, estado) VALUES ";
-            $sql .= "('".$datos['usuario']."', '".$datos['correo']."','".$datos['clave']."', ".$datos['rol_id'].", NOW(), '".$datos['estado']."')";
+            $sql = "INSERT INTO ".$tabla." (moneda_id, tasa, fecha, usuario_id, fecha_creacion) VALUES ";
+            $sql .= "(".$datos['moneda_id'].",".$datos['tasa'].", CURDATE(),".$datos['usuario_id'].", NOW())";
     
-            return insertarUno($sql,$tabla);
+            $resultado = $db->consulta($sql);
+    
+            // Verificar si la consulta se ejecutó correctamente
+            if ($resultado === true) {
+                // Obtener el ID del nuevo registro insertado
+                $id_insertado['id'] = $db->getConexion()->insert_id;
+                $db->cerrar();
+                // Consultar y devolver el registro insertado
+                return obtenerPorId($id_insertado);
+            } else {
+                $db->cerrar();
+                // Si la consulta falla, devolver un mensaje de error
+                return ['error' => 'Error al insertar el registro'];
+            }
         } catch (Exception $e) {
+             // Cerrar la conexión manualmente
+             $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
@@ -127,29 +130,35 @@
         $db = new Conexion();
 
         try {
-            $datosAdministrador = [
-                'usuario' => $datos[0]["usuarioAdministrador"],
-                'clave' => $datos[0]["claveAdministrador"],
-            ];
-
-            $usuarioAdministrador = obtenerPorUsuarioClave($datos,$tabla);
-
-            if($usuarioAdministrador == null || $usuarioAdministrador["rolnombre"] == null || $usuarioAdministrador["rolnombre"] != "Administrador"){
-                return ['error' => 'No se encontro usuario administrador'];
-            }
-
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (usuario, correo, clave, rol_id, fecha_creacion, estado) VALUES ";
+            $sql = "INSERT INTO ".$tabla." (moneda_id, tasa, fecha, usuario_id, fecha_creacion) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
             for ($i = 0; $i < count($datos); $i++){
 
-                $sql .= "('".$datos[$i]['usuario']."', '".$datos[$i]['correo']."','".$datos[$i]['clave']."', ".$datos[$i]['rol_id'].", NOW(), '".$datos[$i]['estado']."')";
+                $sql .= "(".$datos['moneda_id'].",".$datos['tasa'].", CURDATE(),".$datos['usuario_id'].", NOW()),";
             }
 
-            return insertarVarios(rtrim($sql, ','), $tabla);
+            $resultado = $db->consulta(rtrim($sql, ','));
     
+            /// Verificar si la consulta se ejecutó correctamente
+            if ($resultado === true) {
+                // Obtener el rango de IDs asignados a los registros insertados
+                $primer_id = $db->getConexion()->insert_id;
+                $db->cerrar();
+                $ultimo_id = $primer_id + count($datos) - 1;
+
+                // Consultar y devolver los registros insertados
+                $ids_insertados = range($primer_id, $ultimo_id);
+                return ObtenerPorListaId($ids_insertados,$tabla);
+            } else {
+                $db->cerrar();
+                // Si la consulta falla, devolver un mensaje de error
+                return ['error' => 'Error al insertar los registros'];
+            }
         } catch (Exception $e) {
+             // Cerrar la conexión manualmente
+             $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
@@ -163,11 +172,9 @@
         try {
             // Consulta a la base de datos
             $sql = "UPDATE ".$tabla." SET ";
-            $sql .= "usuario = '".$datos['usuario']."', ";
-            $sql .= "correo = '".$datos['correo']."', ";
-            $sql .= "clave = '".$datos['clave']."', ";
-            $sql .= "rol_id = '".$datos['rol_id']."', ";
-            $sql .= "estado = '".$datos['estado']."' ";
+            $sql .= "moneda_id = '".$datos['moneda_id']."', ";
+            $sql .= "tasa = '".$datos['tasa']."', ";
+            $sql .= "usuario_id = '".$datos['usuario_id']."' ";
             $sql .= "WHERE id = ".$datos['id'];
             
             return actualizarUno($datos,$tabla,$sql);
@@ -193,11 +200,9 @@
 
                 // Consulta a la base de datos para actualizar el registro
                 $sql = "UPDATE ".$tabla." SET ";
-                $sql .= "usuario = '".$dato['usuario']."', ";
-                $sql .= "correo = '".$dato['correo']."', ";
-                $sql .= "clave = '".$dato['clave']."', ";
-                $sql .= "rol_id = '".$dato['rol_id']."', ";
-                $sql .= "estado = '".$dato['estado']."' ";
+                $sql .= "moneda_id = '".$dato['moneda_id']."', ";
+                $sql .= "tasa = '".$dato['tasa']."', ";
+                $sql .= "usuario_id = '".$dato['usuario_id']."' ";
                 $sql .= "WHERE id = ".$dato['id'];
                 $listaSQL[] = [
                     'id' => $dato['id'],
@@ -215,7 +220,7 @@
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ' . $e->getMessage()];
         }
-    }    
+    }   
     
     function eliminar($datos,$tabla) {
         // Crear instancia de la clase Conexion
@@ -275,7 +280,7 @@
             return;
         }
 
-        $tabla = "usuarios";
+        $tabla = "tasas_cambio";
         
         $data = json_decode($datosRecibidos, true);
 
@@ -291,22 +296,13 @@
                 echo json_encode(ObtenerPorId($datos,$tabla));
 
                 break;
-            case "obtenerPorUsuario":
+            case "obtenerPorUltimaFecha":
                 $datos = $data['datos'] ?? null;
                 if($datos === null){
                     echo json_encode(['error' => 'No se envio datos']);
                     break;
                 }
-                echo json_encode(ObtenerPorUsuario($datos,$tabla));
-
-                break;
-            case "obtenerPorUsuarioClave":
-                $datos = $data['datos'] ?? null;
-                if($datos === null){
-                    echo json_encode(['error' => 'No se envio datos']);
-                    break;
-                }
-                echo json_encode(ObtenerPorUsuarioClave($datos,$tabla));
+                echo json_encode(ObtenerPorUltimaFecha($tabla));
 
                 break;
             case "obtenerTodos":
