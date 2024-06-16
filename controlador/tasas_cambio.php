@@ -7,7 +7,7 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql = "SELECT t.*, us.usuario,mo.nombre as moneda,mo.simbolo FROM ".$tabla." t";
             $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
             $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
             $sql .= " WHERE t.id = ".$datos['id'];
@@ -26,7 +26,7 @@
     function ObtenerPorUltimaFecha($datos,$tabla) {
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql = "SELECT t.*, us.usuario,mo.nombre as moneda,mo.simbolo FROM ".$tabla." t";
             $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
             $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
             $sql .= " WHERE fecha = CURDATE() AND t.moneda_id = ".$datos['moneda_id'];
@@ -45,7 +45,7 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql = "SELECT t.*, us.usuario,mo.nombre as moneda,mo.simbolo FROM ".$tabla." t";
             $sql .= " JOIN usuarios us ON us.id = t.usuario_id";
             $sql .= " JOIN monedas mo ON mo.id = t.moneda_id";
        
@@ -64,7 +64,7 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT t.*, us.usuario,mo.nombre,mo.simbolo FROM ".$tabla." t";
+            $sql = "SELECT t.*, us.usuario,mo.nombre as moneda,mo.simbolo FROM ".$tabla." t";
             $sql .= " JOIN usuarios us ON us.id = t.usuario_id WHERE t.id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";

@@ -26,9 +26,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         localStorage.removeItem('usuarioLogeado');
         localStorage.removeItem('tasa');
 
-        await Loading(true)
+        await OperarModal(true)
         await VerificarTasa();
-        await Loading(false)
+        // Despachar un evento personalizado indicando que tasas está llena
+        const event = new CustomEvent('tasasListas', { detail: tasas });
+        document.dispatchEvent(event);
+        await OperarModal(false)
 
     } else {
         sessionStorage.removeItem('usuario');
@@ -42,7 +45,7 @@ var modalLoading = null;
 function createLoadingModal() {
     const modalDiv = document.createElement('div');
     modalDiv.innerHTML = `
-        <div class="modal fade" id="ModalLoading" tabindex="-1" aria-labelledby="ModalLoading" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="modalLoading" tabindex="-1" aria-labelledby="modalLoading" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog modal-ls">
                 <div class="modal-content">
                     <div class="modal-body text-center">
@@ -63,12 +66,12 @@ function createLoadingModal() {
             </div>
         </div>`;
     document.body.appendChild(modalDiv);
-    modalLoading = new bootstrap.Modal(document.getElementById('ModalLoading'));
+    modalLoading = new bootstrap.Modal(document.getElementById('modalLoading'));
 }
 
-function Loading(bandera){
+function OperarModal(bandera){
     return new Promise((resolve) => {
-        const elementoModal = document.getElementById('ModalLoading');
+        const elementoModal = document.getElementById('modalLoading');
         elementoModal.addEventListener(bandera ? 'shown.bs.modal' : 'hidden.bs.modal', () => {
             resolve();
         }, { once: true });
@@ -129,7 +132,7 @@ function formatDateString(dateString) {
 
 async function ObtenerSelect(tabla, idSelect, error) {
 	try{
-        Loading(true)
+        OperarModal(true)
 		let datos = {
 			accion: "obtenerTodos"
 		};
@@ -154,9 +157,9 @@ async function ObtenerSelect(tabla, idSelect, error) {
 		}else{
 			mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
 		}
-        Loading(false)
+        OperarModal(false)
 	}catch(e){
-        Loading(false)
+        OperarModal(false)
 		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
 	}
@@ -167,19 +170,19 @@ async function RegistrarVerificarTasa(){
     let exitoVerificarTasas = false;
     
     try{
-        await Loading(true)
-        for(let i = 0; i < this.monedas.length; i++){
+        await OperarModal(true)
+        for(let i = 0; i < monedas.length; i++){
             if(monedas[i].nombre !== 'Dólar'){
                 let datos = {
                     accion: "insertar",
                     datos: {
-                        tasa: parseFloat(document.getElementById("ModalTasaVerificacionInput" + monedas[i].nombre).value),
+                        tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre).value.replace(',', '.')),
                         usuario_id: usuario.usuarioId,
                         moneda_id: monedas[i].id
                     }
                 };
     
-                document.getElementById("ModalTasaVerificacionInput" + monedas[i].nombre).value = '';
+                document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre).value = '';
         
                 let data = await consultar("tasas_cambio",datos);
         
@@ -205,7 +208,7 @@ async function RegistrarVerificarTasa(){
             }
         }
 
-        await Loading(false)
+        await OperarModal(false)
 
         if(exitoVerificarTasas){
             window.location.href = "index.html";
@@ -213,7 +216,7 @@ async function RegistrarVerificarTasa(){
             mostrarNotificacion("No se pudo registrar","#FF0000") 
         }
     }catch(e){
-        Loading(false)
+        OperarModal(false)
         mostrarNotificacion("Error:", e,"#FF0000") 
         console.error('Error:', e);
     }
@@ -250,24 +253,24 @@ function CargarNavbar(pagina){
 async function VerificarTasa(){
     try {
         monedas = await consultar('monedas', { accion: "obtenerTodos", datos: {}});
-        if(typeof this.monedas === 'undefined' || this.monedas === null){
+        if(typeof monedas === 'undefined' || monedas === null){
             throw("Error al consultar la base de datos")
         }
         let contenido = ``;
 
-        for(let i = 0; i < this.monedas.length; i++){
+        for(let i = 0; i < monedas.length; i++){
             if(monedas[i].nombre !== 'Dólar'){
                 let tasa = await consultar('tasas_cambio', { accion: "obtenerPorUltimaFecha", datos: {moneda_id: monedas[i].id}});
                 if(typeof tasa !== 'undefined' && tasa !== null){
                     tasas.push(tasa)
                 }else{
-                    let nombre = "ModalTasaVerificacionInput" + monedas[i].nombre;
+                    let nombre = "modalTasaVerificacionInput" + monedas[i].nombre;
                     let etiquera = "Tasa para " + monedas[i].nombre;
                     contenido += `
                     <div class="row">
                         <div class="col-12 mb-2">
                             <label class="mb-2 text-muted" for="${nombre}">${etiquera}</label>
-                            <input id="${nombre}" type="text" class="form-control" name="${nombre}" value="" pattern ="^[0-9]+(,[0-9]+)?$" required autofocus>
+                            <input id="${nombre}" type="text" class="form-control" name="${nombre}" value="" pattern="^[0-9]+(\.[0-9]+)?$" required autofocus>
                         </div>  
                     </div> `;
                 }
@@ -277,7 +280,7 @@ async function VerificarTasa(){
         if(contenido !== ''){
             const modalDiv = document.createElement('div');
             modalDiv.innerHTML = `
-                        <div class="modal fade" id="ModalTasaVerificacion" tabindex="-1" aria-labelledby="ModalTasaVerificacionLabel" aria-hidden="true" data-bs-backdrop="static">
+                        <div class="modal fade" id="modalTasaVerificacion" tabindex="-1" aria-labelledby="modalTasaVerificacionLabel" aria-hidden="true" data-bs-backdrop="static">
                             <div class="modal-dialog modal-ls">
                                 <div class="modal-content">
                                     <div class="modal-body">
@@ -295,13 +298,13 @@ async function VerificarTasa(){
                             </div>
                         </div>`;
             document.body.appendChild(modalDiv);
-            var myModal = new bootstrap.Modal(document.getElementById('ModalTasaVerificacion'));
+            var myModal = new bootstrap.Modal(document.getElementById('modalTasaVerificacion'));
             myModal.show();
         }
     } catch (error) {
         const modalDiv = document.createElement('div');
         modalDiv.innerHTML = `
-                        <div class="modal fade" id="ModalTasaVerificacion" tabindex="-1" aria-labelledby="ModalTasaVerificacionLabel" aria-hidden="true" data-bs-backdrop="static">
+                        <div class="modal fade" id="modalTasaVerificacion" tabindex="-1" aria-labelledby="modalTasaVerificacionLabel" aria-hidden="true" data-bs-backdrop="static">
                             <div class="modal-dialog modal-ls">
                                 <div class="modal-content">
                                     <div class="modal-body text-center">
@@ -311,7 +314,7 @@ async function VerificarTasa(){
                             </div>
                         </div>`;
         document.body.appendChild(modalDiv);
-        var myModal = new bootstrap.Modal(document.getElementById('ModalTasaVerificacion'));
+        var myModal = new bootstrap.Modal(document.getElementById('modalTasaVerificacion'));
         myModal.show();
         console.error('Error:', error);
     }
