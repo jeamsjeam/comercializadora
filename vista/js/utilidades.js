@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         window.location.href.indexOf('recuperacion.html') === -1) {
 
         CargarNavbar(window.location.href);
-        crearModales();
+        CrearModales();
 
         let datosUsuario = sessionStorage.getItem('usuario');
         if (typeof datosUsuario === 'undefined' || datosUsuario === null) {
@@ -43,7 +43,7 @@ var tasas = [];
 var modalTasas= null;
 var modalLoading = null;
 
-function crearModales() {
+function CrearModales() {
     const modalDivTasas = document.createElement('div');
     modalDivTasas.innerHTML = `
         <div class="modal fade" id="modalTasaVerificacion" tabindex="-1" aria-labelledby="modalTasaVerificacionLabel" aria-hidden="true" data-bs-backdrop="static">
