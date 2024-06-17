@@ -50,7 +50,6 @@ CREATE TABLE tipo_factura (
 CREATE TABLE facturas (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
     persona_id BIGINT NOT NULL, -- Referencia al persona asociado a la factura
-    fecha_factura TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Fecha de emisión de la factura
     estado VARCHAR(20) NOT NULL, -- Estado de la factura (Por ejemplo: Pendiente, Pagada, Cancelada)
     total DECIMAL(10,2) NOT NULL, -- Total de la factura
     moneda_id BIGINT NOT NULL, -- Referencia a la moneda usada en la factura
@@ -142,6 +141,12 @@ ALTER TABLE facturas
 ADD CONSTRAINT fk_facturas_usuarios
 FOREIGN KEY (usuario_id)
 REFERENCES usuarios(id);
+
+-- Agregar clave foránea a la tabla facturas
+ALTER TABLE facturas
+ADD CONSTRAINT fk_facturas_moneda
+FOREIGN KEY (moneda_id)
+REFERENCES monedas(id);
 
 -- Agregar clave foránea a la tabla usuarios
 ALTER TABLE usuarios
