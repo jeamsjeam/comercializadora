@@ -6,7 +6,9 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM ".$tabla." WHERE id = ".$datos['id'];
+            $sql = "SELECT p.*, c.nombre as producto FROM ".$tabla." p";
+            $sql .= " JOIN productos c on c.id = p.producto_id ";
+            $sql .= " WHERE p.id = ".$datos['id'];
 
             return obtenerUno($sql);
 
@@ -17,11 +19,54 @@
         }   
     }
 
+    function ObtenerPorProducto($datos,$tabla) {
+
+        try{
+            $sql = "SELECT p.*, c.nombre as producto FROM ".$tabla." p";
+            $sql .= " JOIN productos c on c.id = p.producto_id ";
+            $sql .= " WHERE p.producto_id = ".$datos['producto_id'];
+
+            if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
+                $sql .= " AND p.fecha_creacion >= '".$datos["fecha_inicio"]." 00:00:00'";
+                $sql .= " AND p.fecha_creacion <= '".$datos["fecha_fin"]." 23:59:59'";
+            }
+
+            return obtenerVarios($sql);
+
+        }catch (Exception $e) {
+            
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }   
+    }
+
+    function ObtenerTodosPorFecha($datos,$tabla) {
+
+        try{         
+            // Consulta a la base de datos
+            $sql = "SELECT p.*, c.nombre as producto FROM ".$tabla." p";
+            $sql .= " JOIN productos c on c.id = p.producto_id ";
+
+            if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
+                $sql .= " AND p.fecha_creacion >= '".$datos["fecha_inicio"]." 00:00:00'";
+                $sql .= " AND p.fecha_creacion <= '".$datos["fecha_fin"]." 23:59:59'";
+            }
+       
+            return ObtenerVarios($sql);
+
+        }catch (Exception $e) {
+
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }   
+    }
+
     function ObtenerTodos($tabla) {
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT * FROM ".$tabla;
+            $sql = "SELECT p.*, c.nombre as producto FROM ".$tabla." p";
+            $sql .= " JOIN productos c on c.id = p.producto_id ";
        
             return ObtenerVarios($sql);
 
@@ -36,15 +81,16 @@
         
         try{
             // Consulta a la base de datos
-            $sql = "SELECT * FROM ".$tabla." WHERE id in (";
+            $sql = "SELECT p.*, c.nombre as producto FROM ".$tabla." p";
+            $sql .= " JOIN productos c on c.id = p.producto_id WHERE p.id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
-
+            
             return ObtenerVarios(rtrim($sql, ',').")");
 
         }catch (Exception $e) {
-
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }  
@@ -54,28 +100,45 @@
         
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (nombre, fecha_creacion) VALUES ";
-            $sql .= "('".$datos['nombre']."', NOW())";
+            // Consulta a la base de datos
+            $sql = "INSERT INTO ".$tabla." (persona_id, fecha_factura, estado, total, moneda_id, tasa_cambio, usuario_id, fecha_creacion, tipo_factura_id) VALUES ";
+            $sql .= "(".$datos['persona_id'].", ";
+            $sql .= "'".$datos['fecha_factura']."', ";
+            $sql .= "'".$datos['estado']."', ";
+            $sql .= $datos['total'].", ";
+            $sql .= $datos['moneda_id'].", ";
+            $sql .= $datos['tasa_cambio'].", ";
+            $sql .= $datos['usuario_id'].", ";
+            $sql .= "NOW(), ";
+            $sql .= $datos['tipo_factura_id'].") ";
     
-           return insertarUno($sql,$tabla);
+            return insertarUno($sql,$tabla);
 
         } catch (Exception $e) {
-
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
     }
 
-    function insertarLista($sql,$datos,$tabla) {
-        
+    function insertarLista($datos,$tabla) {
+       
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (nombre, fecha_creacion) VALUES ";
+            $sql = "INSERT INTO ".$tabla." (nombre, descripcion, precio, stock, categoria_id, fecha_creacion, estado) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
             for ($i = 0; $i < count($datos); $i++){
 
-                $sql .= "('".$datos[$i]['nombre']."', NOW()),";
+                $sql .= "(".$datos['persona_id'].", ";
+                $sql .= "'".$datos['fecha_factura']."', ";
+                $sql .= "'".$datos['estado']."', ";
+                $sql .= $datos['total'].", ";
+                $sql .= $datos['moneda_id'].", ";
+                $sql .= $datos['tasa_cambio'].", ";
+                $sql .= $datos['usuario_id'].", ";
+                $sql .= "NOW(), ";
+                $sql .= $datos['tipo_factura_id']."), ";
             }
 
             return insertarVarios(rtrim($sql, ','),$tabla);
@@ -92,7 +155,14 @@
         try {
             // Consulta a la base de datos
             $sql = "UPDATE ".$tabla." SET ";
-            $sql .= "nombre = '".$datos['nombre']."' ";
+            $sql .= "persona_id = ".$datos['persona_id'].", ";
+            $sql .= "fecha_factura = '".$datos['fecha_factura']."', ";
+            $sql .= "estado = '".$datos['estado']."', ";
+            $sql .= "total = ".$datos['total'].", ";
+            $sql .= "moneda_id = ".$datos['moneda_id'].", ";
+            $sql .= "tasa_cambio = ".$datos['tasa_cambio'].", ";
+            $sql .= "usuario_id = ".$datos['usuario_id'].", ";
+            $sql .= "tipo_factura_id = ".$datos['tipo_factura_id']." ";
             $sql .= "WHERE id = ".$datos['id'];
             
             return actualizarUno($datos,$tabla,$sql);
@@ -113,34 +183,43 @@
             foreach ($datos as $dato) {
 
                 // Consulta a la base de datos para actualizar el registro
-                $sql = "UPDATE ".$tabla." SET nombre = '".$dato['nombre']."' WHERE id = ".$dato['id'];
+                $sql = "UPDATE ".$tabla." SET ";
+                $sql .= "persona_id = ".$dato['persona_id'].", ";
+                $sql .= "fecha_factura = '".$dato['fecha_factura']."', ";
+                $sql .= "estado = '".$dato['estado']."', ";
+                $sql .= "total = ".$dato['total'].", ";
+                $sql .= "moneda_id = ".$dato['moneda_id'].", ";
+                $sql .= "tasa_cambio = ".$dato['tasa_cambio'].", ";
+                $sql .= "usuario_id = ".$dato['usuario_id'].", ";
+                $sql .= "tipo_factura_id = ".$dato['tipo_factura_id']." ";
+                $sql .= "WHERE id = ".$dato['id'];
                 $listaSQL[] = [
                     'id' => $dato['id'],
                     'sql' => $sql
                 ];
             }
     
+            // Consultar y devolver los registros actualizados
             return actualizarVarios($listaSQL,$tabla);
     
         } catch (Exception $e) {
-            
+           
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ' . $e->getMessage()];
         }
-    }   
+    }    
     
     function eliminar($datos,$tabla) {
-        
+
         try {
+            
             // Consulta a la base de datos
             $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
             
             return eliminarUno($datos,$tabla,$sql);
 
         } catch (Exception $e) {
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-    
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
@@ -161,9 +240,8 @@
                 $sql .= $datos[$i]['id'].",";
                 $listaIds[$i] = $datos[$i]['id'];
             }
-
             return eliminarLista($listaIds,$tabla,rtrim($sql, ',').")");
-
+            
         } catch (Exception $e) {
             
             // Código que se ejecuta si se lanza una excepción
@@ -180,7 +258,7 @@
             return;
         }
 
-        $tabla = "categorias";
+        $tabla = "detalles_factura";
         
         $data = json_decode($datosRecibidos, true);
 
@@ -194,6 +272,24 @@
                     break;
                 }
                 echo json_encode(ObtenerPorId($datos,$tabla));
+
+                break;
+            case "obtenerPorProducto":
+                $datos = $data['datos'] ?? null;
+                if($datos === null){
+                    echo json_encode(['error' => 'No se envio datos']);
+                    break;
+                }
+                echo json_encode(ObtenerPorCategoria($datos,$tabla));
+
+                break;
+            case "obtenerTodosPorFecha":
+                $datos = $data['datos'] ?? null;
+                if($datos === null){
+                    echo json_encode(['error' => 'No se envio datos']);
+                    break;
+                }
+                echo json_encode(ObtenerTodosPorFecha($datos,$tabla));
 
                 break;
             case "obtenerTodos":

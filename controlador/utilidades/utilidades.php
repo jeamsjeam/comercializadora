@@ -1,4 +1,7 @@
 <?php
+
+    include 'Conexion.php';
+
     // Permitir solicitudes desde cualquier origen
     header("Access-Control-Allow-Origin: *");
     // Permitir los métodos de solicitud especificados

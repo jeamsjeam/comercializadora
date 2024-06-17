@@ -1,6 +1,5 @@
 <?php
 
-    include 'utilidades/Conexion.php';
     include 'utilidades/utilidades.php';
 
     function ObtenerPorId($datos,$tabla) {
@@ -73,9 +72,7 @@
     }
 
     function ObtenerPorListaId($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-
+        
         try{
             // Consulta a la base de datos
             $sql = "SELECT us.*, ro.nombre as 'rolnombre' FROM ".$tabla." us ";
@@ -84,9 +81,8 @@
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
-            $sql = rtrim($sql, ',').")";
-
-            return ObtenerVarios($sql);
+            
+            return ObtenerVarios(rtrim($sql, ',').")");
 
         }catch (Exception $e) {
 
@@ -96,8 +92,7 @@
     }
 
     function insertar($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
+        
         try {
             $datosAdministrador = [
                 'usuario' => $datos["usuarioAdministrador"],
@@ -115,6 +110,7 @@
             $sql .= "('".$datos['usuario']."', '".$datos['correo']."','".$datos['clave']."', ".$datos['rol_id'].", NOW(), '".$datos['estado']."')";
     
             return insertarUno($sql,$tabla);
+
         } catch (Exception $e) {
 
             // Código que se ejecuta si se lanza una excepción
@@ -123,9 +119,7 @@
     }
 
     function insertarLista($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-
+        
         try {
             $datosAdministrador = [
                 'usuario' => $datos[0]["usuarioAdministrador"],
@@ -157,9 +151,7 @@
     }
 
     function actualizar($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-    
+        
         try {
             // Consulta a la base de datos
             $sql = "UPDATE ".$tabla." SET ";
@@ -173,18 +165,14 @@
             return actualizarUno($datos,$tabla,$sql);
 
         } catch (Exception $e) {
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-    
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
     }
     
     function actualizarLista($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();        
-    
+        
         try {
             $listaSQL = null;
     
@@ -209,18 +197,14 @@
             return actualizarVarios($listaSQL,$tabla);
     
         } catch (Exception $e) {
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-    
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ' . $e->getMessage()];
         }
     }    
     
     function eliminar($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-    
+        
         try {
             // Consulta a la base de datos
             $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
@@ -228,18 +212,14 @@
             return eliminarUno($datos,$tabla,$sql);
 
         } catch (Exception $e) {
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-    
+           
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
     }
     
     function eliminarLista($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-
+        
         try {
             // Consulta a la base de datos
             $sql = "";
@@ -258,9 +238,7 @@
             return eliminarLista($listaIds,$tabla,$sql);
 
         } catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
-
+             
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }

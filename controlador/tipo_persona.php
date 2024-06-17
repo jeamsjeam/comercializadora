@@ -1,6 +1,5 @@
 <?php
 
-    include 'utilidades/Conexion.php';
     include 'utilidades/utilidades.php';
 
     function ObtenerPorId($datos,$tabla) {
@@ -12,9 +11,7 @@
             return obtenerUno($sql);
 
         }catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
-
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }   
@@ -36,34 +33,17 @@
     }
 
     function ObtenerPorListaId($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-
+        
         try{
             // Consulta a la base de datos
             $sql = "SELECT * FROM ".$tabla." WHERE id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }
-            $sql = rtrim($sql, ',').")";
 
-            $consulta = $db->consulta($sql);
+            return ObtenerVarios(rtrim($sql, ',').")");
 
-            $resultado = null;
-
-            if ($consulta !== null && $consulta->num_rows > 0) {
-                // Almacenar la consulta en un diccionario
-                while($fila = $consulta->fetch_assoc()) {
-                    $resultado[] = $fila;
-                }
-            }
-
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-            return $resultado;
         }catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
@@ -71,40 +51,23 @@
     }
 
     function insertar($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
+        
         try {
             // Consulta a la base de datos
             $sql = "INSERT INTO ".$tabla." (nombre, fecha_creacion) VALUES ";
             $sql .= "('".$datos['nombre']."', NOW())";
     
-            $resultado = $db->consulta($sql);
-    
-            // Verificar si la consulta se ejecutó correctamente
-            if ($resultado === true) {
-                // Obtener el ID del nuevo registro insertado
-                $id_insertado['id'] = $db->getConexion()->insert_id;
-                $db->cerrar();
-                // Consultar y devolver el registro insertado
-                return ObtenerPorId($id_insertado,$tabla);
-            } else {
-                $db->cerrar();
-                // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Error al insertar el registro'];
-            }
+           return insertarUno($sql,$tabla);
+
         } catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
 
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
     }
 
-    function insertarLista($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-
+    function insertarLista($sql,$datos,$tabla) {
+        
         try {
             // Consulta a la base de datos
             $sql = "INSERT INTO ".$tabla." (nombre, fecha_creacion) VALUES ";
@@ -115,36 +78,17 @@
                 $sql .= "('".$datos[$i]['nombre']."', NOW()),";
             }
 
-            $resultado = $db->consulta(rtrim($sql, ','));
-    
-            /// Verificar si la consulta se ejecutó correctamente
-            if ($resultado === true) {
-                // Obtener el rango de IDs asignados a los registros insertados
-                $primer_id = $db->getConexion()->insert_id;
-                $db->cerrar();
-                $ultimo_id = $primer_id + count($datos) - 1;
+            return insertarVarios(rtrim($sql, ','),$tabla);
 
-                // Consultar y devolver los registros insertados
-                $ids_insertados = range($primer_id, $ultimo_id);
-                return ObtenerPorListaId($ids_insertados,$tabla);
-            } else {
-                $db->cerrar();
-                // Si la consulta falla, devolver un mensaje de error
-                return ['error' => 'Error al insertar los registros'];
-            }
         } catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
-
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
     }
 
     function actualizar($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-    
+        
         try {
             // Consulta a la base de datos
             $sql = "UPDATE ".$tabla." SET ";
@@ -154,18 +98,14 @@
             return actualizarUno($datos,$tabla,$sql);
 
         } catch (Exception $e) {
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-    
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
     }
     
     function actualizarLista($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();        
-    
+        
         try {
             $listaSQL = null;
     
@@ -180,22 +120,17 @@
                 ];
             }
     
-            // Consultar y devolver los registros actualizados
             return actualizarVarios($listaSQL,$tabla);
     
         } catch (Exception $e) {
-            // Cerrar la conexión manualmente
-            $db->cerrar();
-    
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ' . $e->getMessage()];
         }
     }   
     
     function eliminar($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-    
+        
         try {
             // Consulta a la base de datos
             $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
@@ -212,9 +147,7 @@
     }
     
     function eliminarLista($datos,$tabla) {
-        // Crear instancia de la clase Conexion
-        $db = new Conexion();
-
+        
         try {
             // Consulta a la base de datos
             $sql = "";
@@ -228,14 +161,11 @@
                 $sql .= $datos[$i]['id'].",";
                 $listaIds[$i] = $datos[$i]['id'];
             }
-            $sql = rtrim($sql, ',').")";
 
-            return eliminarLista($listaIds,$tabla,$sql);
+            return eliminarLista($listaIds,$tabla,rtrim($sql, ',').")");
 
         } catch (Exception $e) {
-             // Cerrar la conexión manualmente
-             $db->cerrar();
-
+            
             // Código que se ejecuta si se lanza una excepción
             return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
         }
