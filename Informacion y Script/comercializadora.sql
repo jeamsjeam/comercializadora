@@ -93,7 +93,8 @@ CREATE TABLE monedas (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE, -- Nombre de la moneda (Bolívar, Dólar, Peso Colombiano)
     simbolo VARCHAR(10) NOT NULL, -- Símbolo de la moneda (Bs, $, COL$)
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación del registro
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación del registro
+	principal TINYINT(1) NOT NULL DEFAULT 0, -- Indica si es principal (0: No, 1: Sí)
 );
 
 -- Tabla para almacenar tasas de cambio.
@@ -267,10 +268,10 @@ INSERT INTO roles (nombre, descripcion) VALUES
 ('Cliente', 'Usuario que puede realizar compras');
 
 -- Inserción de datos en la tabla monedas
-INSERT INTO monedas (nombre, simbolo) VALUES
-('Dólar', '$'),
-('Bolívar', 'Bs'),
-('Peso Colombiano', 'COL$');
+INSERT INTO monedas (nombre, simbolo, principal) VALUES
+('Dólar', '$', 1),
+('Bolívar', 'Bs', 0),
+('Peso Colombiano', 'COL$', 0);
 
 -- Inserción de datos en la tabla usuarios
 INSERT INTO usuarios (usuario, correo, clave, rol_id) VALUES

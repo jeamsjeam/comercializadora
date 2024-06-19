@@ -195,7 +195,7 @@ async function RegistrarVerificarTasa(){
     try{
         await Loading(true)
         for(let i = 0; i < monedas.length; i++){
-            if(monedas[i].nombre !== 'Dólar'){
+            if(monedas[i].principal !== "1"){
                 let datos = {
                     accion: "insertar",
                     datos: {

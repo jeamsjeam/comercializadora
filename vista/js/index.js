@@ -14,6 +14,22 @@ document.addEventListener("DOMContentLoaded", async function () {
                     </li>`;
             }
             document.getElementById('informacionTasas').innerHTML = contenido;
+
+            contenido = ``;
+            for (let i = 0; i < monedas.length; i++) {
+                contenido += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-5">
+                      ${monedas[i].nombre} <div>`
+                if(monedas[i].principal === '1'){
+                    contenido += `<span class="badge bg-success rounded-pill mx-3" style="font-size: 0.8rem;">Principal</span>`
+                }
+                contenido += `
+                            <button class="btn btn-sm btn-primary" onclick="ModificarMoneda(${monedas[i].id})"><i class="bi bi-pen"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="EliminarMoneda(${monedas[i].id})"><i class="bi bi-trash3"></i></button>
+                        </div>
+                    </li>`;
+            }
+            document.getElementById('informacionMonedas').innerHTML = contenido;
         } 
     });
 
@@ -29,6 +45,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById('fechaFin').value=ano+"-"+mes+"-"+dia;
     
     await consultarFacturas()
+    Grafica()
 });
 
 async function consultarFacturas() {
@@ -85,4 +102,43 @@ async function consultarFacturas() {
 		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
 	}
+}
+
+function Grafica(){
+    const ctx = document.getElementById('myChart');
+
+    let etiquetas = ['01/06/2024', '02/06/2024', '03/06/2024', '04/06/2024', '05/06/2024', '06/06/2024', '07/06/2024']
+
+    let compras = {
+                    label: 'Compras',
+                    data: [12, 19, 3, 5, 2, 3,1],
+                    backgroundColor: 'rgba(0,255,0)',
+                    borderWidth: 1
+                };
+    let ventas = {
+                    label: 'Ventas',
+                    data: [1, 20, 5, 8, 2, 1,1],
+                    backgroundColor: 'rgba(0,0,255)',
+                    borderWidth: 1
+                };
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: etiquetas,
+            datasets: [
+                compras, 
+                ventas
+            ]
+        },
+        options: {
+            scales: {
+                yAxes:[{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }] 
+            }
+        }
+      });
 }

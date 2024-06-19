@@ -53,9 +53,19 @@
     function insertar($datos,$tabla) {
         
         try {
+
+            if($datos["principal"] === 1){
+                if(ConsultaSQL("UPDATE ".$tabla." SET principal = 0 WHERE principal = 1")){
+                    // Código que se ejecuta si se lanza una excepción
+                    return ['error' => 'Ocurrio un error'];
+                }
+            }
+
+            $sql = "SELECT * FROM ".$tabla." WHERE" ;
+
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (nombre, simbolo, fecha_creacion) VALUES ";
-            $sql .= "('".$datos['nombre']."','".$datos['simbolo']."', NOW())";
+            $sql = "INSERT INTO ".$tabla." (nombre, simbolo, principal fecha_creacion) VALUES ";
+            $sql .= "('".$datos['nombre']."','".$datos['simbolo']."', '".$datos['principal']."', NOW())";
     
             return insertarUno($sql,$tabla);
 
@@ -70,12 +80,22 @@
         
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (nombre, simbolo, fecha_creacion) VALUES ";
-
+            $sql = "INSERT INTO ".$tabla." (nombre, simbolo, principal, fecha_creacion) VALUES ";
+            $bandera = false;
             // Se recorre el objeto procesado y se construye la query
             for ($i = 0; $i < count($datos); $i++){
 
-                $sql .= "('".$datos[$i]['nombre']."','".$datos['simbolo']."', NOW()),";
+                $sql .= "('".$datos[$i]['nombre']."','".$datos['simbolo']."', '".$datos['principal']."', NOW()),";
+                if($datos[$i]["principal"] === 1){
+                    $bandera = true;
+                }
+            }
+
+            if($bandera){
+                if(ConsultaSQL("UPDATE ".$tabla." SET principal = 0 WHERE principal = 1")){
+                    // Código que se ejecuta si se lanza una excepción
+                    return ['error' => 'Ocurrio un error'];
+                }
             }
 
             return insertarVarios(rtrim($sql, ','),$tabla);
@@ -92,9 +112,17 @@
         try {
             // Consulta a la base de datos
             $sql = "UPDATE ".$tabla." SET ";
-            $sql .= "nombre = '".$datos['nombre']."' ";
-            $sql .= "simbolo = '".$datos['simbolo']."' ";
+            $sql .= "nombre = '".$datos['nombre']."', ";
+            $sql .= "simbolo = '".$datos['simbolo']."', ";
+            $sql .= "principal = '".$datos['principal']."' ";
             $sql .= "WHERE id = ".$datos['id'];
+
+            if($datos["principal"] === 1){
+                if(ConsultaSQL("UPDATE ".$tabla." SET principal = 0 WHERE principal = 1")){
+                    // Código que se ejecuta si se lanza una excepción
+                    return ['error' => 'Ocurrio un error'];
+                }
+            }
             
             return actualizarUno($datos,$tabla,$sql);
 
@@ -114,11 +142,21 @@
             foreach ($datos as $dato) {
 
                 // Consulta a la base de datos para actualizar el registro
-                $sql = "UPDATE ".$tabla." SET nombre = '".$dato['nombre']."', simbolo = '".$datos['simbolo']."' WHERE id = ".$dato['id'];
+                $sql = "UPDATE ".$tabla." SET nombre = '".$dato['nombre']."', simbolo = '".$datos['simbolo']."',principal = '".$datos['principal']."' WHERE id = ".$dato['id'];
                 $listaSQL[] = [
                     'id' => $dato['id'],
                     'sql' => $sql
                 ];
+                if($dato["principal"] === 1){
+                    $bandera = true;
+                }
+            }
+
+            if($bandera){
+                if(ConsultaSQL("UPDATE ".$tabla." SET principal = 0 WHERE principal = 1")){
+                    // Código que se ejecuta si se lanza una excepción
+                    return ['error' => 'Ocurrio un error'];
+                }
             }
     
             // Consultar y devolver los registros actualizados

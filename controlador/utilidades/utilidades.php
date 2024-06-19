@@ -286,4 +286,33 @@
         }
     }
 
+    function ConsultaSQL($sql){
+         // Crear instancia de la clase Conexion
+         $db = new Conexion();
+
+         try {
+
+             $resultado = $db->consulta($sql);
+     
+             /// Verificar si la consulta se ejecutó correctamente
+             if ($resultado === true) {
+                 $db->cerrar();
+ 
+                 // Consultar y devolver los registros insertados
+                 return true;
+             } else {
+                 $db->cerrar();
+ 
+                 // Si la consulta falla, devolver un mensaje de error
+                 return false;
+             }
+         } catch (Exception $e) {
+              // Cerrar la conexión manualmente
+              $db->cerrar();
+ 
+             // Código que se ejecuta si se lanza una excepción
+             return false;
+         }
+    }
+
 ?>
