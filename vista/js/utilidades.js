@@ -194,19 +194,20 @@ async function RegistrarVerificarTasa(){
     modalTasas.hide()
     try{
         await Loading(true)
+
         for(let i = 0; i < monedas.length; i++){
             if(monedas[i].principal !== "1"){
                 let datos = {
                     accion: "insertar",
                     datos: {
-                        tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre).value.replace(',', '.')),
+                        tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')).value.replace(',', '.')),
                         usuario_id: usuario.usuarioId,
                         moneda_id: monedas[i].id
                     }
                 };
-    
+                debugger
                 let data = await consultar("tasas_cambio",datos);
-        
+                debugger
                 if(data !== null && typeof data !== 'undefined'){
                     if (data.message) {
                         mostrarNotificacion(data.message,"#FF0000") 
@@ -280,12 +281,12 @@ async function VerificarTasa(){
         let contenido = ``;
 
         for(let i = 0; i < monedas.length; i++){
-            if(monedas[i].nombre !== 'Dólar'){
+            if(monedas[i].principal !== '1'){
                 let tasa = await consultar('tasas_cambio', { accion: "obtenerPorUltimaFecha", datos: {moneda_id: monedas[i].id}});
                 if(typeof tasa !== 'undefined' && tasa !== null){
                     tasas.push(tasa)
                 }else{
-                    let nombre = "modalTasaVerificacionInput" + monedas[i].nombre;
+                    let nombre = "modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '');
                     let etiquera = "Tasa para " + monedas[i].nombre;
                     contenido += `
                     <div class="row">

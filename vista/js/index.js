@@ -23,15 +23,25 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if(monedas[i].principal === '1'){
                     contenido += `<span class="badge bg-success rounded-pill mx-3" style="font-size: 0.8rem;">Principal</span>`
                 }
-                contenido += `
-                            <button class="btn btn-sm btn-primary" onclick="ModificarMoneda(${monedas[i].id})"><i class="bi bi-pen"></i></button>
-                            <button class="btn btn-sm btn-danger" onclick="EliminarMoneda(${monedas[i].id})"><i class="bi bi-trash3"></i></button>
+                contenido += `<button class="btn btn-sm btn-primary" onclick="ModificarMoneda(${monedas[i].id})"><i class="bi bi-check2-circle"></i></button>
                         </div>
                     </li>`;
             }
             document.getElementById('informacionMonedas').innerHTML = contenido;
         } 
+
+        let tasaRegistrada = JSON.parse(localStorage.getItem('tasa'));
+            if (typeof tasaRegistrada !== 'undefined' &&  tasaRegistrada !== null && typeof tasaRegistrada.tasa !== 'undefined' && tasaRegistrada.tasa !== null) {
+                mostrarNotificacion("Tasas Registradas", "linear-gradient(to right, #00b09b, #96c93d)"); 
+            }
+
     });
+
+    let monedaModificada = JSON.parse(localStorage.getItem('monedaModificada'));
+    if (typeof monedaModificada !== 'undefined' &&  monedaModificada !== null && typeof monedaModificada.nombre !== 'undefined' && monedaModificada.nombre !== null) {
+        mostrarNotificacion("Moneda " + monedaModificada.nombre + " modificada como principal", "linear-gradient(to right, #00b09b, #96c93d)"); 
+    }
+    localStorage.removeItem('monedaModificada');
 
     let fecha = new Date(); //Fecha actual
     let mes = fecha.getMonth()+1; //obteniendo mes
@@ -102,6 +112,50 @@ async function consultarFacturas() {
 		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
 	}
+}
+
+async function ModificarMoneda(id){
+
+    try{
+
+        moneda = monedas.find((element) => element.id > id);
+
+        let datos = {
+            accion: "actualizar",
+            datos: {
+                id: id,
+                principal: 1
+            }
+        };
+
+        let data = await consultar("monedas",datos);
+        
+        if(data !== null && typeof data !== 'undefined'){
+            if (data.message) {
+                mostrarNotificacion(data.message,"#FF0000") 
+            } else if (data.error) {
+                if(typeof data[0] !== 'undefined' && data[0] !== null){
+                    mostrarNotificacion(data.error + " " + data[0] ,"#FF0000") 
+                }else{
+                    mostrarNotificacion(data.error,"#FF0000") 
+                }
+            } else {
+                mostrarNotificacion("Moneda: " + data.usuario,"linear-gradient(to right, #00b09b, #96c93d)") 
+                let eliminado = {
+                    moneda: data.nombre
+                }
+
+                localStorage.setItem('modificarMoneda', JSON.stringify(eliminado))
+                window.location.href = "index.html";
+            }
+        }else{
+            mostrarNotificacion("No se pudo eliminar","#FF0000") 
+        }
+    }catch(e){
+        mostrarNotificacion("Error:", e,"#FF0000") 
+        console.error('Error:', e);
+    }
+    
 }
 
 function Grafica(){

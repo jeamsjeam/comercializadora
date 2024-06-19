@@ -112,13 +112,13 @@
         try {
             // Consulta a la base de datos
             $sql = "UPDATE ".$tabla." SET ";
-            $sql .= "nombre = '".$datos['nombre']."', ";
-            $sql .= "simbolo = '".$datos['simbolo']."', ";
+            //$sql .= "nombre = '".$datos['nombre']."', ";
+           // $sql .= "simbolo = '".$datos['simbolo']."', ";
             $sql .= "principal = '".$datos['principal']."' ";
             $sql .= "WHERE id = ".$datos['id'];
 
             if($datos["principal"] === 1){
-                if(ConsultaSQL("UPDATE ".$tabla." SET principal = 0 WHERE principal = 1")){
+                if(!ConsultaSQL("UPDATE ".$tabla." SET principal = 0 WHERE principal = 1")){
                     // Código que se ejecuta si se lanza una excepción
                     return ['error' => 'Ocurrio un error'];
                 }
@@ -141,8 +141,12 @@
             // Se recorre el objeto procesado y se construye la query
             foreach ($datos as $dato) {
 
-                // Consulta a la base de datos para actualizar el registro
-                $sql = "UPDATE ".$tabla." SET nombre = '".$dato['nombre']."', simbolo = '".$datos['simbolo']."',principal = '".$datos['principal']."' WHERE id = ".$dato['id'];
+                // Consulta a la base de datos
+                $sql = "UPDATE ".$tabla." SET ";
+                //$sql .= "nombre = '".$dato['nombre']."', ";
+                // $sql .= "simbolo = '".$dato['simbolo']."', ";
+                $sql .= "principal = '".$dato['principal']."' ";
+                $sql .= "WHERE id = ".$dato['id'];
                 $listaSQL[] = [
                     'id' => $dato['id'],
                     'sql' => $sql
