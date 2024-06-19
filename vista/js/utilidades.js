@@ -196,7 +196,7 @@ async function RegistrarVerificarTasa(){
         await Loading(true)
 
         for(let i = 0; i < monedas.length; i++){
-            if(monedas[i].principal !== "1"){
+            if(monedas[i].principal !== "1" && document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')) != null){
                 let datos = {
                     accion: "insertar",
                     datos: {
