@@ -94,7 +94,7 @@ CREATE TABLE monedas (
     nombre VARCHAR(50) NOT NULL UNIQUE, -- Nombre de la moneda (Bolívar, Dólar, Peso Colombiano)
     simbolo VARCHAR(10) NOT NULL, -- Símbolo de la moneda (Bs, $, COL$)
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación del registro
-	principal TINYINT(1) NOT NULL DEFAULT 0, -- Indica si es principal (0: No, 1: Sí)
+	principal TINYINT(1) NOT NULL DEFAULT 0 -- Indica si es principal (0: No, 1: Sí)
 );
 
 -- Tabla para almacenar tasas de cambio.

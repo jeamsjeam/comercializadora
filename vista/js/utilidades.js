@@ -205,9 +205,9 @@ async function RegistrarVerificarTasa(){
                         moneda_id: monedas[i].id
                     }
                 };
-                debugger
+       
                 let data = await consultar("tasas_cambio",datos);
-                debugger
+          
                 if(data !== null && typeof data !== 'undefined'){
                     if (data.message) {
                         mostrarNotificacion(data.message,"#FF0000") 

@@ -149,14 +149,14 @@
             // Consulta a la base de datos
             
             $sql = "SELECT p.tipo_factura_id AS factura, COUNT(p.tipo_factura_id) AS cantidad FROM ".$tabla." p";
-            $sql .= " WHERE p.tipo_factura_id = 1";
+            $sql .= " WHERE p.tipo_factura_id = 1  AND p.estado = 'Pagada' ";
             if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
                 $sql .= " AND p.fecha_creacion >= '".$datos["fecha_inicio"]." 00:00:00'";
                 $sql .= " AND p.fecha_creacion <= '".$datos["fecha_fin"]." 23:59:59'";
             }
             $sql .= " UNION ";
             $sql .= "SELECT p.tipo_factura_id AS factura, COUNT(p.tipo_factura_id) AS cantidad FROM ".$tabla." p";
-            $sql .= " WHERE p.tipo_factura_id = 2";
+            $sql .= " WHERE p.tipo_factura_id = 2 AND p.estado = 'Pagada' ";
             if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
                 $sql .= " AND p.fecha_creacion >= '".$datos["fecha_inicio"]." 00:00:00'";
                 $sql .= " AND p.fecha_creacion <= '".$datos["fecha_fin"]." 23:59:59'";
@@ -200,6 +200,33 @@
             }
             
             return $facturas;
+
+        }catch (Exception $e) {
+
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }   
+    }
+
+    function ObtenerCantidadPorTipo($datos,$tabla) {
+
+        try{         
+
+            if($datos["fecha_inicio"] == null || $datos["fecha_fin"] == null){
+                return ['error' => 'Error en los datos enviados'];
+            }
+            if($datos["estado"] == null){
+                $datos["estado"] = "Pagada";
+            }
+
+            // Consulta a la base de datos
+            $sql = "SELECT tipo, fecha, COUNT(fecha) AS cantidad FROM (";
+            $sql .= " SELECT tipo_factura_id AS tipo, DATE_FORMAT(fa.fecha_creacion, '%d-%m-%Y') AS fecha FROM ".$tabla." fa";
+            $sql .= " WHERE fa.tipo_factura_id = ".$datos["tipo"]." AND fa.estado = '".$datos["estado"]."' AND";
+            $sql .= " fa.fecha_creacion >= '".$datos["fecha_inicio"]." 00:00:00' AND";
+            $sql .= " fa.fecha_creacion <= '".$datos["fecha_fin"]." 23:59:59'";
+            $sql .= " ) AS tabla GROUP BY tipo, fecha";
+            return obtenerVarios($sql);
 
         }catch (Exception $e) {
 
@@ -478,6 +505,15 @@
                     break;
                 }
                 echo json_encode(ObtenerTodosPorFecha($datos,$tabla));
+
+                break;
+            case "obtenerCantidadPorTipo":
+                $datos = $data['datos'] ?? null;
+                if($datos === null){
+                    echo json_encode(['error' => 'No se envio datos']);
+                    break;
+                }
+                echo json_encode(ObtenerCantidadPorTipo($datos,$tabla));
 
                 break;
             case "obtenerTodos":

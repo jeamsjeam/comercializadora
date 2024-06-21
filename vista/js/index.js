@@ -55,7 +55,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById('fechaFin').value=ano+"-"+mes+"-"+dia;
     
     await consultarFacturas()
-    Grafica()
 });
 
 async function consultarFacturas() {
@@ -71,11 +70,14 @@ async function consultarFacturas() {
         spanVentas.className = "badge bg-danger rounded-pill"
         spanCompras.className = "badge bg-danger rounded-pill"
 
+        let fechaInicio = document.getElementById("fechaInicio").value
+        let fechaFin = document.getElementById("fechaFin").value
+
         let datos = {
             accion: "obtenerCantidadVentas",
             datos: {
-                fecha_inicio: document.getElementById("fechaInicio").value,
-                fecha_fin: document.getElementById("fechaFin").value
+                fecha_inicio: fechaInicio,
+                fecha_fin: fechaFin
             }
         };
 
@@ -95,10 +97,19 @@ async function consultarFacturas() {
                     for(let i = 0; i < data.length; i++){
                         if(data[i].factura === "1"){
                             spanVentas.innerHTML = data[i].cantidad
-                            spanVentas.className = "badge bg-primary rounded-pill"
+                            if(data[i].cantidad !== '0'){
+                                spanVentas.className = "badge bg-primary rounded-pill"
+                            }else{
+                                spanVentas.className = "badge bg-danger rounded-pill"
+                            }
+                            
                         }else{ 
                             spanCompras.innerHTML = data[i].cantidad
-                            spanCompras.className = "badge bg-primary rounded-pill"
+                            if(data[i].cantidad !== '0'){
+                                spanCompras.className = "badge bg-primary rounded-pill"
+                            }else{
+                                spanCompras.className = "badge bg-danger rounded-pill"
+                            }
                         }
                     }
                 } 
@@ -106,12 +117,86 @@ async function consultarFacturas() {
 		}else{
 			mostrarNotificacion("No se encontro datos","#FF0000") 
 		}
+        await DatosGrafica(fechaInicio, fechaFin);
         await Loading(false)
 	}catch(e){
         await Loading(false)
 		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
 	}
+}
+
+async function DatosGrafica(fechaInicio, fechaFin){
+
+    try {
+
+        let dataTipo1 = []
+        let dataTipo2 = []
+        let etiquetas = []
+
+        for(let i = 0; i < 2; i++){
+
+            let datos = {
+                accion: "obtenerCantidadPorTipo",
+                datos: {
+                    fecha_inicio: fechaInicio,
+                    fecha_fin: fechaFin,
+                    tipo: (i+1),
+                    estado: "Pagada"
+                }
+            };
+            let data = await consultar("facturas",datos);
+        
+            let inicio = new Date(fechaInicio)
+            let fin = new Date(fechaFin)
+
+            while(fin.getTime() >= inicio.getTime()){
+                inicio.setDate(inicio.getDate() + 1);
+                let dia = inicio.getDate()
+                let mes = (inicio.getMonth() + 1)
+                let anio = inicio.getFullYear()
+
+                if(dia<10)
+                    dia='0'+dia;
+                if(mes<10)
+                    mes='0'+mes
+                
+                let iteracionActual = dia + '-' + mes + '-' + anio
+
+                if(i === 0){
+                    etiquetas.push(iteracionActual)
+                }
+                
+                let datoExiste = null
+
+                if(data !== null && typeof data !== 'undefined' && data.length > 0 && typeof data[0].fecha !== 'undefined'  && data[0].fecha !== null){
+                    datoExiste = data.find(x => x.fecha === iteracionActual)
+                }
+
+                if(typeof datoExiste !== 'undefined' && datoExiste !== null){
+                    if(parseInt(datoExiste.tipo) == 1){
+                        dataTipo1.push(parseInt(datoExiste.cantidad))
+                    }else{
+                        dataTipo2.push(parseInt(datoExiste.cantidad))
+                    }
+                    
+                }else{
+                    if((i+1) == 1){
+                        dataTipo1.push(0)
+                    }else{
+                        dataTipo2.push(0)
+                    }
+                }
+            }
+        }
+
+        Grafica(etiquetas, dataTipo1,dataTipo2)
+    } catch (e) {
+        mostrarNotificacion("Error:", e,"#FF0000") 
+		console.error('Error:', e);
+    }
+
+    
 }
 
 async function ModificarMoneda(id){
@@ -158,25 +243,29 @@ async function ModificarMoneda(id){
     
 }
 
-function Grafica(){
-    const ctx = document.getElementById('myChart');
+var myChart = null
 
-    let etiquetas = ['01/06/2024', '02/06/2024', '03/06/2024', '04/06/2024', '05/06/2024', '06/06/2024', '07/06/2024']
+function Grafica(etiquetas, datosTipo1, datosTipo2){
+    let ctx = document.getElementById('myChart');
 
     let compras = {
-                    label: 'Compras',
-                    data: [12, 19, 3, 5, 2, 3,1],
+                    label: 'Ventas',
+                    data: datosTipo1,
                     backgroundColor: 'rgba(0,255,0)',
                     borderWidth: 1
                 };
     let ventas = {
-                    label: 'Ventas',
-                    data: [1, 20, 5, 8, 2, 1,1],
+                    label: 'Compras',
+                    data: datosTipo2,
                     backgroundColor: 'rgba(0,0,255)',
                     borderWidth: 1
                 };
 
-    new Chart(ctx, {
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: etiquetas,
@@ -187,12 +276,12 @@ function Grafica(){
         },
         options: {
             scales: {
-                yAxes:[{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }] 
+              y: {
+                ticks: {
+                  stepSize: 1
+                },
+              }
             }
-        }
+          }
       });
 }
