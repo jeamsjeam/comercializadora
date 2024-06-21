@@ -256,6 +256,17 @@ async function ModificarMoneda(id){
     
 }
 
+async function AbrirModalCrearTasa(){
+    await ObtenerSelect("monedas", "monedas-select", "moneda", monedas);
+    let modalTasas = new bootstrap.Modal(document.getElementById('modalCrearTasa'));
+    modalTasas.show();
+}
+
+async function CrearTasa(){
+    let moneda = document.querySelector('select[name="rol"]').selectedOptions[0].value
+    let tasa = document.getElementById("tasaNueva").value
+}
+
 var myChart = null
 
 function Grafica(etiquetas, datosTipo1, datosTipo2){

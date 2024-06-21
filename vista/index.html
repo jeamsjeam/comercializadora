@@ -14,7 +14,7 @@
   <nav id="navbar" class="navbar navbar-expand-lg navbar-dark ht bg-dark">
   </nav>
 
-  <div class="container-fluid">
+  <div class="container">
     <section class="mt-5">
       <div class="row text-center px-5 mb-5">
         <div class="col-12">
@@ -72,7 +72,7 @@
                       <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
                     </li>
                   </ul>
-                <button class="btn btn-success m-3" onclick="CrearTasas()">Agregar tasa</button>
+                <button class="btn btn-success m-3" onclick="AbrirModalCrearTasa()">Agregar tasa</button>
               </div>
             </div>
             <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 mb-5 mb-lg-0">
@@ -89,6 +89,42 @@
         </div>
       </div>
     </section>
+
+  <div class="modal fade" id="modalCrearTasa" tabindex="-1" aria-labelledby="modalCrearTasa" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-ls">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <form name="formularioCrearTasas" id="formularioCrearTasas" method="post" class="m-3" action="#" onsubmit="event.preventDefault(); CrearTasa()">
+            <div class="row">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="mb-2 text-muted" for="moneda">Moneda</label>
+                  <select name="moneda" class="form-select" aria-label="Default select example" id="monedas-select">
+                    <!-- Agrega opciones del select si es necesario -->
+                  </select>
+                </div>
+  
+                <div class="mb-3">
+                  <div class="col-12 mb-2">
+                    <label class="mb-2 text-muted" for="tasaNueva">Tasa</label>
+                    <input id="tasaNueva" type="text" class="form-control" name="tasaNueva" value="" pattern="^[0-9]+(\.[0-9]+)?$" required autofocus>
+                  </div>  
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4 mb-3">
+              <!-- Boton Registrar -->
+              <div class="col-6">
+                <button type="submit" name="botonRegistrarTasas" value="1" class="btn btn-primary">Registrar</button>
+              </div>
+              <div class="col-6">
+                <button type="submit" name="cancelarTasas" value="1" class="btn btn-primary">Cancelar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 
 	<script src="bootstrap-5/js/bootstrap.min.js"></script>

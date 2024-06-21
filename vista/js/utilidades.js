@@ -153,36 +153,44 @@ function formatoDecimalString(valor) {
     }
 }
 
-async function ObtenerSelect(tabla, idSelect, error) {
+async function ObtenerSelect(tabla, idSelect, error, datos) {
 	try{
-        Loading(true)
-		let datos = {
-			accion: "obtenerTodos"
-		};
 
-		let select = document.getElementById(idSelect);
+        let select = document.getElementById(idSelect);
+        
+        if(typeof datos !== 'undefined' && datos !== null){
+            datos.forEach(s => {
+                // Creamos una opción para cada select
+                let option = document.createElement("option");
+                option.value = s.id;
+                option.textContent = s.nombre;
+                select.appendChild(option);
+            });
+        }else{
+            let datos = {
+                accion: "obtenerTodos"
+            };
 
-		let data = await consultar(tabla,datos);
-		if(data !== null && typeof data !== 'undefined'){
-			if (data.message) {
-				mostrarNotificacion(data.message,"#FF0000") 
-			} else if (data.error) {
-				mostrarNotificacion(data.error,"#FF0000") 
-			} else {
-				data.forEach(s => {
-					// Creamos una opción para cada select
-					let option = document.createElement("option");
-					option.value = s.id;
-					option.textContent = s.nombre;
-					select.appendChild(option);
-				});
-			}
-		}else{
-			mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
-		}
-        Loading(false)
+            let data = await consultar(tabla,datos);
+            if(data !== null && typeof data !== 'undefined'){
+                if (data.message) {
+                    mostrarNotificacion(data.message,"#FF0000") 
+                } else if (data.error) {
+                    mostrarNotificacion(data.error,"#FF0000") 
+                } else {
+                    data.forEach(s => {
+                        // Creamos una opción para cada select
+                        let option = document.createElement("option");
+                        option.value = s.id;
+                        option.textContent = s.nombre;
+                        select.appendChild(option);
+                    });
+                }
+            }else{
+                mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
+            }
+        }
 	}catch(e){
-        Loading(false)
 		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
 	}
@@ -242,7 +250,6 @@ async function RegistrarVerificarTasa(){
         mostrarNotificacion("Error:", e,"#FF0000") 
         console.error('Error:', e);
     }
-    
 }
 
 function CargarNavbar(pagina){
