@@ -275,7 +275,6 @@ async function ModalCrearTasa(bandera){
         else
         modalCrearTasa.hide();
     });
-    
 }
 
 async function CrearTasa(){
