@@ -158,7 +158,7 @@ async function ObtenerSelect(tabla, idSelect, error, datos) {
 
         let select = document.getElementById(idSelect);
         select.innerHTML = ""
-        
+
         if(typeof datos !== 'undefined' && datos !== null){
             datos.forEach(s => {
                 // Creamos una opción para cada select

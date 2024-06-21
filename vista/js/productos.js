@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 async function DatosTabla(){
-
     try{
 
         let datos = {
@@ -18,6 +17,83 @@ async function DatosTabla(){
                 mostrarNotificacion(data.error,"#FF0000") 
             } else {
                 initDataTable(data)
+            }
+        }else{
+            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
+        }
+        
+	}catch(e){
+		mostrarNotificacion("Error:", e,"#FF0000") 
+		console.error('Error:', e);
+	}
+}
+
+var modalProductos = null
+
+async function ModalProductos(datos,bandera,tipo){
+    // if(bandera){
+    //     await ObtenerSelect("monedas", "monedas-select", "moneda", monedas.filter((x) => x.principal !== '1'));
+    // }
+    if(typeof modalProductos === 'undefined' || modalProductos === null){
+        modalProductos = new bootstrap.Modal(document.getElementById('modalProductos'));
+    }
+
+    //Si quieren abrirlo
+    if(bandera){
+        if(tipo === 'modificar'){
+            console.log(1)
+        }else if(tipo === 'eliminar'){
+            ContenidoConfirmacionEliminar(datos)
+        }
+    }else{
+        if(tipo === 'modificar'){
+            console.log(1)
+            await DatosTabla()
+        }else if(tipo === 'eliminar'){
+            await EliminarProducto(datos)
+            await DatosTabla()
+        }
+    }
+
+    return new Promise((resolve) => {
+        const elementoModal = document.getElementById('modalProductos');
+        elementoModal.addEventListener(bandera ? 'shown.bs.modal' : 'hidden.bs.modal', () => {
+            resolve();
+        }, { once: true });
+        if(bandera)
+            modalProductos.show();
+        else
+        modalProductos.hide();
+    });
+}
+
+function ContenidoConfirmacionEliminar(datos){
+    let contenido = `<div class="row mt-4 mb-3">
+                        <div class="col-6">
+                             <button name="eliminarProducto" value="1" class="btn btn-primary" onclick="ModalProductos(${datos},false,'eliminar')">Eliminar</button>
+                        </div>
+                        <div class="col-6">
+                            <button name="cancelarEliminarProducto" value="2" class="btn btn-danger" onclick="ModalProductos(0,false,'cancelar')">Cancelar</button>
+                        </div>
+                    </div>`
+    document.getElementById("contenidoProductos").innerHTML = contenido
+}
+
+async function EliminarProducto(id){
+    try{
+        let datos = {
+            accion: "eliminar",
+            datos: { id: id }
+        };
+
+        let data = await consultar("productos",datos);
+        if(data !== null && typeof data !== 'undefined'){
+            if (data.message) {
+                mostrarNotificacion(data.message,"#FF0000") 
+            } else if (data.error) {
+                mostrarNotificacion(data.error,"#FF0000") 
+            } else {
+                mostrarNotificacion("Producto Eliminado", "linear-gradient(to right, #00b09b, #96c93d)"); 
             }
         }else{
             mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
@@ -88,11 +164,9 @@ function listUsers(datos) {
                     <td>${dato.categoria != null && typeof dato.categoria !== 'undefined' ? dato.categoria : ''}</td>
                     <!-- <td><i class="fa-solid fa-check" style="color: green;"></i></td> -->
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="AbrirModalModificardato(${dato.id})"
-                        ${dato.nombre != null && typeof dato.nombre !== 'undefined' ? '' : 'disabled'}
+                        <button class="btn btn-sm btn-primary" onclick="ModalProductos(${dato.id},true,'modificar')"
                         ><i class="bi bi-pen"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="AbrirModalEliminardato(${dato.id})"
-                        ${dato.nombre != null && typeof dato.nombre !== 'undefined' ? '' : 'disabled'}
+                        <button class="btn btn-sm btn-danger" onclick="ModalProductos(${dato.id},true,'eliminar')"
                         ><i class="bi bi-trash3"></i></button>
                     </td>
                 </tr>`;

@@ -199,7 +199,7 @@
         try {
             
             // Consulta a la base de datos
-            $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
+            $sql = "UPDATE ".$tabla." SET estado = 'Inactivo' WHERE id = ".$datos['id'];
             
             return eliminarUno($datos,$tabla,$sql);
 
@@ -218,7 +218,7 @@
             $listaIds = [];
             // Se recorre el objeto procesado y se construye la query
 
-            $sql = "DELETE FROM ".$tabla." WHERE id IN (";
+            $sql = "UPDATE ".$tabla." SET estado = 'Inactivo' WHERE id IN (";
 
             for ($i = 0; $i < count($datos); $i++){
                 // Consulta a la base de datos
