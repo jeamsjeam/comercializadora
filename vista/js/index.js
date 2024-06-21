@@ -43,6 +43,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     localStorage.removeItem('monedaModificada');
 
+    InicializarFechasFacturas()
+    
+    await consultarFacturas()
+});
+
+function InicializarFechasFacturas(){
     let fecha = new Date(); //Fecha actual
     let mes = fecha.getMonth()+1; //obteniendo mes
     let dia = fecha.getDate(); //obteniendo dia
@@ -51,11 +57,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         dia='0'+dia; //agrega cero si el menor de 10
     if(mes<10)
         mes='0'+mes //agrega cero si el menor de 10
-    document.getElementById('fechaInicio').value=ano+"-"+mes+"-"+dia;
     document.getElementById('fechaFin').value=ano+"-"+mes+"-"+dia;
-    
-    await consultarFacturas()
-});
+
+    fecha.setDate(fecha.getDate()-7);
+    mes = fecha.getMonth()+1; //obteniendo mes
+    dia = fecha.getDate(); //obteniendo dia
+    ano = fecha.getFullYear(); //obteniendo año
+    if(dia<10)
+        dia='0'+dia; //agrega cero si el menor de 10
+    if(mes<10)
+        mes='0'+mes //agrega cero si el menor de 10
+    document.getElementById('fechaInicio').value=ano+"-"+mes+"-"+dia;
+}
 
 async function consultarFacturas() {
 	try{    
