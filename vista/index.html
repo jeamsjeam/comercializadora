@@ -16,39 +16,18 @@
 
   <div class="container-fluid">
     <section class="mt-5">
-      <div class="row text-center px-5">
-        <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 px-5 mb-5">
-          <div class="row p-5 mb-5 borde">
-            <div class="col-12">
-              <h3>Tasas</h3>
-              <ul id="informacionTasas" class="list-group px-5">
-                <li class="list-group-item d-flex justify-content-between align-items-center px-5">
-                  <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
-                </li>
-              </ul>
-              <button class="btn btn-success m-3" onclick="CrearTasas()">Agregar tasa</button>
+      <div class="row text-center px-5 mb-5">
+        <div class="col-12">
+          <div class="row p-3 borde">
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6">
+              <h3>Cantidad de Ventas/Compras</h3>
+                <div class="row mx-auto">
+                  <div class="col-12">
+                    <canvas id="myChart" style="max-height: 300px;"></canvas>
+                  </div>
+                </div>
             </div>
-          </div>
-          <div class="row p-5 mt-5 borde">
-            <div class="col-12">
-              <h3>Monedas</h3>
-              <ul id="informacionMonedas" class="list-group px-5">
-                <li class="list-group-item d-flex justify-content-between align-items-center px-5">
-                  <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 px-5 pt-5 borde">
-          <h3>Cantidad de Ventas/Compras</h3>
-          <div class="row text-center">
-            <div class="col-12">
-              <canvas id="myChart" style="max-height: 300px;"></canvas>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12 pb-5">
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 pt-5">
               <form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); consultarFacturas()">
 								<div class="mb-3">
                   <div class="row px-3">
@@ -62,7 +41,6 @@
                     </div>
                   </div>
 								</div>
-
 								<div class="mb-3">
 									<ul class="list-group px-5">
                     <li class="list-group-item d-flex justify-content-between align-items-center px-5">
@@ -75,11 +53,37 @@
                     </li>
                   </ul>
 								</div>
-
 								<button type="submit" class="btn btn-success" onclick="">
                   Consultar
                 </button>
 							</form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row text-center px-4">
+        <div class="col-12">
+          <div class="row p-3">
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 mb-5 mb-lg-0">
+              <div class="borde pt-4" style="width: 100%; height: 100%;">
+                <h3>Tasas</h3>
+                  <ul id="informacionTasas" class="list-group px-5">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-5">
+                      <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
+                    </li>
+                  </ul>
+                <button class="btn btn-success m-3" onclick="CrearTasas()">Agregar tasa</button>
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 mb-5 mb-lg-0">
+              <div class="borde pt-4 pb-4" style="width: 100%; height: 100%;">
+                <h3>Monedas</h3>
+                <ul id="informacionMonedas" class="list-group px-5">
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-5">
+                    <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
