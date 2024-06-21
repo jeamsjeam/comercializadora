@@ -6,7 +6,7 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, tp.nombre as categoria FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as categoria FROM ".$tabla." p";
             $sql .= " JOIN categorias c on c.id = p.categoria_id ";
             $sql .= " WHERE p.id = ".$datos['id'];
 
@@ -23,9 +23,9 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, tp.nombre as categoria FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as categoria FROM ".$tabla." p";
             $sql .= " JOIN categorias c on c.id = p.categoria_id ";
-            $sql .= " WHERE p.nombre = ".$datos['nombre'];
+            $sql .= " WHERE p.estado = 'Activo' AND p.nombre = ".$datos['nombre'];
 
             return obtenerUno($sql);
 
@@ -40,9 +40,9 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, tp.nombre as categoria FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as categoria FROM ".$tabla." p";
             $sql .= " JOIN categorias c on c.id = p.categoria_id ";
-            $sql .= " WHERE p.categoria_id = ".$datos['categoria_id'];
+            $sql .= " WHERE p.estado = 'Activo' AND p.categoria_id = ".$datos['categoria_id'];
 
             return obtenerVarios($sql);
 
@@ -57,8 +57,9 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT p.*, tp.nombre as categoria FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as categoria FROM ".$tabla." p";
             $sql .= " JOIN categorias c on c.id = p.categoria_id ";
+            $sql .= " WHERE p.estado = 'Activo'";
        
             return ObtenerVarios($sql);
 
@@ -73,7 +74,7 @@
         
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, tp.nombre as categoria FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as categoria FROM ".$tabla." p";
             $sql .=" JOIN categorias c on c.id = p.categoria_id WHERE p.id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";

@@ -157,6 +157,7 @@ async function ObtenerSelect(tabla, idSelect, error, datos) {
 	try{
 
         let select = document.getElementById(idSelect);
+        select.innerHTML = ""
         
         if(typeof datos !== 'undefined' && datos !== null){
             datos.forEach(s => {
@@ -208,7 +209,7 @@ async function RegistrarVerificarTasa(){
                 let datos = {
                     accion: "insertar",
                     datos: {
-                        tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')).value.replace(',', '.')),
+                        tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')).replace(',', '.')),
                         usuario_id: usuario.usuarioId,
                         moneda_id: monedas[i].id
                     }

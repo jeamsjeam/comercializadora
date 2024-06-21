@@ -72,7 +72,7 @@
                       <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
                     </li>
                   </ul>
-                <button class="btn btn-success m-3" onclick="AbrirModalCrearTasa()">Agregar tasa</button>
+                <button class="btn btn-success m-3" onclick="ModalCrearTasa(true)">Agregar tasa</button>
               </div>
             </div>
             <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 mb-5 mb-lg-0">
@@ -118,7 +118,7 @@
                 <button type="submit" name="botonRegistrarTasas" value="1" class="btn btn-primary">Registrar</button>
               </div>
               <div class="col-6">
-                <button type="submit" name="cancelarTasas" value="1" class="btn btn-primary">Cancelar</button>
+                <div name="cancelarTasas" value="1" class="btn btn-danger" onclick="ModalCrearTasa(false)">Cancelar</div>
               </div>
             </div>
           </form>

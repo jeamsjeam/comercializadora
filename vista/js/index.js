@@ -256,15 +256,72 @@ async function ModificarMoneda(id){
     
 }
 
-async function AbrirModalCrearTasa(){
-    await ObtenerSelect("monedas", "monedas-select", "moneda", monedas);
-    let modalTasas = new bootstrap.Modal(document.getElementById('modalCrearTasa'));
-    modalTasas.show();
+var modalCrearTasa = null
+
+async function ModalCrearTasa(bandera){
+    if(bandera){
+        await ObtenerSelect("monedas", "monedas-select", "moneda", monedas.filter((x) => x.principal !== '1'));
+    }
+    if(typeof modalCrearTasa === 'undefined' || modalCrearTasa === null){
+        modalCrearTasa = new bootstrap.Modal(document.getElementById('modalCrearTasa'));
+    }
+    return new Promise((resolve) => {
+        const elementoModal = document.getElementById('modalCrearTasa');
+        elementoModal.addEventListener(bandera ? 'shown.bs.modal' : 'hidden.bs.modal', () => {
+            resolve();
+        }, { once: true });
+        if(bandera)
+            modalCrearTasa.show();
+        else
+        modalCrearTasa.hide();
+    });
+    
 }
 
 async function CrearTasa(){
-    let moneda = document.querySelector('select[name="rol"]').selectedOptions[0].value
-    let tasa = document.getElementById("tasaNueva").value
+    try {
+        let usuario = JSON.parse(sessionStorage.getItem('usuario'))
+        let moneda = document.querySelector('select[name="moneda"]').selectedOptions[0]
+        let tasa = document.getElementById("tasaNueva")
+
+        let datos = {
+            accion: "insertar",
+            datos: {
+                tasa: parseFloat(tasa.value.replace(' ', '').replace(',', '.')),
+                usuario_id: usuario.usuarioId,
+                moneda_id: parseInt(moneda.value)
+            }
+        };
+
+        moneda.value = 1
+        tasa.value = ''
+
+        let data = await consultar("tasas_cambio",datos);
+
+        if(data !== null && typeof data !== 'undefined'){
+            if (data.message) {
+                mostrarNotificacion(data.message,"#FF0000") 
+            } else if (data.error) {
+                if(typeof data[0] !== 'undefined' && data[0] !== null){
+                    mostrarNotificacion(data.error + " " + data[0] ,"#FF0000") 
+                }else{
+                    mostrarNotificacion(data.error,"#FF0000") 
+                }
+            } else {
+                let tasa = {
+                    tasa: data.tasa
+                }
+                localStorage.setItem('tasa', JSON.stringify(tasa))
+                window.location.href = "index.html";
+            }
+        }else{
+            mostrarNotificacion("No se pudo registrar","#FF0000") 
+        }
+    } catch (e) {
+        mostrarNotificacion("Error:", e,"#FF0000") 
+		console.error('Error:', e);  
+    }
+    
 }
 
 var myChart = null
