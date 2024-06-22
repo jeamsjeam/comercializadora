@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     await DatosTabla()
 });
 
+var productos = []
+var modalProductos = null
+
 async function DatosTabla(){
     try{
 
@@ -16,6 +19,7 @@ async function DatosTabla(){
             } else if (data.error) {
                 mostrarNotificacion(data.error,"#FF0000") 
             } else {
+                productos = data
                 initDataTable(data)
             }
         }else{
@@ -28,26 +32,24 @@ async function DatosTabla(){
 	}
 }
 
-var modalProductos = null
-
 async function ModalProductos(datos,bandera,tipo){
-    // if(bandera){
-    //     await ObtenerSelect("monedas", "monedas-select", "moneda", monedas.filter((x) => x.principal !== '1'));
-    // }
+    if(bandera){
+        
+    }
     if(typeof modalProductos === 'undefined' || modalProductos === null){
         modalProductos = new bootstrap.Modal(document.getElementById('modalProductos'));
     }
 
-    //Si quieren abrirlo
     if(bandera){
-        if(tipo === 'modificar'){
-            console.log(1)
+        if(tipo === 'insertar' || tipo === 'actualizar'){
+            ContenidoProducto(tipo === 'insertar' ? null : productos.find((x) => parseInt(x.id) === datos))
+            await ObtenerSelect("categorias", "categorias-select", "categoria");
         }else if(tipo === 'eliminar'){
             ContenidoConfirmacionEliminar(datos)
         }
     }else{
-        if(tipo === 'modificar'){
-            console.log(1)
+        if(tipo === 'insertar' || tipo === 'actualizar'){
+            await AccionProducto(tipo)
             await DatosTabla()
         }else if(tipo === 'eliminar'){
             await EliminarProducto(datos)
@@ -69,13 +71,59 @@ async function ModalProductos(datos,bandera,tipo){
 
 function ContenidoConfirmacionEliminar(datos){
     let contenido = `<div class="row mt-4 mb-3">
+                        <h4>¿Esta seguro que desea eliminar este elemento?</h4>
                         <div class="col-6">
-                             <button name="eliminarProducto" value="1" class="btn btn-primary" onclick="ModalProductos(${datos},false,'eliminar')">Eliminar</button>
+                             <button name="eliminarProducto" value="1" class="btn btn-danger" onclick="ModalProductos(${datos},false,'eliminar')">Eliminar</button>
                         </div>
                         <div class="col-6">
-                            <button name="cancelarEliminarProducto" value="2" class="btn btn-danger" onclick="ModalProductos(0,false,'cancelar')">Cancelar</button>
+                            <button name="cancelarEliminarProducto" value="2" class="btn btn-secondary" onclick="ModalProductos(0,false,'cancelar')">Cancelar</button>
                         </div>
                     </div>`
+    document.getElementById("contenidoProductos").innerHTML = contenido
+}
+
+function ContenidoProducto(datos){
+    let bandera = (typeof datos === 'undefined' || datos === null)
+    let contenido = `<h1 class="fs-4 card-title fw-bold mb-4">${bandera ? 'Registrar' : 'Modificar'}</h1>
+							<form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); ModalProductos(0,false,'${bandera ? 'insertar' : 'actualizar'}')">
+
+                                <div class="mb-3">
+									<label class="mb-2 text-muted" for="categoria">Categoria</label>
+									<select name="categoria" class="form-select" aria-label="Default select example" id="categorias-select">
+										<!-- Agrega opciones del select si es necesario -->
+									</select>
+								</div>
+
+								<div class="mb-3">
+									<label class="mb-2 text-muted" for="nombreProducto">Nombre</label>
+									<input id="nombreProducto" type="text" class="form-control" name="nombreProducto" value="${bandera ? '' : datos.nombre}" required >
+                                    <input id="idProducto" type="text" class="form-control" name="idProducto" value="${bandera ? '' : datos.id}" hidden>
+								</div>
+
+								<div class="mb-3">
+									<label class="mb-2 text-muted" for="descripcionProducto">Descripcion</label>
+									<input id="descripcionProducto" type="text" class="form-control" name="descripcionProducto" value="${bandera ? '' : datos.descripcion}" required>
+								</div>
+
+								<div class="mb-3">
+									<label class="mb-2 text-muted" for="precioProducto">Precio</label>
+									<input id="precioProducto" type="text" class="form-control" name="precioProducto" value="${bandera ? '' : datos.precio}" required>
+								</div>
+
+                                <div class="mb-3">
+									<label class="mb-2 text-muted" for="stockProducto">Stock</label>
+									<input id="stockProducto" type="text" class="form-control" name="stockProducto" value="${bandera ? '' : datos.stock}" required>
+								</div>
+
+								<div class="row mt-3">
+									<div class="col-6">
+                                        <button type="submit" class="btn btn-primary ms-auto">${bandera ? 'Registrar' : 'Modificar'}</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <div name="" value="2" class="btn btn-secondary" onclick="ModalProductos(0,false,'cancelar')">Cancelar</div>
+                                    </div>
+								</div>
+							</form>`
     document.getElementById("contenidoProductos").innerHTML = contenido
 }
 
@@ -105,26 +153,119 @@ async function EliminarProducto(id){
 	}
 }
 
+async function ModificarProducto(){
+    try{
+        let nombre = document.getElementById("nombreProducto")
+        let id = document.getElementById("idProducto")
+        let descripcion = document.getElementById("descripcionProducto")
+        let precio = document.getElementById("precioProducto")
+        let stock = document.getElementById("stockProducto")
+        let categoria_id = document.querySelector('select[name="categoria"]').selectedOptions[0]
+
+        let datos = {
+            accion: "actualizar",
+            datos: { 
+                id: parseInt(id.value),
+                nombre: nombre.value,
+                descripcion: descripcion.value,
+                precio: parseFloat(precio.value.replace(',','.')),
+                stock: parseInt(stock.value),
+                categoria_id: categoria_id.value,
+                estado: 'Activo'
+            }
+        };
+        
+        
+
+        let data = await consultar("productos",datos);
+        if(data !== null && typeof data !== 'undefined'){
+            if (data.message) {
+                mostrarNotificacion(data.message,"#FF0000") 
+            } else if (data.error) {
+                mostrarNotificacion(data.error,"#FF0000") 
+            } else {
+                id.value = ''
+                nombre.value = ''
+                descripcion.value = ''
+                precio.value = ''
+                stock.value = ''
+                categoria_id.value = 1
+                mostrarNotificacion("Producto Modificado", "linear-gradient(to right, #00b09b, #96c93d)"); 
+            }
+        }else{
+            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
+        }
+        
+	}catch(e){
+		mostrarNotificacion("Error:", e,"#FF0000") 
+		console.error('Error:', e);
+	}
+}
+
+async function AccionProducto(accion){
+    try{
+        let nombre = document.getElementById("nombreProducto")
+        let id = document.getElementById("idProducto")
+        let descripcion = document.getElementById("descripcionProducto")
+        let precio = document.getElementById("precioProducto")
+        let stock = document.getElementById("stockProducto")
+        let categoria_id = document.querySelector('select[name="categoria"]').selectedOptions[0]
+
+        let datos = {
+            accion: accion,
+            datos: { 
+                id: parseInt(id.value),
+                nombre: nombre.value,
+                descripcion: descripcion.value,
+                precio: parseFloat(precio.value.replace(',','.')),
+                stock: parseInt(stock.value),
+                categoria_id: categoria_id.value,
+                estado: 'Activo'
+            }
+        };
+        
+        let data = await consultar("productos",datos);
+        if(data !== null && typeof data !== 'undefined'){
+            if (data.message) {
+                mostrarNotificacion(data.message,"#FF0000") 
+            } else if (data.error) {
+                mostrarNotificacion(data.error,"#FF0000") 
+            } else {
+                id.value = ''
+                nombre.value = ''
+                descripcion.value = ''
+                precio.value = ''
+                stock.value = ''
+                categoria_id.value = 1
+                mostrarNotificacion("Producto " + (accion === 'insertar' ? 'Registrado' : 'Modificado'), "linear-gradient(to right, #00b09b, #96c93d)"); 
+            }
+        }else{
+            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
+        }
+        
+	}catch(e){
+		mostrarNotificacion("Error:", e,"#FF0000") 
+		console.error('Error:', e);
+	}
+}
+
 var dataTable;
 var dataTableIsInitialized = false;
 var numeroPorPagona = 10;
 
 const dataTableOptions = {
-    //scrollX: "2000px",
-    //lengthMenu: [5, 10, 15, 20, 100, 200, 500],
+    scrollY: 'auto',  // Ajusta la altura automáticamente
+    scrollCollapse: true,  // Permite colapsar la tabla si hay menos registros
     columnDefs: [
-        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6] },
-        //{ orderable: false, targets: [1, 2] },
-        //{ searchable: false, targets: [1] }
-        //{ width: "50%", targets: [0] }
+        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6] }
     ],
     pageLength: numeroPorPagona,
     destroy: true,
     language: {
         lengthMenu: "Mostrar _MENU_ registros por página",
-        zeroRecords: "Ningún reposo encontrado",
+        zeroRecords: "Ningún registro encontrado",
         info: "Mostrando de _START_ a _END_ de un total de _TOTAL_ registros",
-        infoEmpty: "Ningún reposo encontrado",
+        infoEmpty: "Ningún registro encontrado",
         infoFiltered: "(filtrados desde _MAX_ registros totales)",
         search: "Buscar:",
         loadingRecords: "Cargando...",
@@ -134,8 +275,7 @@ const dataTableOptions = {
             next: "Siguiente",
             previous: "Anterior"
         }
-    },
-    sScrollY: (250),
+    }
 };
 
 function initDataTable(datos) { 
@@ -143,14 +283,14 @@ function initDataTable(datos) {
         dataTable.destroy();
     }
 
-    listUsers(datos);
+    listaDatos(datos);
 
     dataTable = $("#datatable_productos").DataTable(dataTableOptions);
 
     dataTableIsInitialized = true;
 }
 
-function listUsers(datos) {
+function listaDatos(datos) {
     try {
         let content = ``;
         datos.forEach((dato, index) => {
@@ -164,7 +304,7 @@ function listUsers(datos) {
                     <td>${dato.categoria != null && typeof dato.categoria !== 'undefined' ? dato.categoria : ''}</td>
                     <!-- <td><i class="fa-solid fa-check" style="color: green;"></i></td> -->
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="ModalProductos(${dato.id},true,'modificar')"
+                        <button class="btn btn-sm btn-primary" onclick="ModalProductos(${dato.id},true,'actualizar')"
                         ><i class="bi bi-pen"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="ModalProductos(${dato.id},true,'eliminar')"
                         ><i class="bi bi-trash3"></i></button>

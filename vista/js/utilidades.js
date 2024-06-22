@@ -209,7 +209,7 @@ async function RegistrarVerificarTasa(){
                 let datos = {
                     accion: "insertar",
                     datos: {
-                        tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')).replace(',', '.')),
+                        tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')).value.replace(',', '.')),
                         usuario_id: usuario.usuarioId,
                         moneda_id: monedas[i].id
                     }

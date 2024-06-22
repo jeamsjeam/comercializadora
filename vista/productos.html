@@ -17,6 +17,11 @@
   <div class="container">
     <section>
       <div class="row">
+        <div class="col-12 mt-4">
+          <button class="btn btn-success" onclick="ModalProductos(0,true,'insertar')">Registrar Producto</button>
+        </div>
+      </div>
+      <div class="row">
         <div class="col-12 my-5">
           <table id="datatable_productos" class="table table-striped">
             <caption>
@@ -34,11 +39,11 @@
                 </tr>
             </thead>
             <tbody id="tableBody_productos"></tbody>
-        </table> 
+          </table> 
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
   <div class="modal fade" id="modalProductos" tabindex="-1" aria-labelledby="modalProductos" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-ls">
