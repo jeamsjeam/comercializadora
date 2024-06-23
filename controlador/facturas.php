@@ -6,10 +6,11 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda, pe.nombre as persona, pe.tipo_persona_id as tipopersona, pe.cedula as cedula FROM ".$tabla." p";
             $sql .= " JOIN tipo_factura c on c.id = p.tipo_factura_id ";
             $sql .= " JOIN usuarios u on u.id = p.usuario_id ";
             $sql .= " JOIN monedas m on m.id = p.moneda_id ";
+            $sql .= " JOIN personas pe on pe.id = p.persona_id ";
             $sql .= " WHERE p.id = ".$datos['id'];
 
             $factura = obtenerUno($sql);
@@ -33,10 +34,11 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda, pe.nombre as persona, pe.tipo_persona_id as tipopersona, pe.cedula as cedula FROM ".$tabla." p";
             $sql .= " JOIN tipo_factura c on c.id = p.tipo_factura_id ";
             $sql .= " JOIN usuarios u on u.id = p.usuario_id ";
             $sql .= " JOIN monedas m on m.id = p.moneda_id ";
+            $sql .= " JOIN personas pe on pe.id = p.persona_id ";
             $sql .= " WHERE p.tipo_factura = ".$datos['tipo_factura'];
 
             if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
@@ -71,10 +73,11 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda, pe.nombre as persona, pe.tipo_persona_id as tipopersona, pe.cedula as cedula FROM ".$tabla." p";
             $sql .= " JOIN tipo_factura c on c.id = p.tipo_factura_id ";
             $sql .= " JOIN usuarios u on u.id = p.usuario_id ";
             $sql .= " JOIN monedas m on m.id = p.moneda_id ";
+            $sql .= " JOIN personas pe on pe.id = p.persona_id ";
             $sql .= " WHERE p.persona_id = ".$datos['persona_id'];
 
             if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
@@ -109,10 +112,11 @@
 
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda, pe.nombre as persona, pe.tipo_persona_id as tipopersona, pe.cedula as cedula FROM ".$tabla." p";
             $sql .= " JOIN tipo_factura c on c.id = p.tipo_factura_id ";
             $sql .= " JOIN usuarios u on u.id = p.usuario_id ";
             $sql .= " JOIN monedas m on m.id = p.moneda_id ";
+            $sql .= " JOIN personas pe on pe.id = p.persona_id ";
             $sql .= " WHERE p.moneda_id = ".$datos['moneda_id'];
 
             if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
@@ -175,10 +179,11 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda, pe.nombre as persona, pe.tipo_persona_id as tipopersona, pe.cedula as cedula FROM ".$tabla." p";
             $sql .= " JOIN tipo_factura c on c.id = p.tipo_factura_id ";
             $sql .= " JOIN usuarios u on u.id = p.usuario_id ";
             $sql .= " JOIN monedas m on m.id = p.moneda_id ";
+            $sql .= " JOIN personas pe on pe.id = p.persona_id ";
 
             if($datos["fecha_inicio"] !== null && $datos["fecha_fin"] !==  null){
                 $sql .= " WHERE p.fecha_creacion >= '".$datos["fecha_inicio"]." 00:00:00'";
@@ -239,10 +244,11 @@
 
         try{         
             // Consulta a la base de datos
-            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda, pe.nombre as persona, pe.tipo_persona_id as tipopersona, pe.cedula as cedula FROM ".$tabla." p";
             $sql .= " JOIN tipo_factura c on c.id = p.tipo_factura_id ";
             $sql .= " JOIN usuarios u on u.id = p.usuario_id ";
             $sql .= " JOIN monedas m on m.id = p.moneda_id ";
+            $sql .= " JOIN personas pe on pe.id = p.persona_id ";
 
             $consulta = obtenerVarios($sql);
 
@@ -271,10 +277,11 @@
         
         try{
             // Consulta a la base de datos
-            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda FROM ".$tabla." p";
+            $sql = "SELECT p.*, c.nombre as tipofactura, u.usuario, m.nombre as moneda, pe.nombre as persona, pe.tipo_persona_id as tipopersona, pe.cedula as cedula FROM ".$tabla." p";
             $sql .= " JOIN tipo_factura c on c.id = p.tipo_factura_id ";
             $sql .= " JOIN usuarios u on u.id = p.usuario_id ";
-            $sql .= " JOIN monedas m on m.id = p.moneda_id WHERE p.id in (";
+            $sql .= " JOIN monedas m on m.id = p.moneda_id ";
+            $sql .= " JOIN personas pe on pe.id = p.persona_id WHERE p.id in (";
             foreach ($datos as $id) {
                 $sql .= $id.",";
             }

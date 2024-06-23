@@ -11,7 +11,7 @@ INSERT INTO personas (nombre, cedula, extrangero, telefono, direccion, tipo_pers
 ('María López', '87654321', 0, '04247654321', 'Avenida Siempre Viva 456', 1),
 ('Carlos Sánchez', '11223344', 1, '04121122334', 'Bulevar del Sol 789', 2),
 ('Ana Gómez', '55667788', 0, '04165566778', 'Calle Luna 101', 1),
-('Pedro Fernández', '99887766', 0, '04269988776', 'Calle Sol 202', 3);
+('Pedro Fernández', '99887766', 0, '04269988776', 'Calle Sol 202', 1);
 
 -- Inserción de datos en la tabla productos
 INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, estado) VALUES

@@ -30,7 +30,7 @@ CREATE TABLE tipo_persona (
 CREATE TABLE personas (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL, -- Nombre del persona
-    cedula VARCHAR(20) UNIQUE, -- Cédula del persona (se asume como única)
+    cedula VARCHAR(20) NOT NULL, -- Cédula del persona (se asume como única)
 	extrangero TINYINT(1) NOT NULL DEFAULT 0, -- Indica si es extrangero (0: No, 1: Sí)
     telefono VARCHAR(20), -- Número de teléfono del persona
     direccion TEXT, -- Dirección del persona
@@ -186,8 +186,8 @@ INSERT INTO categorias (nombre) VALUES
 -- Inserción de datos en la tabla tipo_persona
 INSERT INTO tipo_persona (nombre) VALUES
 ('Cliente'),
-('Proveedor'),
-('Empleado');
+('Proveedor');
+-- ('Empleado');
 
 -- Inserción de datos en la tabla tipo_factura
 INSERT INTO tipo_factura (nombre) VALUES

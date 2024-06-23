@@ -97,7 +97,7 @@ function ContenidoProducto(datos){
 								<div class="mb-3">
 									<label class="mb-2 text-muted" for="nombreProducto">Nombre</label>
 									<input id="nombreProducto" type="text" class="form-control" name="nombreProducto" value="${bandera ? '' : datos.nombre}" required >
-                                    <input id="idProducto" type="text" class="form-control" name="idProducto" value="${bandera ? '' : datos.id}" hidden>
+                                    <input id="idProducto" type="text" class="form-control" name="idProducto" value="${bandera ? '0' : datos.id}" hidden>
 								</div>
 
 								<div class="mb-3">
@@ -153,55 +153,6 @@ async function EliminarProducto(id){
 	}
 }
 
-async function ModificarProducto(){
-    try{
-        let nombre = document.getElementById("nombreProducto")
-        let id = document.getElementById("idProducto")
-        let descripcion = document.getElementById("descripcionProducto")
-        let precio = document.getElementById("precioProducto")
-        let stock = document.getElementById("stockProducto")
-        let categoria_id = document.querySelector('select[name="categoria"]').selectedOptions[0]
-
-        let datos = {
-            accion: "actualizar",
-            datos: { 
-                id: parseInt(id.value),
-                nombre: nombre.value,
-                descripcion: descripcion.value,
-                precio: parseFloat(precio.value.replace(',','.')),
-                stock: parseInt(stock.value),
-                categoria_id: categoria_id.value,
-                estado: 'Activo'
-            }
-        };
-        
-        
-
-        let data = await consultar("productos",datos);
-        if(data !== null && typeof data !== 'undefined'){
-            if (data.message) {
-                mostrarNotificacion(data.message,"#FF0000") 
-            } else if (data.error) {
-                mostrarNotificacion(data.error,"#FF0000") 
-            } else {
-                id.value = ''
-                nombre.value = ''
-                descripcion.value = ''
-                precio.value = ''
-                stock.value = ''
-                categoria_id.value = 1
-                mostrarNotificacion("Producto Modificado", "linear-gradient(to right, #00b09b, #96c93d)"); 
-            }
-        }else{
-            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
-        }
-        
-	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
-		console.error('Error:', e);
-	}
-}
-
 async function AccionProducto(accion){
     try{
         let nombre = document.getElementById("nombreProducto")
@@ -210,6 +161,14 @@ async function AccionProducto(accion){
         let precio = document.getElementById("precioProducto")
         let stock = document.getElementById("stockProducto")
         let categoria_id = document.querySelector('select[name="categoria"]').selectedOptions[0]
+
+        if(nombre.value === '' ||
+            descripcion.value ==='' ||
+            precio.value === '' ||
+            stock.value === ''){
+                mostrarNotificacion("Todos los campos son requeridos","#FF0000") 
+                return;
+        }
 
         let datos = {
             accion: accion,
@@ -223,7 +182,7 @@ async function AccionProducto(accion){
                 estado: 'Activo'
             }
         };
-        
+
         let data = await consultar("productos",datos);
         if(data !== null && typeof data !== 'undefined'){
             if (data.message) {

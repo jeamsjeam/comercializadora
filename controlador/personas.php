@@ -19,12 +19,30 @@
         }   
     }
 
+    function ObtenerPorCedula($datos,$tabla) {
+
+        try{
+            // Consulta a la base de datos
+            $sql = "SELECT p.*, tp.nombre as tipopersona FROM ".$tabla." p";
+            $sql .= " JOIN tipo_persona tp on tp.id = p.tipo_persona_id ";
+            $sql .= " WHERE p.estado = 'Activo' AND p.cedula = '".$datos['cedula']."'";
+
+            return obtenerUno($sql);
+
+        }catch (Exception $e) {
+            
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }   
+    }
+
     function ObtenerTodos($tabla) {
 
         try{         
             // Consulta a la base de datos
             $sql = "SELECT p.*, tp.nombre as tipopersona FROM ".$tabla." p";
             $sql .= " JOIN tipo_persona tp on tp.id = p.tipo_persona_id ";
+            $sql .= " WHERE p.estado = 'Activo'";
        
             return ObtenerVarios($sql);
 
@@ -57,6 +75,13 @@
     function insertar($datos,$tabla) {
         
         try {
+
+            $existeCedula = ObtenerPorCedula($datos,$tabla);
+
+            if($existeCedula !== null){
+                return ['error' => 'La cedula ya esta registrada'];
+            }
+
             // Consulta a la base de datos
             // Consulta a la base de datos
             $sql = "INSERT INTO ".$tabla." (nombre, cedula, extrangero, telefono, direccion, fecha_creacion, estado, tipo_persona_id) VALUES ";
@@ -95,6 +120,12 @@
                 $sql .= "NOW(), ";
                 $sql .= "'".$datos[$i]['estado']."', ";
                 $sql .= $datos[$i]['tipo_persona_id']."), ";
+
+                $existeCedula = ObtenerPorCedula($datos[$i],$tabla);
+
+                if($existeCedula !== null){
+                    return ['error' => 'La cedula ya esta registrada'];
+                }
             }
 
             return insertarVarios(rtrim($sql, ','),$tabla);
@@ -112,7 +143,6 @@
             // Consulta a la base de datos
             $sql = "UPDATE ".$tabla." SET ";
             $sql .= "nombre = '".$datos['nombre']."', ";
-            $sql .= "cedula = '".$datos['cedula']."', ";
             $sql .= "extrangero = ".$datos['extrangero'].", ";
             $sql .= "telefono = '".$datos['telefono']."', ";
             $sql .= "direccion = '".$datos['direccion']."', ";
@@ -140,7 +170,6 @@
                 // Consulta a la base de datos para actualizar el registro
                 $sql = "UPDATE ".$tabla." SET ";
                 $sql .= "nombre = '".$dato['nombre']."', ";
-                $sql .= "cedula = '".$dato['cedula']."', ";
                 $sql .= "extrangero = ".$dato['extrangero'].", ";
                 $sql .= "telefono = '".$dato['telefono']."', ";
                 $sql .= "direccion = '".$dato['direccion']."', ";
@@ -168,7 +197,7 @@
         try {
             
             // Consulta a la base de datos
-            $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
+            $sql = "UPDATE ".$tabla." SET estado = 'Inactivo' WHERE id = ".$datos['id'];
             
             return eliminarUno($datos,$tabla,$sql);
 
@@ -187,7 +216,7 @@
             $listaIds = [];
             // Se recorre el objeto procesado y se construye la query
 
-            $sql = "DELETE FROM ".$tabla." WHERE id IN (";
+            $sql = "UPDATE ".$tabla." SET estado = 'Inactivo' WHERE id IN (";
 
             for ($i = 0; $i < count($datos); $i++){
                 // Consulta a la base de datos
@@ -226,6 +255,15 @@
                     break;
                 }
                 echo json_encode(ObtenerPorId($datos,$tabla));
+
+                break;
+            case "obtenerPorCedula":
+                $datos = $data['datos'] ?? null;
+                if($datos === null){
+                    echo json_encode(['error' => 'No se envio datos']);
+                    break;
+                }
+                echo json_encode(ObtenerPorCedula($datos,$tabla));
 
                 break;
             case "obtenerTodos":
