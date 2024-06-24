@@ -1,31 +1,53 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    await DatosTabla()
+
+    // Se revisa si las tasas están listas para mostrarlas en el HTML
+    document.addEventListener('tasasListas', async function(event) {
+        // Aquí puedes continuar con la lógica que depende de la variable tasas
+        if (typeof event.detail !== 'undefined' && event.detail !== null && event.detail.length > 0) {
+            await ObtenerSelect("monedas", "monedas-select", "Moneda",monedas);
+            await ObtenerSelect("tipo_factura", "tipofacturas-select", "Tipo Factura");
+        } 
+    });
+
 });
 
-var personas = []
-var modalPersonas = null
 
-async function DatosTabla(){
+var modalPersonas = null
+var persona = null
+
+async function BuscarPersona(cedula, bandera){
     try{
+        let seccionFactura = document.getElementById("seccionFactura")
+        let seccionInformacion = document.getElementById("seccionInformacion")
+        seccionFactura.className = "d-none"
+        seccionInformacion.className = "d-none"
+        persona = null
 
         let datos = {
-            accion: "obtenerTodos"
+            accion: 'obtenerPorCedula',
+            datos: {
+                cedula: (typeof cedula !== 'undefined' && cedula !== null ? cedula : document.getElementById("buscarCedula").value)
+            }
         };
 
         let data = await consultar("personas",datos);
+
         if(data !== null && typeof data !== 'undefined'){
             if (data.message) {
                 mostrarNotificacion(data.message,"#FF0000") 
             } else if (data.error) {
                 mostrarNotificacion(data.error,"#FF0000") 
             } else {
-                personas = data
-                initDataTable(data)
+                if(bandera)
+                    mostrarNotificacion("Persona Encontrada", "linear-gradient(to right, #00b09b, #96c93d)"); 
+                InfoBusquedaPersona(data)
+                persona = data
+                seccionFactura.className = ""
+                seccionInformacion.className = ""
             }
         }else{
-            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
+            await ModalPersonas(null,true,'insertar')
         }
-        
 	}catch(e){
 		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
@@ -47,10 +69,8 @@ async function ModalPersonas(datos,bandera,tipo){
     }else{
         if(tipo === 'insertar' || tipo === 'actualizar'){
             await AccionPersona(tipo)
-            await DatosTabla()
         }else if(tipo === 'eliminar'){
             await EliminarPersona(datos)
-            await DatosTabla()
         }
     }
 
@@ -64,19 +84,6 @@ async function ModalPersonas(datos,bandera,tipo){
         else
         modalPersonas.hide();
     });
-}
-
-function ContenidoConfirmacionEliminar(datos){
-    let contenido = `<div class="row mt-4 mb-3">
-                        <h4>¿Esta seguro que desea eliminar este elemento?</h4>
-                        <div class="col-6">
-                             <button name="eliminarPersona" value="1" class="btn btn-danger" onclick="ModalPersonas(${datos},false,'eliminar')">Eliminar</button>
-                        </div>
-                        <div class="col-6">
-                            <button name="cancelarEliminarPersona" value="2" class="btn btn-secondary" onclick="ModalPersonas(0,false,'cancelar')">Cancelar</button>
-                        </div>
-                    </div>`
-    document.getElementById("contenidoPersonas").innerHTML = contenido
 }
 
 function ContenidoPersona(datos){
@@ -102,7 +109,7 @@ function ContenidoPersona(datos){
                                     </div>
                                     <div class="col-9">
                                         <label class="mb-2 text-muted" for="cedulaPersona">Cedula</label>
-                                        <input id="cedulaPersona" type="text" class="form-control" name="cedulaPersona" value="${bandera ? '' : datos.cedula}" ${bandera ? '' : 'disabled'} required>
+                                        <input id="cedulaPersona" type="text" class="form-control" name="cedulaPersona" value="${bandera ? document.getElementById("buscarCedula").value : datos.cedula}" ${bandera ? '' : 'disabled'} required>
                                     </div>
                                 </div>
                             </div>
@@ -133,32 +140,6 @@ function ContenidoPersona(datos){
                             </div>
                         </form>`
     document.getElementById("contenidoPersonas").innerHTML = contenido
-}
-
-async function EliminarPersona(id){
-    try{
-        let datos = {
-            accion: "eliminar",
-            datos: { id: id }
-        };
-
-        let data = await consultar("personas",datos);
-        if(data !== null && typeof data !== 'undefined'){
-            if (data.message) {
-                mostrarNotificacion(data.message,"#FF0000") 
-            } else if (data.error) {
-                mostrarNotificacion(data.error,"#FF0000") 
-            } else {
-                mostrarNotificacion("Persona Eliminado", "linear-gradient(to right, #00b09b, #96c93d)"); 
-            }
-        }else{
-            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
-        }
-        
-	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
-		console.error('Error:', e);
-	}
 }
 
 async function AccionPersona(accion){
@@ -199,6 +180,7 @@ async function AccionPersona(accion){
             } else if (data.error) {
                 mostrarNotificacion(data.error,"#FF0000") 
             } else {
+                await BuscarPersona(cedula.value, false);
                 id.value = ''
                 nombre.value = ''
                 cedula.value = ''
@@ -218,71 +200,28 @@ async function AccionPersona(accion){
 	}
 }
 
-var dataTable;
-var dataTableIsInitialized = false;
-var numeroPorPagona = 10;
-
-const dataTableOptions = {
-    scrollY: 'auto',  // Ajusta la altura automáticamente
-    scrollCollapse: true,  // Permite colapsar la tabla si hay menos registros
-    columnDefs: [
-        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6] }
-    ],
-    pageLength: numeroPorPagona,
-    destroy: true,
-    language: {
-        lengthMenu: "Mostrar _MENU_ registros por página",
-        zeroRecords: "Ningún registro encontrado",
-        info: "Mostrando de _START_ a _END_ de un total de _TOTAL_ registros",
-        infoEmpty: "Ningún registro encontrado",
-        infoFiltered: "(filtrados desde _MAX_ registros totales)",
-        search: "Buscar:",
-        loadingRecords: "Cargando...",
-        paginate: {
-            first: "Primero",
-            last: "Último",
-            next: "Siguiente",
-            previous: "Anterior"
-        }
-    }
-};
-
-function initDataTable(datos) { 
-    if (dataTableIsInitialized) {
-        dataTable.destroy();
-    }
-
-    listaDatos(datos);
-
-    dataTable = $("#datatable_personas").DataTable(dataTableOptions);
-
-    dataTableIsInitialized = true;
-}
-
-function listaDatos(datos) {
-    try {
-        let content = ``;
-        datos.forEach((dato, index) => {
-            content += `
-                 <tr>
-                    <td>${index + 1}</td>
-                    <td>${dato.extrangero != null && typeof dato.extrangero !== 'undefined' ? (dato.extrangero === '0' ? 'V' : 'E') : ''}</td>
-                    <td>${dato.cedula != null && typeof dato.cedula !== 'undefined' ? dato.cedula : ''}</td>
-                    <td>${dato.nombre != null && typeof dato.nombre !== 'undefined' ? dato.nombre : ''}</td>
-                    <td>${dato.telefono != null && typeof dato.telefono !== 'undefined' ? dato.telefono : ''}</td>
-                    <td>${dato.direccion != null && typeof dato.direccion !== 'undefined' ? dato.direccion : ''}</td>
-                    <td>${dato.tipopersona != null && typeof dato.tipopersona !== 'undefined' ? dato.tipopersona : ''}</td>
-                    <!-- <td><i class="fa-solid fa-check" style="color: green;"></i></td> -->
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="ModalPersonas(${dato.id},true,'actualizar')"
-                        ><i class="bi bi-pen"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="ModalPersonas(${dato.id},true,'eliminar')"
-                        ><i class="bi bi-trash3"></i></button>
-                    </td>
-                </tr>`;
-        });
-        tableBody_personas.innerHTML = content;
-    } catch (ex) {
-        alert(ex);
-    }
+function InfoBusquedaPersona(datos){
+    let contenido =`<div class="col-12 d-flex flex-row bd-highlight mb-3">
+                        <div class="p-2 bd-highlight"> 
+                            <label class="text-muted" for="nombre">Cedula</label>
+                            <input type="text" class="form-control" name="nombre" value="${datos.extrangero + '-' + datos.cedula}" disabled>
+                        </div>
+                        <div class="p-2 bd-highlight"> 
+                            <label class="text-muted" for="nombre">Nombre</label>
+                            <input type="text" class="form-control" name="nombre" value="${datos.nombre}" disabled>
+                        </div>
+                        <div class="p-2 bd-highlight"> 
+                            <label class="text-muted" for="nombre">Telefono</label>
+                            <input type="text" class="form-control" name="nombre" value="${datos.telefono}" disabled>
+                        </div>
+                        <div class="p-2 bd-highlight"> 
+                            <label class="text-muted" for="direccion">Direccion</label>
+                            <input type="text" class="form-control" name="direccion" value="${datos.direccion}" disabled>
+                        </div>
+                        <div class="p-2 bd-highlight"> 
+                            <label class="text-muted" for="tipo">Tipo</label>
+                            <input type="text" class="form-control" name="tipo" value="${datos.tipopersona}" disabled>
+                        </div>
+                    </div>`
+    document.getElementById("infoBusquedaPersona").innerHTML = contenido
 }
