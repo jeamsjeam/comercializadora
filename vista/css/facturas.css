@@ -59,4 +59,10 @@
 
         -webkit-text-fill-color: white !important;
     }
+
+.borde-normal {
+    border-width: 1px;
+    border-style: solid;
+    border-color: grey;
+    }
   

@@ -9,6 +9,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         } 
     });
 
+    await ObtenerSelect("productos", "productos-select", "Producto");
+
+    $("#productos-select").select2();
+
 });
 
 
@@ -18,9 +22,7 @@ var persona = null
 async function BuscarPersona(cedula, bandera){
     try{
         let seccionFactura = document.getElementById("seccionFactura")
-        let seccionInformacion = document.getElementById("seccionInformacion")
         seccionFactura.className = "d-none"
-        seccionInformacion.className = "d-none"
         persona = null
 
         let datos = {
@@ -43,7 +45,6 @@ async function BuscarPersona(cedula, bandera){
                 InfoBusquedaPersona(data)
                 persona = data
                 seccionFactura.className = ""
-                seccionInformacion.className = ""
             }
         }else{
             await ModalPersonas(null,true,'insertar')
