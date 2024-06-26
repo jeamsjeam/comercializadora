@@ -57,7 +57,7 @@ async function BuscarPersona(cedula, bandera){
                     mostrarNotificacion("Persona Encontrada", "linear-gradient(to right, #00b09b, #96c93d)"); 
                 InfoBusquedaPersona(data)
                 persona = data
-                seccionFactura.className = ""
+                seccionFactura.className = "mb-5"
             }
         }else{
             await ModalPersonas(null,true,'insertar')
@@ -263,11 +263,11 @@ async function SeccionesFacturaProducto(indice){
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="producto-${indice}">Producto</label>
                                         <input id="producto-${indice}" type="text" class="form-control" name="producto-${indice}" value=""
-                                            required disabled>
+                                            disabled>
                                         <input id="productoid-${indice}" type="text" class="form-control" name="productoid-${indice}"
-                                            value="" required disabled hidden>
+                                            value="" hidden>
                                         <input id="estado-${indice}" type="text" class="form-control" name="estado-${indice}" value="Activo"
-                                            required disabled hidden>
+                                            hidden>
                                     </div>
                                 </div>
                                 <div class="col-2">
@@ -281,18 +281,18 @@ async function SeccionesFacturaProducto(indice){
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="precio-${indice}">Precio</label>
                                         <input id="precio-${indice}" type="text" class="form-control" name="precio-${indice}" value=""
-                                            required disabled style="max-width: 150px;">
+                                            disabled style="max-width: 150px;">
                                     </div>
                                 </div>
                                 <div class="col-2">
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="stock-${indice}">Stock</label>
                                         <input id="stock-${indice}" type="text" class="form-control" name="stock-${indice}" value=""
-                                            required disabled style="max-width: 150px;">
+                                            disabled style="max-width: 150px;">
                                     </div>
                                 </div>
                                 <div class="col-1">
-                                    <div class="mb-3 pt-4">
+                                    <div class="mb-3" style="padding: 34px;">
                                         <button class="btn btn-sm btn-danger" onclick="BorrarSeccionFactura(${indice})"><i
                                                 class="bi bi-trash3"></i></button>
                                     </div>
@@ -302,7 +302,7 @@ async function SeccionesFacturaProducto(indice){
                     </div>`
 
     let documento = document.getElementById("contenidoFactura")
-    documento.insertAdjacentHTML('beforeend', contenido); 
+    documento.insertAdjacentHTML('beforeend', contenido);
 
     await ObtenerSelect("productos", "productos-select-" + indice, "Producto",productos);
     $("#productos-select-" + indice).select2();
@@ -320,6 +320,7 @@ async function AgregarSeccionFactura(){
 function BorrarSeccionFactura(valor){
     document.getElementById("estado-"+valor).value = "Inactivo"
     document.getElementById("seccion-"+valor).className += " d-none"
+    document.getElementById("cantidad-"+valor).removeAttribute("required");
 }
 
 function LlenarInputProductos(numero, valor){
@@ -337,7 +338,8 @@ function LlenarInputProductos(numero, valor){
     console.log(numero + ': ' + valor);
     var inputs = document.querySelectorAll('input[id^="productoid-"]');
     inputs.forEach(function(input) {
-        if(input.value === valor){
+        if(input.value === valor && numero !== input.id.split('-')[1]){
+            debugger
             mostrarNotificacion("Producto ya seleccionado","#FF0000") 
             bandera = true
             return;
