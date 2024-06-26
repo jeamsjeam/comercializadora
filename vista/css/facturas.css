@@ -60,9 +60,8 @@
         -webkit-text-fill-color: white !important;
     }
 
-.borde-normal {
+.borde-abajo {
     border-width: 1px;
-    border-style: solid;
-    border-color: grey;
+    border-bottom: solid grey;
     }
   

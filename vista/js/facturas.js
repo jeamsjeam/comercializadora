@@ -9,15 +9,36 @@ document.addEventListener("DOMContentLoaded", async function () {
         } 
     });
 
-    await ObtenerSelect("productos", "productos-select", "Producto");
+    productos = await consultar("productos", {accion: "obtenerTodos"})
+    productos.unshift({
+        categoria: "",
+        categoria_id:"0",
+        descripcion: "",
+        estado: "Activo",
+        fecha_creacion: "",
+        id: "0",
+        nombre: "Seleccionar",
+        precio: "0",
+        stock: "0",
+    }); 
 
-    $("#productos-select").select2();
+    await ObtenerSelect("productos", "productos-select-0", "Producto",productos);
+
+    $("#productos-select-0").select2();
 
 });
 
+$("[id^='productos-select-']").on('change', function() {
+    if(typeof $(this).val() === 'undefined' || $(this).val() === null || $(this).val() == '0'){
+        return
+    }
+    LlenarInputProductos($(this).attr('id').split('-')[2], $(this).val());
+
+});
 
 var modalPersonas = null
 var persona = null
+var productos = []
 
 async function BuscarPersona(cedula, bandera){
     try{
@@ -225,4 +246,36 @@ function InfoBusquedaPersona(datos){
                         </div>
                     </div>`
     document.getElementById("infoBusquedaPersona").innerHTML = contenido
+}
+
+function LlenarInputProductos(numero, valor){
+    console.log(numero + ': ' + valor);
+    let producto = productos.find(x => x.id === valor)
+
+    document.getElementById("producto-"+numero).value = producto.nombre
+    document.getElementById("productoid-"+numero).value = producto.id
+    document.getElementById("stock-"+numero).value = producto.stock
+    document.getElementById("precio-"+numero).value = producto.precio
+
+}
+
+// Llama a la función iniciarImpresionAutomatica() cada 2 segundos
+setInterval(function() {
+    iniciarImpresionAutomatica();
+}, 5000);
+
+// Función para iniciar la impresión automática
+function iniciarImpresionAutomatica() {
+    // Selector para obtener todos los inputs cuyo id comience con 'productoid-'
+    var inputs = document.querySelectorAll('input[id^="productoid-"]');
+    
+    if(inputs.length === 0){
+        console.log("No se encontraron inputs con id que comience con 'productoid-'.");
+        return;
+    }
+
+    inputs.forEach(function(input, index) {
+        var valor = input.value;
+        console.log("Valor del input " + index + ": " + valor);
+    });
 }
