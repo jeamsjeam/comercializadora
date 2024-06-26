@@ -22,23 +22,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         stock: "0",
     }); 
 
-    await ObtenerSelect("productos", "productos-select-0", "Producto",productos);
-
-    $("#productos-select-0").select2();
-
-});
-
-$("[id^='productos-select-']").on('change', function() {
-    if(typeof $(this).val() === 'undefined' || $(this).val() === null || $(this).val() == '0'){
-        return
-    }
-    LlenarInputProductos($(this).attr('id').split('-')[2], $(this).val());
+    await SeccionesFacturaProducto(contadorSeccionFactura)
+    contadorSeccionFactura++;
 
 });
 
 var modalPersonas = null
 var persona = null
 var productos = []
+var contadorSeccionFactura = 0
 
 async function BuscarPersona(cedula, bandera){
     try{
@@ -226,7 +218,7 @@ function InfoBusquedaPersona(datos){
     let contenido =`<div class="col-12 d-flex flex-row bd-highlight mb-3">
                         <div class="p-2 bd-highlight"> 
                             <label class="text-muted" for="nombre">Cedula</label>
-                            <input type="text" class="form-control" name="nombre" value="${datos.extrangero + '-' + datos.cedula}" disabled>
+                            <input type="text" class="form-control" name="nombre" value="${(datos.extrangero === 0 ? 'V' : 'E') + '-' + datos.cedula}" disabled>
                         </div>
                         <div class="p-2 bd-highlight"> 
                             <label class="text-muted" for="nombre">Nombre</label>
@@ -248,8 +240,118 @@ function InfoBusquedaPersona(datos){
     document.getElementById("infoBusquedaPersona").innerHTML = contenido
 }
 
+async function SeccionesFacturaProducto(indice){
+
+    let contenido =`<div id="seccion-${indice}" class="row p-2 borde-abajo">
+                        <div class="col-sm-12 col-md-12 col-lg-4 col-lx-4 col-xxl-4 mb-5 mb-lg-0">
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label class="mb-2 text-muted" for="productos-select-${indice}">Productos</label>
+                                    </div>
+                                    <div id="select2-${indice}" class="col-12">
+                                        <select name="productos-select-${indice}" class="form-select" aria-label="Default select example"
+                                            id="productos-select-${indice}" style="width: 100%;">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-8 col-lx-8 col-xxl-8 mb-5 mb-lg-0">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="producto-${indice}">Producto</label>
+                                        <input id="producto-${indice}" type="text" class="form-control" name="producto-${indice}" value=""
+                                            required disabled>
+                                        <input id="productoid-${indice}" type="text" class="form-control" name="productoid-${indice}"
+                                            value="" required disabled hidden>
+                                        <input id="estado-${indice}" type="text" class="form-control" name="estado-${indice}" value="Activo"
+                                            required disabled hidden>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="cantidad-${indice}">Cantidad</label>
+                                        <input id="cantidad-${indice}" type="number" class="form-control" name="cantidad-${indice}" value=""
+                                            required style="max-width: 150px;">
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="precio-${indice}">Precio</label>
+                                        <input id="precio-${indice}" type="text" class="form-control" name="precio-${indice}" value=""
+                                            required disabled style="max-width: 150px;">
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="stock-${indice}">Stock</label>
+                                        <input id="stock-${indice}" type="text" class="form-control" name="stock-${indice}" value=""
+                                            required disabled style="max-width: 150px;">
+                                    </div>
+                                </div>
+                                <div class="col-1">
+                                    <div class="mb-3 pt-4">
+                                        <button class="btn btn-sm btn-danger" onclick="BorrarSeccionFactura(${indice})"><i
+                                                class="bi bi-trash3"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+
+    let documento = document.getElementById("contenidoFactura")
+    documento.insertAdjacentHTML('beforeend', contenido); 
+
+    await ObtenerSelect("productos", "productos-select-" + indice, "Producto",productos);
+    $("#productos-select-" + indice).select2();
+
+    $("[id^='productos-select-']").on('change', function() {
+        LlenarInputProductos($(this).attr('id').split('-')[2], $(this).val());
+    });
+}
+
+async function AgregarSeccionFactura(){
+    await SeccionesFacturaProducto(contadorSeccionFactura)
+    contadorSeccionFactura++;
+}
+
+function BorrarSeccionFactura(valor){
+    document.getElementById("estado-"+valor).value = "Inactivo"
+    document.getElementById("seccion-"+valor).className += " d-none"
+}
+
 function LlenarInputProductos(numero, valor){
+
+    if(typeof valor === 'undefined' || valor === null || valor === '0'){
+        document.getElementById("producto-"+numero).value = ''
+        document.getElementById("productoid-"+numero).value = ''
+        document.getElementById("stock-"+numero).value = ''
+        document.getElementById("precio-"+numero).value = ''
+        return
+    }
+
+    let bandera = false;
+
     console.log(numero + ': ' + valor);
+    var inputs = document.querySelectorAll('input[id^="productoid-"]');
+    inputs.forEach(function(input) {
+        if(input.value === valor){
+            mostrarNotificacion("Producto ya seleccionado","#FF0000") 
+            bandera = true
+            return;
+        }
+    });
+
+    if(bandera){
+        document.getElementById("producto-"+numero).value = ''
+        document.getElementById("productoid-"+numero).value = ''
+        document.getElementById("stock-"+numero).value = ''
+        document.getElementById("precio-"+numero).value = ''
+        return;
+    }
+
     let producto = productos.find(x => x.id === valor)
 
     document.getElementById("producto-"+numero).value = producto.nombre
@@ -267,15 +369,21 @@ setInterval(function() {
 // Función para iniciar la impresión automática
 function iniciarImpresionAutomatica() {
     // Selector para obtener todos los inputs cuyo id comience con 'productoid-'
-    var inputs = document.querySelectorAll('input[id^="productoid-"]');
+    let inputs = document.querySelectorAll('input[id^="productoid-"]');
     
-    if(inputs.length === 0){
+    if(typeof inputs === 'undefined' || inputs === null || inputs.length === 0){
         console.log("No se encontraron inputs con id que comience con 'productoid-'.");
         return;
     }
 
     inputs.forEach(function(input, index) {
         var valor = input.value;
-        console.log("Valor del input " + index + ": " + valor);
+        let numero = input.id.split('-')[1]
+ 
+        if(document.getElementById("estado-"+numero).value !== 'Inactivo' && valor !== '0'){
+            console.log("Valor del input " + index + ": " + valor);
+        }else{
+            console.log("Valor del input " + index + ": " + valor + " INACTIVO");
+        }
     });
 }

@@ -45,76 +45,29 @@
     <form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); ModalPersonas()">
       <div class="d-flex justify-content-between mb-2">
         <button type="submit" class="btn btn-primary">Registrar</button>
-        <button class="btn btn-sm btn-success" onclick=""><i class="bi bi-plus-circle-dotted"></i></button>
+        <button class="btn btn-sm btn-success" onclick="AgregarSeccionFactura()"><i class="bi bi-plus-circle-dotted"></i></button>
       </div>
       <div class="row">
         <div class="col-12 d-flex flex-row bd-highlight mb-3">
-          <div class="p-2 bd-highlight"> 
-            <label class="mb-2 text-muted" for="tipofactura">Tipo Factura</label>
-            <select name="tipofactura" class="form-select" aria-label="Default select example" id="tipofacturas-select">
-                <!-- Agrega opciones del select si es necesario -->
-            </select>
-          </div>
-          <div class="p-2 bd-highlight"> 
-            <label class="mb-2 text-muted" for="moneda">Moneda</label>
-            <select name="moneda" class="form-select" aria-label="Default select example" id="monedas-select">
-                <!-- Agrega opciones del select si es necesario -->
-            </select>
-          </div>
+            <div class="p-2 bd-highlight">
+                <label class="mb-2 text-muted" for="tipofactura">Tipo Factura</label>
+                <select name="tipofactura" class="form-select" aria-label="Default select example" id="tipofacturas-select">
+                    <!-- Agrega opciones del select si es necesario -->
+                </select>
+            </div>
+            <div class="p-2 bd-highlight">
+                <label class="mb-2 text-muted" for="moneda">Moneda</label>
+                <select name="moneda" class="form-select" aria-label="Default select example" id="monedas-select">
+                    <!-- Agrega opciones del select si es necesario -->
+                </select>
+            </div>
         </div>
       </div>
-      <div class="row p-2 borde-abajo" >
-        <div class="col-sm-12 col-md-12 col-lg-4 col-lx-4 col-xxl-4 mb-5 mb-lg-0">
-          <div class="mb-3">
-            <div class="row">
-              <div class="col-12">
-                <label class="mb-2 text-muted" for="productos-select-0">Productos</label>
-              </div>
-              <div class="col-12">
-                <select name="productos-select-0" class="form-select" aria-label="Default select example" id="productos-select-0" style="width: 100%;">
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-12 col-md-12 col-lg-8 col-lx-8 col-xxl-8 mb-5 mb-lg-0">
-          <div class="row">
-            <div class="col-4">
-              <div class="mb-3">
-                <label class="mb-2 text-muted" for="producto-0">Producto</label>
-                <input id="producto-0" type="text" class="form-control" name="producto-0" value="" required disabled>
-                <input id="productoid-0" type="text" class="form-control" name="productoid-0" value="" required disabled hidden>
-              </div>
-            </div>
-            <div class="col-2">
-              <div class="mb-3">
-                <label class="mb-2 text-muted" for="cantidad-0">Cantidad</label>
-                <input id="cantidad-0" type="number" class="form-control" name="cantidad-0" value="" required style="max-width: 150px;">
-              </div>
-            </div>
-            <div class="col-2">
-              <div class="mb-3">
-                <label class="mb-2 text-muted" for="precio-0">Precio</label>
-                <input id="precio-0" type="text" class="form-control" name="precio-0" value="" required disabled style="max-width: 150px;">
-              </div>
-            </div>
-            <div class="col-2">
-              <div class="mb-3">
-                <label class="mb-2 text-muted" for="stock-0">Stock</label>
-                <input id="stock-0" type="text" class="form-control" name="stock-0" value="" required disabled style="max-width: 150px;">
-              </div>
-            </div>
-            <div class="col-1">
-              <div class="mb-3 pt-4">
-                <button class="btn btn-sm btn-danger" onclick=""><i class="bi bi-trash3"></i></button>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div id="contenidoFactura">
       </div>
       <div class="d-flex justify-content-between mt-3">
         <button type="submit" class="btn btn-primary">Registrar</button>
-        <button class="btn btn-sm btn-success" onclick=""><i class="bi bi-plus-circle-dotted"></i></button>
+        <button class="btn btn-sm btn-success" onclick="AgregarSeccionFactura()"><i class="bi bi-plus-circle-dotted"></i></button>
       </div>
     </form>
 
