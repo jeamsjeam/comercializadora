@@ -277,6 +277,15 @@
                 echo json_encode(ObtenerPorCategoria($datos,$tabla));
 
                 break;
+            case "obtenerPorListaId":
+                $datos = $data['datos'] ?? null;
+                if($datos === null){
+                    echo json_encode(['error' => 'No se envio datos']);
+                    break;
+                }
+                echo json_encode(obtenerPorListaId($datos,$tabla));
+
+                break;
             case "obtenerTodos":
 
                 echo json_encode(ObtenerTodos($tabla));

@@ -59,7 +59,8 @@ async function verificarUsuario() {
 					usuarioId: data.id,
 					usuario: data.usuario,
 					rol: data.rolnombre,
-					rolId: data.rol_id
+					rolId: data.rol_id,
+					id: data.id
 				}
 
 				sessionStorage.setItem('usuario', JSON.stringify(usuario))

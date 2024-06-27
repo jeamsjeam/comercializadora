@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (typeof event.detail !== 'undefined' && event.detail !== null && event.detail.length > 0) {
             await ObtenerSelect("monedas", "monedas-select", "Moneda",monedas);
             await ObtenerSelect("tipo_factura", "tipofacturas-select", "Tipo Factura");
+
+            document.getElementById("tasaActual").value = tasaSeleccionada
+
+            $("[id='monedas-select']").on('change', function() {
+                BuscarTasaSeleccionada($(this).val())
+            });
         } 
     });
 
@@ -23,7 +29,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }); 
 
     await SeccionesFacturaProducto(contadorSeccionFactura)
-    contadorSeccionFactura++;
+
+    usuario = JSON.parse(sessionStorage.getItem('usuario'))
 
 });
 
@@ -31,6 +38,13 @@ var modalPersonas = null
 var persona = null
 var productos = []
 var contadorSeccionFactura = 0
+var banderaIntervalo = true
+var banderaExisteStock = true
+var factura = null
+var datosFactura = null
+var tasaSeleccionada = 1
+var monedaSelecionada = 1
+var usuario = null;
 
 async function BuscarPersona(cedula, bandera){
     try{
@@ -243,7 +257,7 @@ function InfoBusquedaPersona(datos){
 async function SeccionesFacturaProducto(indice){
 
     let contenido =`<div id="seccion-${indice}" class="row p-2 borde-abajo">
-                        <div class="col-sm-12 col-md-12 col-lg-4 col-lx-4 col-xxl-4 mb-5 mb-lg-0">
+                        <div class="col-sm-12 col-md-12 col-lg-3 col-lx-3 col-xxl-3 mb-5 mb-lg-0">
                             <div class="mb-3">
                                 <div class="row">
                                     <div class="col-12">
@@ -257,9 +271,9 @@ async function SeccionesFacturaProducto(indice){
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-12 col-md-12 col-lg-8 col-lx-8 col-xxl-8 mb-5 mb-lg-0">
+                        <div class="col-sm-12 col-md-12 col-lg-9 col-lx-9 col-xxl-9 mb-5 mb-lg-0">
                             <div class="row">
-                                <div class="col-4">
+                                <div class="col-3">
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="producto-${indice}">Producto</label>
                                         <input id="producto-${indice}" type="text" class="form-control" name="producto-${indice}" value=""
@@ -279,13 +293,22 @@ async function SeccionesFacturaProducto(indice){
                                 </div>
                                 <div class="col-2">
                                     <div class="mb-3">
-                                        <label class="mb-2 text-muted" for="precio-${indice}">Precio</label>
+                                        <label class="mb-2 text-muted" for="precio-${indice}">Monto</label>
                                         <input id="precio-${indice}" type="text" class="form-control" name="precio-${indice}" value=""
                                             disabled style="max-width: 150px;">
+                                        <input id="precio-principal-${indice}" type="text" class="form-control" name="precio-principal-${indice}" value=""
+                                            hidden >
                                     </div>
                                 </div>
                                 <div class="col-2">
                                     <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="precio-unitario-${indice}">Precio Unitario</label>
+                                        <input id="precio-unitario-${indice}" type="text" class="form-control" name="precio-unitario-${indice}" value=""
+                                            disabled style="max-width: 150px;">
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="mb-3" >
                                         <label class="mb-2 text-muted" for="stock-${indice}">Stock</label>
                                         <input id="stock-${indice}" type="text" class="form-control" name="stock-${indice}" value=""
                                             disabled style="max-width: 150px;">
@@ -310,11 +333,22 @@ async function SeccionesFacturaProducto(indice){
     $("[id^='productos-select-']").on('change', function() {
         LlenarInputProductos($(this).attr('id').split('-')[2], $(this).val());
     });
+
+    $("[id^='cantidad-']").on('input', function() {
+        let numero = $(this).attr('id').split('-')[1] 
+        let valor = $(this).val()
+        let precioPrincipal = document.getElementById("precio-principal-" + numero).value
+        if(typeof precioPrincipal === 'undefined' || precioPrincipal === null || precioPrincipal === ''){
+            return
+        }
+        document.getElementById("precio-" + numero).value = formatoDecimalString((parseFloat(precioPrincipal.replace(',','.')) * tasaSeleccionada * parseInt(valor)).toString())
+    });
+
+    contadorSeccionFactura++;
 }
 
 async function AgregarSeccionFactura(){
     await SeccionesFacturaProducto(contadorSeccionFactura)
-    contadorSeccionFactura++;
 }
 
 function BorrarSeccionFactura(valor){
@@ -330,16 +364,16 @@ function LlenarInputProductos(numero, valor){
         document.getElementById("productoid-"+numero).value = ''
         document.getElementById("stock-"+numero).value = ''
         document.getElementById("precio-"+numero).value = ''
+        document.getElementById("precio-principal-"+numero).value = ''
+        document.getElementById("precio-unitario-"+numero).value = ''
         return
     }
 
     let bandera = false;
 
-    console.log(numero + ': ' + valor);
     var inputs = document.querySelectorAll('input[id^="productoid-"]');
     inputs.forEach(function(input) {
         if(input.value === valor && numero !== input.id.split('-')[1]){
-            debugger
             mostrarNotificacion("Producto ya seleccionado","#FF0000") 
             bandera = true
             return;
@@ -351,6 +385,8 @@ function LlenarInputProductos(numero, valor){
         document.getElementById("productoid-"+numero).value = ''
         document.getElementById("stock-"+numero).value = ''
         document.getElementById("precio-"+numero).value = ''
+        document.getElementById("precio-principal-"+numero).value = ''
+        document.getElementById("precio-unitario-"+numero).value = ''
         return;
     }
 
@@ -359,33 +395,139 @@ function LlenarInputProductos(numero, valor){
     document.getElementById("producto-"+numero).value = producto.nombre
     document.getElementById("productoid-"+numero).value = producto.id
     document.getElementById("stock-"+numero).value = producto.stock
-    document.getElementById("precio-"+numero).value = producto.precio
-
+    let cantidad = document.getElementById("cantidad-"+numero).value
+    if(typeof cantidad === 'undefined' || cantidad === null || cantidad === ''){
+        document.getElementById("precio-"+numero).value = 0
+    }else{
+        document.getElementById("precio-"+numero).value = formatoDecimalString((parseFloat(producto.precio) * tasaSeleccionada * parseInt(cantidad)).toString())
+    }
+    document.getElementById("precio-principal-"+numero).value = producto.precio
+    document.getElementById("precio-unitario-"+numero).value = formatoDecimalString((parseFloat(producto.precio) * tasaSeleccionada).toString())
 }
 
 // Llama a la función iniciarImpresionAutomatica() cada 2 segundos
-setInterval(function() {
-    iniciarImpresionAutomatica();
-}, 5000);
+setInterval(async function() {
+    if(!banderaIntervalo){
+        return
+    }
+    await VerificarStockProductos();
+}, 4000);
 
 // Función para iniciar la impresión automática
-function iniciarImpresionAutomatica() {
+async function VerificarStockProductos() {
+    
+    banderaExisteStock = false
+
     // Selector para obtener todos los inputs cuyo id comience con 'productoid-'
     let inputs = document.querySelectorAll('input[id^="productoid-"]');
     
     if(typeof inputs === 'undefined' || inputs === null || inputs.length === 0){
-        console.log("No se encontraron inputs con id que comience con 'productoid-'.");
         return;
     }
 
-    inputs.forEach(function(input, index) {
-        var valor = input.value;
+    let listaInfoProductos = []
+
+    inputs.forEach(function(input) {
+        let valor = input.value;
         let numero = input.id.split('-')[1]
  
-        if(document.getElementById("estado-"+numero).value !== 'Inactivo' && valor !== '0'){
-            console.log("Valor del input " + index + ": " + valor);
-        }else{
-            console.log("Valor del input " + index + ": " + valor + " INACTIVO");
+        if(document.getElementById("estado-"+numero).value !== 'Inactivo' && valor !== '' && valor !== '0'){
+            listaInfoProductos.push({
+                index: parseInt(numero),
+                id: parseInt(valor)
+            })
         }
     });
+
+    if(typeof listaInfoProductos !== 'undefined' && listaInfoProductos !== null && listaInfoProductos.length > 0){
+
+        let montoTotal = 0
+
+        let data = await consultar("productos",{"accion":"obtenerPorListaId","datos":listaInfoProductos.map(x => x.id)})
+
+        if(typeof data !== 'undefined' && data !== null && data.length > 0){
+
+            banderaExisteStock = true
+
+            for(let i = 0; i < data.length; i++){
+                let posicion = parseInt(listaInfoProductos.find(x => x.id === parseInt(data[i].id)).index)
+                let valorCantidad = document.getElementById("cantidad-"+posicion).value
+                let totalStock = parseInt(data[i].stock) - parseInt(valorCantidad !== '' ? parseInt(valorCantidad) : 0)
+                let stockProducto = document.getElementById("stock-" + posicion)
+                if(totalStock < 0 || valorCantidad === ''){
+                    if(totalStock < 0){
+                        totalStock = 0
+                        stockProducto.className = "form-control fondo-rojo"
+                    }
+                    banderaExisteStock = false
+                }else{
+                    stockProducto.className = "form-control"
+                }
+                stockProducto.value = totalStock
+
+                let precioProducto = document.getElementById("precio-"+posicion).value
+                montoTotal += typeof precioProducto !== 'undefined' && precioProducto !== null && precioProducto !== '' ? parseFloat(precioProducto.replace(',','.')) : 0
+            }
+
+        }
+        
+        factura = {
+            persona_id: persona.id,
+            estado: 'Pagada',
+            total: montoTotal,
+            moneda_id: monedaSelecionada,
+            tasa: tasaSeleccionada,
+            usuario_id : usuario.Id,
+            tipo_factura: document.querySelector('select[name="tipofactura"]').selectedOptions[0].value
+        }
+        console.log(factura)
+
+        document.getElementById("montoTotal").value = formatoDecimalString(montoTotal.toString())
+    }
+}
+
+function BuscarTasaSeleccionada(monedaid){
+    if(monedas.find(x => x.id === monedaid).principal === '1'){
+        tasaSeleccionada = 1
+    }
+    else{
+        tasaSeleccionada = parseFloat(tasas.find(x => x.moneda_id === monedaid).tasa)
+    }
+
+    monedaSelecionada = parseInt(monedaid)
+
+    document.getElementById("tasaActual").value = tasaSeleccionada
+
+    // Selector para obtener todos los inputs cuyo id comience con 'productoid-'
+    let inputs = document.querySelectorAll('input[id^="precio-principal-"]');
+    
+    if(typeof inputs === 'undefined' || inputs === null || inputs.length === 0){
+        return;
+    }
+
+    inputs.forEach(function(input) {
+        let valor = input.value;
+        let numero = input.id.split('-')[2]
+
+        if(document.getElementById("estado-"+numero).value !== 'Inactivo' && valor !== '' && valor !== '0'){
+            let precioActual = document.getElementById("precio-unitario-"+numero)
+            precioActual.value = formatoDecimalString((parseFloat(valor.replace(',','.')) * tasaSeleccionada ).toString())
+
+            parseInt(document.getElementById("cantidad-"+numero).value)
+
+            let MontoActual = document.getElementById("precio-"+numero)
+            MontoActual.value = formatoDecimalString((parseFloat(valor.replace(',','.')) * tasaSeleccionada * parseInt(document.getElementById("cantidad-"+numero).value)).toString())
+        }
+    });
+}
+
+async function RegistrarFactura(){
+    banderaIntervalo = false
+    await VerificarStockProductos()
+    if(!banderaExisteStock){
+        mostrarNotificacion("No existe stock o no se agregaron todas las cantidades de productos", "#FF0000") 
+        banderaIntervalo = true
+    }else{
+        mostrarNotificacion("FacturaRegistrada", "linear-gradient(to right, #00b09b, #96c93d)"); 
+    }
 }

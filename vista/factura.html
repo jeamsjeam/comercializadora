@@ -44,7 +44,7 @@
 
     <form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); ModalPersonas()">
       <div class="d-flex justify-content-between mb-2">
-        <button type="submit" class="btn btn-primary">Registrar</button>
+        <button type="submit" class="btn btn-primary" onclick="RegistrarFactura()">Registrar</button>
         <button class="btn btn-sm btn-success" onclick="AgregarSeccionFactura()"><i class="bi bi-plus-circle-dotted"></i></button>
       </div>
       <div class="row">
@@ -61,12 +61,20 @@
                     <!-- Agrega opciones del select si es necesario -->
                 </select>
             </div>
+            <div class="p-2 bd-highlight">
+              <label class="mb-2 text-muted" for="tasaActual">Tasa</label>
+              <input id="tasaActual" type="text" class="form-control" name="tasaActual" value="" disabled>
+            </div>
+            <div class="p-2 bd-highlight">
+              <label class="mb-2 text-muted" for="montoTotal">Total</label>
+              <input id="montoTotal" type="text" class="form-control" name="montoTotal" value="" disabled>
+            </div>
         </div>
       </div>
       <div id="contenidoFactura">
       </div>
       <div class="d-flex justify-content-between mt-3">
-        <button type="submit" class="btn btn-primary">Registrar</button>
+        <button type="submit" class="btn btn-primary" onclick="RegistrarFactura()">Registrar</button>
         <button class="btn btn-sm btn-success" onclick="AgregarSeccionFactura()"><i class="bi bi-plus-circle-dotted"></i></button>
       </div>
     </form>
