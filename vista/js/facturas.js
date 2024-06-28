@@ -272,9 +272,9 @@ function InfoBusquedaPersona(datos){
 
 async function SeccionesFacturaProducto(indice){
 
-    let contenido =`<div id="seccion-${indice}" class="row p-2 borde-abajo">
+    let contenido =`<div id="seccion-${indice}" class="row p-3 borde-abajo">
                         <div class="col-sm-12 col-md-12 col-lg-3 col-lx-3 col-xxl-3 mb-5 mb-lg-0">
-                            <div class="mb-3">
+                            <div class="">
                                 <div class="row">
                                     <div class="col-12">
                                         <label class="mb-2 text-muted" for="productos-select-${indice}">Productos</label>
@@ -290,7 +290,7 @@ async function SeccionesFacturaProducto(indice){
                         <div class="col-sm-12 col-md-12 col-lg-9 col-lx-9 col-xxl-9 mb-5 mb-lg-0">
                             <div class="row">
                                 <div class="col-3">
-                                    <div class="mb-3">
+                                    <div class="">
                                         <label class="mb-2 text-muted" for="producto-${indice}">Producto</label>
                                         <input id="producto-${indice}" type="text" class="form-control" name="producto-${indice}" value=""
                                             disabled>
@@ -301,14 +301,14 @@ async function SeccionesFacturaProducto(indice){
                                     </div>
                                 </div>
                                 <div class="col-2">
-                                    <div class="mb-3">
+                                    <div class="">
                                         <label class="mb-2 text-muted" for="cantidad-${indice}">Cantidad</label>
                                         <input id="cantidad-${indice}" type="number" class="form-control" name="cantidad-${indice}" value=""
                                             required style="max-width: 150px;">
                                     </div>
                                 </div>
                                 <div class="col-2">
-                                    <div class="mb-3">
+                                    <div class="">
                                         <label class="mb-2 text-muted" for="monto-${indice}">Monto</label>
                                         <input id="monto-${indice}" type="text" class="form-control" name="monto-${indice}" value=""
                                             disabled style="max-width: 150px;">
@@ -317,21 +317,21 @@ async function SeccionesFacturaProducto(indice){
                                     </div>
                                 </div>
                                 <div class="col-2">
-                                    <div class="mb-3">
+                                    <div class="">
                                         <label class="mb-2 text-muted" for="precio-unitario-${indice}">Precio Unitario</label>
                                         <input id="precio-unitario-${indice}" type="text" class="form-control" name="precio-unitario-${indice}" value=""
                                             disabled style="max-width: 150px;">
                                     </div>
                                 </div>
                                 <div class="col-2">
-                                    <div class="mb-3" >
+                                    <div class="" >
                                         <label class="mb-2 text-muted" for="stock-${indice}">Stock</label>
                                         <input id="stock-${indice}" type="text" class="form-control" name="stock-${indice}" value=""
                                             disabled style="max-width: 150px;">
                                     </div>
                                 </div>
                                 <div class="col-1">
-                                    <div class="mb-3" style="padding: 34px;">
+                                    <div class="" style="padding: 34px;">
                                         <button class="btn btn-sm btn-danger" onclick="BorrarSeccionFactura(${indice})"><i
                                                 class="bi bi-trash3"></i></button>
                                     </div>
