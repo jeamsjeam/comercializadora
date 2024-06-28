@@ -287,7 +287,7 @@ async function CrearTasa(){
             accion: "insertar",
             datos: {
                 tasa: parseFloat(tasa.value.replace(' ', '').replace(',', '.')),
-                usuario_id: usuario.usuarioId,
+                usuario_id: usuario.id,
                 moneda_id: parseInt(moneda.value)
             }
         };

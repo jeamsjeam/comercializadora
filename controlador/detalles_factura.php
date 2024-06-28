@@ -101,16 +101,12 @@
         try {
             // Consulta a la base de datos
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (persona_id, fecha_factura, estado, total, moneda_id, tasa_cambio, usuario_id, fecha_creacion, tipo_factura_id) VALUES ";
-            $sql .= "(".$datos['persona_id'].", ";
-            $sql .= "'".$datos['fecha_factura']."', ";
-            $sql .= "'".$datos['estado']."', ";
-            $sql .= $datos['total'].", ";
-            $sql .= $datos['moneda_id'].", ";
-            $sql .= $datos['tasa_cambio'].", ";
-            $sql .= $datos['usuario_id'].", ";
-            $sql .= "NOW(), ";
-            $sql .= $datos['tipo_factura_id'].") ";
+            $sql = "INSERT INTO ".$tabla." (factura_id, producto_id, cantidad, precio_unitario, fecha_creacion) VALUES ";
+            $sql .= "(".$datos['factura_id'].", ";
+            $sql .= "".$datos['producto_id'].", ";
+            $sql .= "".$datos['cantidad'].", ";
+            $sql .= "".$datos['precio_unitario'].", ";
+            $sql .= "NOW() ) ";
     
             return insertarUno($sql,$tabla);
 
@@ -125,20 +121,17 @@
        
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (nombre, descripcion, precio, stock, categoria_id, fecha_creacion, estado) VALUES ";
+            $$sql = "INSERT INTO ".$tabla." (factura_id, producto_id, cantidad, precio_unitario, fecha_creacion) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
-            for ($i = 0; $i < count($datos); $i++){
+            foreach ($datos as $dato) {
 
-                $sql .= "(".$datos['persona_id'].", ";
-                $sql .= "'".$datos['fecha_factura']."', ";
-                $sql .= "'".$datos['estado']."', ";
-                $sql .= $datos['total'].", ";
-                $sql .= $datos['moneda_id'].", ";
-                $sql .= $datos['tasa_cambio'].", ";
-                $sql .= $datos['usuario_id'].", ";
-                $sql .= "NOW(), ";
-                $sql .= $datos['tipo_factura_id']."), ";
+                // Consulta a la base de datos para actualizar el registro
+                $sql .= "(".$dato['factura_id'].", ";
+                $sql .= "".$dato['producto_id'].", ";
+                $sql .= "".$dato['cantidad'].", ";
+                $sql .= "".$dato['precio_unitario'].", ";
+                $sql .= "NOW() ), ";
             }
 
             return insertarVarios(rtrim($sql, ','),$tabla);

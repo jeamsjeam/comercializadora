@@ -142,7 +142,19 @@ function formatoFechaString(dateString) {
 }
 
 function formatoDecimalString(valor) {
-    let decimal = parseFloat(valor.replace(',', '.'));
+
+    let decimal = 0;
+    if(isNaN(valor)){
+        decimal = 0
+    }else if(typeof valor === 'string'){
+        if(valor === ''){
+            decimal = 0
+        }else{
+            decimal = parseFloat(valor.replace(',', '.'));
+        }
+    }else{
+        decimal = valor
+    }
 
     if (decimal % 1 !== 0) {
         // Si tiene decimales, mostrar dos decimales
@@ -210,7 +222,7 @@ async function RegistrarVerificarTasa(){
                     accion: "insertar",
                     datos: {
                         tasa: parseFloat(document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')).value.replace(',', '.')),
-                        usuario_id: usuario.usuarioId,
+                        usuario_id: usuario.id,
                         moneda_id: monedas[i].id
                     }
                 };

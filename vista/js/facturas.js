@@ -28,8 +28,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         stock: "0",
     }); 
 
-    await SeccionesFacturaProducto(contadorSeccionFactura)
-
     usuario = JSON.parse(sessionStorage.getItem('usuario'))
 
 });
@@ -41,16 +39,32 @@ var contadorSeccionFactura = 0
 var banderaIntervalo = true
 var banderaExisteStock = true
 var factura = null
-var datosFactura = null
+var detalleFactura = []
 var tasaSeleccionada = 1
 var monedaSelecionada = 1
 var usuario = null;
 
+async function LimpiarVariables(busqueda){
+    factura = null
+    banderaExisteStock = true
+    banderaIntervalo = true
+    detalleFactura = []
+    persona = null
+    document.getElementById("contenidoFactura").innerHTML = ''
+    document.getElementById("contenidoPersonas").innerHTML = ''
+    contadorSeccionFactura = 0
+    document.getElementById("seccionFactura").className = "d-none"
+    await SeccionesFacturaProducto(contadorSeccionFactura)
+    if(busqueda)
+        document.getElementById("buscarCedula").value = ''
+}
+
 async function BuscarPersona(cedula, bandera){
     try{
+        await Loading(true)
+        await LimpiarVariables(false)
+
         let seccionFactura = document.getElementById("seccionFactura")
-        seccionFactura.className = "d-none"
-        persona = null
 
         let datos = {
             accion: 'obtenerPorCedula',
@@ -60,7 +74,7 @@ async function BuscarPersona(cedula, bandera){
         };
 
         let data = await consultar("personas",datos);
-
+        await Loading(false)
         if(data !== null && typeof data !== 'undefined'){
             if (data.message) {
                 mostrarNotificacion(data.message,"#FF0000") 
@@ -76,7 +90,9 @@ async function BuscarPersona(cedula, bandera){
         }else{
             await ModalPersonas(null,true,'insertar')
         }
+        
 	}catch(e){
+        await Loading(false)
 		mostrarNotificacion("Error:", e,"#FF0000") 
 		console.error('Error:', e);
 	}
@@ -232,7 +248,7 @@ function InfoBusquedaPersona(datos){
     let contenido =`<div class="col-12 d-flex flex-row bd-highlight mb-3">
                         <div class="p-2 bd-highlight"> 
                             <label class="text-muted" for="nombre">Cedula</label>
-                            <input type="text" class="form-control" name="nombre" value="${(datos.extrangero === 0 ? 'V' : 'E') + '-' + datos.cedula}" disabled>
+                            <input type="text" class="form-control" name="nombre" value="${(datos.extrangero === 0 ? 'E' : 'V') + '-' + datos.cedula}" disabled>
                         </div>
                         <div class="p-2 bd-highlight"> 
                             <label class="text-muted" for="nombre">Nombre</label>
@@ -293,8 +309,8 @@ async function SeccionesFacturaProducto(indice){
                                 </div>
                                 <div class="col-2">
                                     <div class="mb-3">
-                                        <label class="mb-2 text-muted" for="precio-${indice}">Monto</label>
-                                        <input id="precio-${indice}" type="text" class="form-control" name="precio-${indice}" value=""
+                                        <label class="mb-2 text-muted" for="monto-${indice}">Monto</label>
+                                        <input id="monto-${indice}" type="text" class="form-control" name="monto-${indice}" value=""
                                             disabled style="max-width: 150px;">
                                         <input id="precio-principal-${indice}" type="text" class="form-control" name="precio-principal-${indice}" value=""
                                             hidden >
@@ -335,16 +351,47 @@ async function SeccionesFacturaProducto(indice){
     });
 
     $("[id^='cantidad-']").on('input', function() {
-        let numero = $(this).attr('id').split('-')[1] 
-        let valor = $(this).val()
-        let precioPrincipal = document.getElementById("precio-principal-" + numero).value
-        if(typeof precioPrincipal === 'undefined' || precioPrincipal === null || precioPrincipal === ''){
-            return
-        }
-        document.getElementById("precio-" + numero).value = formatoDecimalString((parseFloat(precioPrincipal.replace(',','.')) * tasaSeleccionada * parseInt(valor)).toString())
+        ValorCantidadProducto($(this).val(),$(this).attr('id').split('-')[1] )
     });
 
     contadorSeccionFactura++;
+}
+
+function ValorCantidadProducto(valor, numero){
+    let precioPrincipal = document.getElementById("precio-principal-" + numero).value
+    if(typeof precioPrincipal === 'undefined' || precioPrincipal === null || precioPrincipal === ''){
+        return
+    }
+
+    document.getElementById("monto-" + numero).value = formatoDecimalString(parseFloat(precioPrincipal.replace(',','.')) * tasaSeleccionada * parseInt(valor))
+
+    SumarTotal()
+
+}
+
+function SumarTotal(){
+    // Selector para obtener todos los inputs cuyo id comience con 'productoid-'
+    let inputs = document.querySelectorAll('input[id^="monto-"]');
+    
+    if(typeof inputs === 'undefined' || inputs === null || inputs.length === 0){
+        return;
+    }
+
+    let total = 0
+
+    inputs.forEach(function(input) {
+        let valorPrecio = input.value;
+        let numeroPrecio = input.id.split('-')[1]
+
+        let estado = document.getElementById("estado-"+numeroPrecio).value
+
+        if(estado.value !== 'Inactivo' && valorPrecio !== '' && valorPrecio !== '0'){
+            total += parseFloat(valorPrecio)
+        }
+    });
+
+    if(total >= 0)
+        document.getElementById("montoTotal").value = total
 }
 
 async function AgregarSeccionFactura(){
@@ -363,7 +410,7 @@ function LlenarInputProductos(numero, valor){
         document.getElementById("producto-"+numero).value = ''
         document.getElementById("productoid-"+numero).value = ''
         document.getElementById("stock-"+numero).value = ''
-        document.getElementById("precio-"+numero).value = ''
+        document.getElementById("monto-"+numero).value = ''
         document.getElementById("precio-principal-"+numero).value = ''
         document.getElementById("precio-unitario-"+numero).value = ''
         return
@@ -384,7 +431,7 @@ function LlenarInputProductos(numero, valor){
         document.getElementById("producto-"+numero).value = ''
         document.getElementById("productoid-"+numero).value = ''
         document.getElementById("stock-"+numero).value = ''
-        document.getElementById("precio-"+numero).value = ''
+        document.getElementById("monto-"+numero).value = ''
         document.getElementById("precio-principal-"+numero).value = ''
         document.getElementById("precio-unitario-"+numero).value = ''
         return;
@@ -397,12 +444,14 @@ function LlenarInputProductos(numero, valor){
     document.getElementById("stock-"+numero).value = producto.stock
     let cantidad = document.getElementById("cantidad-"+numero).value
     if(typeof cantidad === 'undefined' || cantidad === null || cantidad === ''){
-        document.getElementById("precio-"+numero).value = 0
+        document.getElementById("monto-"+numero).value = 0
     }else{
-        document.getElementById("precio-"+numero).value = formatoDecimalString((parseFloat(producto.precio) * tasaSeleccionada * parseInt(cantidad)).toString())
+        document.getElementById("monto-"+numero).value = formatoDecimalString(parseFloat(producto.precio) * tasaSeleccionada * parseInt(cantidad))
     }
     document.getElementById("precio-principal-"+numero).value = producto.precio
-    document.getElementById("precio-unitario-"+numero).value = formatoDecimalString((parseFloat(producto.precio) * tasaSeleccionada).toString())
+    document.getElementById("precio-unitario-"+numero).value = formatoDecimalString(parseFloat(producto.precio) * tasaSeleccionada)
+
+    SumarTotal()
 }
 
 // Llama a la función iniciarImpresionAutomatica() cada 2 segundos
@@ -448,10 +497,12 @@ async function VerificarStockProductos() {
         if(typeof data !== 'undefined' && data !== null && data.length > 0){
 
             banderaExisteStock = true
+            detalleFactura = []
 
             for(let i = 0; i < data.length; i++){
                 let posicion = parseInt(listaInfoProductos.find(x => x.id === parseInt(data[i].id)).index)
                 let valorCantidad = document.getElementById("cantidad-"+posicion).value
+
                 let totalStock = parseInt(data[i].stock) - parseInt(valorCantidad !== '' ? parseInt(valorCantidad) : 0)
                 let stockProducto = document.getElementById("stock-" + posicion)
                 if(totalStock < 0 || valorCantidad === ''){
@@ -465,24 +516,32 @@ async function VerificarStockProductos() {
                 }
                 stockProducto.value = totalStock
 
-                let precioProducto = document.getElementById("precio-"+posicion).value
-                montoTotal += typeof precioProducto !== 'undefined' && precioProducto !== null && precioProducto !== '' ? parseFloat(precioProducto.replace(',','.')) : 0
-            }
+                let precioProducto = document.getElementById("monto-"+posicion).value
 
+                montoTotal += typeof precioProducto !== 'undefined' && precioProducto !== null && precioProducto !== '' ? parseFloat(precioProducto.replace(',','.')) : 0
+
+                if(valorCantidad !== ''){
+                    detalleFactura.push({
+                        factura_id: 0,
+                        producto_id: parseInt(data[i].id),
+                        cantidad: parseInt(valorCantidad),
+                        precio_unitario: parseFloat(data[i].precio) * tasaSeleccionada
+                    })
+                }
+            }
         }
-        
+
         factura = {
-            persona_id: persona.id,
+            persona_id: parseInt(persona.id),
             estado: 'Pagada',
             total: montoTotal,
             moneda_id: monedaSelecionada,
-            tasa: tasaSeleccionada,
-            usuario_id : usuario.Id,
-            tipo_factura: document.querySelector('select[name="tipofactura"]').selectedOptions[0].value
+            tasa_cambio: tasaSeleccionada,
+            usuario_id : parseInt(usuario.id),
+            tipo_factura_id: parseInt(document.querySelector('select[name="tipofactura"]').selectedOptions[0].value)
         }
-        console.log(factura)
 
-        document.getElementById("montoTotal").value = formatoDecimalString(montoTotal.toString())
+        document.getElementById("montoTotal").value = montoTotal
     }
 }
 
@@ -511,14 +570,16 @@ function BuscarTasaSeleccionada(monedaid){
 
         if(document.getElementById("estado-"+numero).value !== 'Inactivo' && valor !== '' && valor !== '0'){
             let precioActual = document.getElementById("precio-unitario-"+numero)
-            precioActual.value = formatoDecimalString((parseFloat(valor.replace(',','.')) * tasaSeleccionada ).toString())
+            precioActual.value = formatoDecimalString(parseFloat(valor.replace(',','.')) * tasaSeleccionada)
 
-            parseInt(document.getElementById("cantidad-"+numero).value)
+            let MontoActual = document.getElementById("monto-"+numero)
+            let cantidadActual = document.getElementById("cantidad-"+numero).value
 
-            let MontoActual = document.getElementById("precio-"+numero)
-            MontoActual.value = formatoDecimalString((parseFloat(valor.replace(',','.')) * tasaSeleccionada * parseInt(document.getElementById("cantidad-"+numero).value)).toString())
+            MontoActual.value =  formatoDecimalString(parseFloat(valor.replace(',','.')) * tasaSeleccionada * parseInt(typeof cantidadActual === 'undefined' || cantidadActual === null || cantidadActual === '' ? 1 : cantidadActual))
         }
     });
+
+    SumarTotal()
 }
 
 async function RegistrarFactura(){
@@ -528,6 +589,33 @@ async function RegistrarFactura(){
         mostrarNotificacion("No existe stock o no se agregaron todas las cantidades de productos", "#FF0000") 
         banderaIntervalo = true
     }else{
-        mostrarNotificacion("FacturaRegistrada", "linear-gradient(to right, #00b09b, #96c93d)"); 
+        try{
+            console.log(factura)
+            let datos = {
+                accion: 'insertarConDetalles',
+                datos: { 
+                    factura: factura,
+                    detalle_factura: detalleFactura
+                }
+            };
+    
+            let data = await consultar("facturas",datos);
+            if(data !== null && typeof data !== 'undefined'){
+                if (data.message) {
+                    mostrarNotificacion(data.message,"#FF0000") 
+                } else if (data.error) {
+                    mostrarNotificacion(data.error,"#FF0000") 
+                } else {
+                    await LimpiarVariables(true)
+                    mostrarNotificacion("Factura Registrada", "linear-gradient(to right, #00b09b, #96c93d)"); 
+                }
+            }else{
+                mostrarNotificacion("No se registro" + error,"#FF0000") 
+            }
+            
+        }catch(e){
+            mostrarNotificacion("Error:", e,"#FF0000") 
+            console.error('Error:', e);
+        }
     }
 }

@@ -347,6 +347,82 @@
         }
     }
 
+    function insertarConDetalles($datos,$tabla) {
+       
+        try {
+            $factura = insertar($datos["factura"],$tabla);
+
+            $resultado = null;
+            $detallesInsertar = [];
+
+            // Se recorre el objeto procesado y se construye la query
+            foreach ($datos["detalle_factura"] as $dato) {
+
+                // Consulta a la base de datos para actualizar el registro
+                $dato['factura_id'] = $factura["id"];
+                $detallesInsertar[] = $dato;
+            }
+
+            $detalles = insertarListaDetalles($detallesInsertar,'detalles_factura');
+
+            $resultado[] = [
+                'factura' => $factura,
+                'detalle_factura' => $detalles
+            ];
+
+            return $resultado;
+
+        } catch (Exception $e) {
+            
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }
+    }
+
+    function insertarListaDetalles($datos,$tabla) {
+       
+        try {
+            // Consulta a la base de datos
+            $sql = "INSERT INTO ".$tabla." (factura_id, producto_id, cantidad, precio_unitario, fecha_creacion) VALUES ";
+
+            // Se recorre el objeto procesado y se construye la query
+            foreach ($datos as $dato) {
+
+                // Consulta a la base de datos para actualizar el registro
+                $sql .= "(".$dato['factura_id'].", ";
+                $sql .= "".$dato['producto_id'].", ";
+                $sql .= "".$dato['cantidad'].", ";
+                $sql .= "".$dato['precio_unitario'].", ";
+                $sql .= "NOW() ),";
+            }
+            return insertarVariosExtra(rtrim($sql, ','),$datos,$tabla);
+
+        } catch (Exception $e) {
+            
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }
+    }
+
+    function ObtenerPorListaIdExtra($datos,$tabla) {
+        
+        try{
+            // Consulta a la base de datos
+            $sql = "SELECT p.*, c.nombre as producto FROM ".$tabla." p";
+            $sql .= " JOIN productos c on c.id = p.producto_id WHERE p.id in (";
+            foreach ($datos as $id) {
+                $sql .= $id.",";
+            }
+            
+            return ObtenerVarios(rtrim($sql, ',').")");
+
+        }catch (Exception $e) {
+            
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }  
+    }
+
     function actualizar($datos,$tabla) {
         
         try {
@@ -544,6 +620,15 @@
                     break;
                 }
                 echo json_encode(insertar($datos,$tabla));
+
+                break;
+            case "insertarConDetalles":
+                $datos = $data['datos'] ?? null;
+                if($datos === null){
+                    echo json_encode(['error' => 'No se envio datos']);
+                    break;
+                }
+                echo json_encode(insertarConDetalles($datos,$tabla));
 
                 break;
             case "insertarLista":
