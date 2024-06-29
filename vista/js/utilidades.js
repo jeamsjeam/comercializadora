@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.dispatchEvent(event);
         await Loading(false)
 
+        const eventLoading = new CustomEvent('eventLoading', { detail: modalLoading });
+        document.dispatchEvent(eventLoading);
+
     } else {
         // Se elimina el objeto usuario en caso de estar en el login
         sessionStorage.removeItem('usuario');

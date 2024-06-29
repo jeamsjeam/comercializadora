@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    await DatosTabla()
+    document.addEventListener('eventLoading', async function(event) {
+        if (typeof event.detail !== 'undefined' && event.detail !== null) {
+            await Loading(true)
+            await DatosTabla()
+            await Loading(false)
+        }
+    });
 });
 
 var productos = []

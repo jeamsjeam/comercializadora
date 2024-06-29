@@ -1,9 +1,15 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    await DatosTabla()
+    document.addEventListener('eventLoading', async function(event) {
+        if (typeof event.detail !== 'undefined' && event.detail !== null) {
+            await Loading(true)
+            await DatosTabla()
+            await Loading(false)
+        }
+    });
 });
 
-var personas = []
-var modalPersonas = null
+var facturas = []
+var modalfacturas = null
 
 async function DatosTabla(){
     try{
@@ -12,14 +18,14 @@ async function DatosTabla(){
             accion: "obtenerTodos"
         };
 
-        let data = await consultar("personas",datos);
+        let data = await consultar("facturas",datos);
         if(data !== null && typeof data !== 'undefined'){
             if (data.message) {
                 mostrarNotificacion(data.message,"#FF0000") 
             } else if (data.error) {
                 mostrarNotificacion(data.error,"#FF0000") 
             } else {
-                personas = data
+                facturas = data
                 initDataTable(data)
             }
         }else{
@@ -32,15 +38,15 @@ async function DatosTabla(){
 	}
 }
 
-async function ModalPersonas(datos,bandera,tipo){
-    if(typeof modalPersonas === 'undefined' || modalPersonas === null){
-        modalPersonas = new bootstrap.Modal(document.getElementById('modalPersonas'));
+async function Modalfacturas(datos,bandera,tipo){
+    if(typeof modalfacturas === 'undefined' || modalfacturas === null){
+        modalfacturas = new bootstrap.Modal(document.getElementById('modalfacturas'));
     }
 
     if(bandera){
         if(tipo === 'insertar' || tipo === 'actualizar'){
-            ContenidoPersona(tipo === 'insertar' ? null : personas.find((x) => parseInt(x.id) === datos))
-            await ObtenerSelect("tipo_persona", "tipopersonas-select", "Tipo Persona");
+            ContenidoPersona(tipo === 'insertar' ? null : facturas.find((x) => parseInt(x.id) === datos))
+            await ObtenerSelect("tipo_persona", "tipofacturas-select", "Tipo Persona");
         }else if(tipo === 'eliminar'){
             ContenidoConfirmacionEliminar(datos)
         }
@@ -55,14 +61,14 @@ async function ModalPersonas(datos,bandera,tipo){
     }
 
     return new Promise((resolve) => {
-        const elementoModal = document.getElementById('modalPersonas');
+        const elementoModal = document.getElementById('modalfacturas');
         elementoModal.addEventListener(bandera ? 'shown.bs.modal' : 'hidden.bs.modal', () => {
             resolve();
         }, { once: true });
         if(bandera)
-            modalPersonas.show();
+            modalfacturas.show();
         else
-        modalPersonas.hide();
+        modalfacturas.hide();
     });
 }
 
@@ -70,23 +76,23 @@ function ContenidoConfirmacionEliminar(datos){
     let contenido = `<div class="row mt-4 mb-3">
                         <h4>¿Esta seguro que desea eliminar este elemento?</h4>
                         <div class="col-6">
-                             <button name="eliminarPersona" value="1" class="btn btn-danger" onclick="ModalPersonas(${datos},false,'eliminar')">Eliminar</button>
+                             <button name="eliminarPersona" value="1" class="btn btn-danger" onclick="Modalfacturas(${datos},false,'eliminar')">Eliminar</button>
                         </div>
                         <div class="col-6">
-                            <button name="cancelarEliminarPersona" value="2" class="btn btn-secondary" onclick="ModalPersonas(0,false,'cancelar')">Cancelar</button>
+                            <button name="cancelarEliminarPersona" value="2" class="btn btn-secondary" onclick="Modalfacturas(0,false,'cancelar')">Cancelar</button>
                         </div>
                     </div>`
-    document.getElementById("contenidoPersonas").innerHTML = contenido
+    document.getElementById("contenidofacturas").innerHTML = contenido
 }
 
 function ContenidoPersona(datos){
     let bandera = (typeof datos === 'undefined' || datos === null)
     let contenido = `<h1 class="fs-4 card-title fw-bold mb-4">${bandera ? 'Registrar' : 'Modificar'}</h1>
-                        <form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); ModalPersonas(0,false,'${bandera ? 'insertar' : 'actualizar'}')">
+                        <form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); Modalfacturas(0,false,'${bandera ? 'insertar' : 'actualizar'}')">
 
                             <div class="mb-3">
                                 <label class="mb-2 text-muted" for="tipopersona">Tipo Persona</label>
-                                <select name="tipopersona" class="form-select" aria-label="Default select example" id="tipopersonas-select">
+                                <select name="tipopersona" class="form-select" aria-label="Default select example" id="tipofacturas-select">
                                     <!-- Agrega opciones del select si es necesario -->
                                 </select>
                             </div>
@@ -128,11 +134,11 @@ function ContenidoPersona(datos){
                                     <button type="submit" class="btn btn-primary ms-auto">${bandera ? 'Registrar' : 'Modificar'}</button>
                                 </div>
                                 <div class="col-6">
-                                    <div name="" value="2" class="btn btn-secondary" onclick="ModalPersonas(0,false,'cancelar')">Cancelar</div>
+                                    <div name="" value="2" class="btn btn-secondary" onclick="Modalfacturas(0,false,'cancelar')">Cancelar</div>
                                 </div>
                             </div>
                         </form>`
-    document.getElementById("contenidoPersonas").innerHTML = contenido
+    document.getElementById("contenidofacturas").innerHTML = contenido
 }
 
 async function EliminarPersona(id){
@@ -142,7 +148,7 @@ async function EliminarPersona(id){
             datos: { id: id }
         };
 
-        let data = await consultar("personas",datos);
+        let data = await consultar("facturas",datos);
         if(data !== null && typeof data !== 'undefined'){
             if (data.message) {
                 mostrarNotificacion(data.message,"#FF0000") 
@@ -192,7 +198,7 @@ async function AccionPersona(accion){
             }
         };
 
-        let data = await consultar("personas",datos);
+        let data = await consultar("facturas",datos);
         if(data !== null && typeof data !== 'undefined'){
             if (data.message) {
                 mostrarNotificacion(data.message,"#FF0000") 
@@ -226,7 +232,7 @@ const dataTableOptions = {
     scrollY: 'auto',  // Ajusta la altura automáticamente
     scrollCollapse: true,  // Permite colapsar la tabla si hay menos registros
     columnDefs: [
-        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6] }
+        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] }
     ],
     pageLength: numeroPorPagona,
     destroy: true,
@@ -254,7 +260,7 @@ function initDataTable(datos) {
 
     listaDatos(datos);
 
-    dataTable = $("#datatable_personas").DataTable(dataTableOptions);
+    dataTable = $("#datatable_facturas").DataTable(dataTableOptions);
 
     dataTableIsInitialized = true;
 }
@@ -266,22 +272,24 @@ function listaDatos(datos) {
             content += `
                  <tr>
                     <td>${index + 1}</td>
-                    <td>${dato.extrangero != null && typeof dato.extrangero !== 'undefined' ? (dato.extrangero === '0' ? 'V' : 'E') : ''}</td>
-                    <td>${dato.cedula != null && typeof dato.cedula !== 'undefined' ? dato.cedula : ''}</td>
+                    <td>${dato.tipofactura != null && typeof dato.tipofactura !== 'undefined' ?  dato.tipofactura : ''}</td>
+                    <td>${dato.estado != null && typeof dato.estado !== 'undefined' ? dato.estado : ''}</td>
+                    <td>${dato.cedula != null && typeof dato.cedula !== 'undefined' ? (dato.extrangero === '0' ? 'V-' : 'E-') + dato.cedula : ''}</td>
                     <td>${dato.nombre != null && typeof dato.nombre !== 'undefined' ? dato.nombre : ''}</td>
-                    <td>${dato.telefono != null && typeof dato.telefono !== 'undefined' ? dato.telefono : ''}</td>
-                    <td>${dato.direccion != null && typeof dato.direccion !== 'undefined' ? dato.direccion : ''}</td>
-                    <td>${dato.tipopersona != null && typeof dato.tipopersona !== 'undefined' ? dato.tipopersona : ''}</td>
-                    <!-- <td><i class="fa-solid fa-check" style="color: green;"></i></td> -->
+                    <td>${dato.total != null && typeof dato.total !== 'undefined' ? formatoDecimalString(dato.total) : ''}</td>
+                    <td>${dato.moneda != null && typeof dato.moneda !== 'undefined' ? dato.moneda : ''}</td>
+                    <td>${dato.tasa_cambio != null && typeof dato.tasa_cambio !== 'undefined' ? formatoDecimalString(dato.tasa_cambio) : ''}</td>
+                    <td>${dato.usuario != null && typeof dato.usuario !== 'undefined' ? dato.usuario : ''}</td>
+                    <td>${dato.fecha_creacion != null && typeof dato.fecha_creacion !== 'undefined' ? dato.fecha_creacion : ''}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="ModalPersonas(${dato.id},true,'actualizar')"
-                        ><i class="bi bi-pen"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="ModalPersonas(${dato.id},true,'eliminar')"
-                        ><i class="bi bi-trash3"></i></button>
+                        <button class="btn btn-sm btn-primary" onclick="Modalfacturas(${dato.id},true,'actualizar')"
+                        ><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="Modalfacturas(${dato.id},true,'eliminar')"
+                        ><i class="bi bi-x-octagon"></i></button>
                     </td>
                 </tr>`;
         });
-        tableBody_personas.innerHTML = content;
+        tableBody_facturas.innerHTML = content;
     } catch (ex) {
         alert(ex);
     }

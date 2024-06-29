@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/toastify.css">
-    <link rel="stylesheet" type="text/css" href="css/facturas.css">
     <link rel="stylesheet" type="text/css" href="css/DataTable/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" type="text/css" href="css/DataTable/cdnjs.cloudflare.com_ajax_libs_font-awesome_6.2.0_css_all.min.css">
     <link rel="stylesheet" type="text/css" href="bootstrap-5/css/bootstrap.min.css">
@@ -19,38 +18,41 @@
     <section>
       <div class="row">
         <div class="col-12 mt-4">
-          <button class="btn btn-success" onclick="ModalPersonas(0,true,'insertar')">Registrar Persona</button>
+          <button class="btn btn-success" onclick="Modalfacturas(0,true,'insertar')">Registrar Persona</button>
         </div>
       </div>
       <div class="row">
         <div class="col-12 my-5">
-          <table id="datatable_personas" class="table table-striped">
+          <table id="datatable_facturas" class="table table-striped">
             <caption>
-                Personas
+                Facturas
             </caption>
             <thead>
                 <tr>
                     <th class="centered">#</th>
-                    <th class="centered">-</th>
-                    <th class="centered">cedula</th>
-                    <th class="centered">Nombre</th>
-                    <th class="centered">Telefono</th>
-                    <th class="centered">Direccion</th>
                     <th class="centered">Tipo</th>
+                    <th class="centered">Estado</th>
+                    <th class="centered">Cedula</th>
+                    <th class="centered">Nombre</th>
+                    <th class="centered">Total</th>
+                    <th class="centered">Moneda</th>
+                    <th class="centered">Tasa</th>
+                    <th class="centered">Usuario</th>
+                    <th class="centered">Fecha</th>
                     <th class="centered">Opciones</th>
                 </tr>
             </thead>
-            <tbody id="tableBody_personas"></tbody>
+            <tbody id="tableBody_facturas"></tbody>
           </table> 
         </div>
       </div>
     </section>
   </div>
 
-  <div class="modal fade" id="modalPersonas" tabindex="-1" aria-labelledby="modalPersonas" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal fade" id="modalfacturas" tabindex="-1" aria-labelledby="modalfacturas" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-ls">
       <div class="modal-content">
-        <div id="contenidoPersonas" class="modal-body text-center">
+        <div id="contenidofacturas" class="modal-body text-center">
         </div>
       </div>
     </div>
