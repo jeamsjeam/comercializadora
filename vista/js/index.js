@@ -2,9 +2,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Se revisa si las tasas están listas para mostrarlas en el HTML
     document.addEventListener('tasasListas', function(event) {
-        // Aquí puedes continuar con la lógica que depende de la variable tasas
+        // Se verifica si existe tasas
         if (typeof event.detail !== 'undefined' && event.detail !== null && event.detail.length > 0) {
+            
             let contenido = ``;
+            // Se recorren las tasas y se agregan al html
             for (let i = 0; i < tasas.length; i++) {
 
                 contenido += `
@@ -16,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById('informacionTasas').innerHTML = contenido;
 
             contenido = ``;
+             // Se recorren las monedas y se agregan al html
             for (let i = 0; i < monedas.length; i++) {
                 contenido += `
                     <li class="list-group-item d-flex justify-content-between align-items-center px-5">
@@ -30,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById('informacionMonedas').innerHTML = contenido;
         } 
 
+        // se verifica si existe en el localStorage tasa para mostrar una notificacion en verde
         let tasaRegistrada = JSON.parse(localStorage.getItem('tasa'));
         if (typeof tasaRegistrada !== 'undefined' &&  tasaRegistrada !== null && typeof tasaRegistrada.tasa !== 'undefined' && tasaRegistrada.tasa !== null) {
             mostrarNotificacion("Tasas Registradas", "linear-gradient(to right, #00b09b, #96c93d)"); 
@@ -37,17 +41,23 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     });
 
+    // se verifica si existe en el localStorage monedaModificada para mostrar una notificacion en verde
     let monedaModificada = JSON.parse(localStorage.getItem('monedaModificada'));
     if (typeof monedaModificada !== 'undefined' &&  monedaModificada !== null && typeof monedaModificada.nombre !== 'undefined' && monedaModificada.nombre !== null) {
         mostrarNotificacion("Moneda " + monedaModificada.nombre + " modificada como principal", "linear-gradient(to right, #00b09b, #96c93d)"); 
     }
     localStorage.removeItem('monedaModificada');
 
+    // Se inicializan las fechas de la consulta de las facturas
     InicializarFechasFacturas()
     
+    // Se consultan las facturas
     await consultarFacturas()
 });
 
+var modalCrearTasa = null
+
+// Funcion que agrega fecha inicio y fecha fin de un rango de hace 7 dias hasta hoy
 function InicializarFechasFacturas(){
     let fecha = new Date(); //Fecha actual
     let mes = fecha.getMonth()+1; //obteniendo mes
@@ -70,6 +80,7 @@ function InicializarFechasFacturas(){
     document.getElementById('fechaInicio').value=ano+"-"+mes+"-"+dia;
 }
 
+// Funcion para consultar las facturas para llenar los campos respectivos
 async function consultarFacturas() {
 	try{    
         await Loading(true)
@@ -139,6 +150,7 @@ async function consultarFacturas() {
 	}
 }
 
+// Funcion que consulta los datos de la grafica
 async function DatosGrafica(fechaInicio, fechaFin){
 
     try {
@@ -212,10 +224,10 @@ async function DatosGrafica(fechaInicio, fechaFin){
     
 }
 
+// Funcion para modificar la moneda principal
+// id: id de la moneda
 async function ModificarMoneda(id){
-
     try{
-
         moneda = monedas.find((element) => element.id > id);
 
         let datos = {
@@ -256,8 +268,8 @@ async function ModificarMoneda(id){
     
 }
 
-var modalCrearTasa = null
-
+// Funcion para crear, abrir y cerrar el modeal de modificar tasa
+// bandera: valor true o false para abrir o cerrar el modal
 async function ModalCrearTasa(bandera){
     if(bandera){
         await ObtenerSelect("monedas", "monedas-select", "moneda", monedas.filter((x) => x.principal !== '1'));
@@ -277,6 +289,7 @@ async function ModalCrearTasa(bandera){
     });
 }
 
+// Funcion para crear tasas
 async function CrearTasa(){
     try {
         let usuario = JSON.parse(sessionStorage.getItem('usuario'))
@@ -324,7 +337,7 @@ async function CrearTasa(){
 }
 
 var myChart = null
-
+// Funcion para cargar la grafica
 function Grafica(etiquetas, datosTipo1, datosTipo2){
     let ctx = document.getElementById('myChart');
 
