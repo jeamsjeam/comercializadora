@@ -1,7 +1,11 @@
 <?php
 
+    // Se importa el archivo utilidades.php
     include 'utilidades/utilidades.php';
 
+    // Funcion para obtener un registro por id
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerPorId($datos,$tabla) {
 
         try{
@@ -17,6 +21,8 @@
         }   
     }
 
+    // Funcion para obtener todos los registros
+    // $tabla: String que es el nombre de la tabla
     function ObtenerTodos($tabla) {
 
         try{         
@@ -32,6 +38,9 @@
         }   
     }
 
+    // Funcion para obtener registos por una lista de id
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerPorListaId($datos,$tabla) {
         
         try{
@@ -50,6 +59,9 @@
         }  
     }
 
+    // Funcion para insertar un registro
+    // $datos: datos para ser insertados
+    // $tabla: String que es el nombre de la tabla
     function insertar($datos,$tabla) {
 
         try {
@@ -66,6 +78,9 @@
         }
     }
 
+    // Funcion para insertar varios registros
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function insertarLista($datos,$tabla) {
         
         try {
@@ -87,6 +102,9 @@
         }
     }
 
+    // Funcion para actualizar un registro
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function actualizar($datos,$tabla) {
         
         try {
@@ -104,6 +122,9 @@
         }
     }
     
+    // Funcion para actualizar varios registros
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function actualizarLista($datos,$tabla) {
         
         try {
@@ -130,6 +151,9 @@
         }
     }    
     
+    // Funcion para eliminar un registro
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function eliminar($datos,$tabla) {
         
         try {
@@ -145,6 +169,9 @@
         }
     }
     
+    // Funcion para eliminar varios registros
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function eliminarLista($datos,$tabla) {
         
         try {
@@ -179,10 +206,13 @@
             return;
         }
 
+        // Se asigna el nombr de una tabla
         $tabla = "roles";
         
+        // Se guarda los datos enviados en una variable
         $data = json_decode($datosRecibidos, true);
 
+        // Se consulta la accion a tomar
         $accion = $data['accion'] ?? null;
 
         switch ($accion){

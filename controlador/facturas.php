@@ -528,6 +528,9 @@
         }
     }    
     
+    // Funcion para eliminar un registro
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function eliminar($datos,$tabla) {
 
         try {
@@ -544,6 +547,9 @@
         }
     }
     
+    // Funcion para eliminar varios registros
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function eliminarLista($datos,$tabla) {
         
         try {
@@ -577,10 +583,13 @@
             return;
         }
 
+        // Se asigna el nombr de una tabla
         $tabla = "facturas";
         
+        // Se guarda los datos enviados en una variable
         $data = json_decode($datosRecibidos, true);
 
+        // Se consulta la accion a tomar
         $accion = $data['accion'] ?? null;
 
         switch ($accion){
