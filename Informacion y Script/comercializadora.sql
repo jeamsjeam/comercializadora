@@ -12,7 +12,9 @@ CREATE TABLE productos (
     id BIGINT AUTO_INCREMENT  PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL, -- Nombre del producto
     descripcion TEXT, -- Descripción del producto
-    precio DECIMAL(10,2) NOT NULL, -- Precio del producto en la moneda base (USD)
+    precio DECIMAL(10,2) NOT NULL, -- Precio del producto en la moneda base
+    descuento DECIMAL(10,2) NOT NULL, -- Precio del producto en la moneda base 
+    cantidad_descuento int NOT NULL, -- Precio del producto en la moneda base 
     stock INT NOT NULL, -- Cantidad en stock del producto
     categoria_id BIGINT NOT NULL, -- Referencia a la categoría del producto
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación del producto

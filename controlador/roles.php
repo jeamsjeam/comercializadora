@@ -78,7 +78,7 @@
                 $sql .= "('".$datos[$i]['nombre']."', NOW()),";
             }
 
-            return insertarVarios(rtrim($sql, ','),$tabla);
+            return insertarVarios(rtrim($sql, ','),$datos,$tabla);
 
         } catch (Exception $e) {
             

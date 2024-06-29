@@ -94,10 +94,12 @@
         try {
             // Consulta a la base de datos
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (nombre, descripcion, precio, stock, categoria_id, fecha_creacion, estado) VALUES ";
+            $sql = "INSERT INTO ".$tabla." (nombre, descripcion, precio, descuento, cantidad_descuento, stock, categoria_id, fecha_creacion, estado) VALUES ";
             $sql .= "('".$datos['nombre']."', ";
             $sql .= "'".$datos['descripcion']."', ";
             $sql .= $datos['precio'].", ";
+            $sql .= $datos['descuento'].", ";
+            $sql .= $datos['cantidad_descuento'].", ";
             $sql .= $datos['stock'].", ";
             $sql .= $datos['categoria_id'].", ";
             $sql .= "NOW(), ";
@@ -116,7 +118,7 @@
        
         try {
             // Consulta a la base de datos
-            $sql = "INSERT INTO ".$tabla." (nombre, descripcion, precio, stock, categoria_id, fecha_creacion, estado) VALUES ";
+            $sql = "INSERT INTO ".$tabla." (nombre, descripcion, precio, descuento, cantidad_descuento, stock, categoria_id, fecha_creacion, estado) VALUES ";
 
             // Se recorre el objeto procesado y se construye la query
             for ($i = 0; $i < count($datos); $i++){
@@ -124,13 +126,15 @@
                 $sql .= "('".$datos[$i]['nombre']."', ";
                 $sql .= "'".$datos[$i]['descripcion']."', ";
                 $sql .= $datos[$i]['precio'].", ";
+                $sql .= $datos[$i]['descuento'].", ";
+                $sql .= $datos[$i]['cantidad_descuento'].", ";
                 $sql .= $datos[$i]['stock'].", ";
                 $sql .= $datos[$i]['categoria_id'].", ";
                 $sql .= "NOW(), ";
                 $sql .= "'".$datos[$i]['estado']."'), ";
             }
 
-            return insertarVarios(rtrim($sql, ','),$tabla);
+            return insertarVarios(rtrim($sql, ','),$datos,$tabla);
 
         } catch (Exception $e) {
             
@@ -147,6 +151,8 @@
             $sql .= "nombre = '".$datos['nombre']."', ";
             $sql .= "descripcion = '".$datos['descripcion']."', ";
             $sql .= "precio = ".$datos['precio'].", ";
+            $sql .= "descuento = ".$datos['descuento'].", ";
+            $sql .= "cantidad_descuento = ".$datos['cantidad_descuento'].", ";
             $sql .= "stock = ".$datos['stock'].", ";
             $sql .= "categoria_id = ".$datos['categoria_id'].", ";
             $sql .= "estado = '".$datos['estado']."' ";
@@ -174,6 +180,8 @@
                 $sql .= "nombre = '".$dato['nombre']."', ";
                 $sql .= "descripcion = '".$dato['descripcion']."', ";
                 $sql .= "precio = ".$dato['precio'].", ";
+                $sql .= "descuento = ".$dato['descuento'].", ";
+                $sql .= "cantidad_descuento = ".$dato['cantidad_descuento'].", ";
                 $sql .= "stock = ".$dato['stock'].", ";
                 $sql .= "categoria_id = ".$dato['categoria_id'].", ";
                 $sql .= "estado = '".$dato['estado']."' ";

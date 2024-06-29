@@ -110,6 +110,21 @@ function ContenidoProducto(datos){
 									<input id="precioProducto" type="text" class="form-control" name="precioProducto" value="${bandera ? '' : datos.precio}" required>
 								</div>
 
+                                <div class="row"> 
+                                    <div class="col-6"> 
+                                        <div class="mb-3">
+                                            <label class="mb-2 text-muted" for="descuentoProducto">Descuento</label>
+                                            <input id="descuentoProducto" type="text" class="form-control" name="descuentoProducto" value="${bandera ? '' : datos.descuento}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6"> 
+                                        <div class="mb-3">
+                                            <label class="mb-2 text-muted" for="cantidadDescuentoProducto">Cantidad descuento</label>
+                                            <input id="cantidadDescuentoProducto" type="text" class="form-control" name="cantidadDescuentoProducto" value="${bandera ? '' : datos.cantidad_descuento}" required>
+                                        </div>
+                                    </div>
+                                </div>
+    
                                 <div class="mb-3">
 									<label class="mb-2 text-muted" for="stockProducto">Stock</label>
 									<input id="stockProducto" type="text" class="form-control" name="stockProducto" value="${bandera ? '' : datos.stock}" required>
@@ -159,6 +174,8 @@ async function AccionProducto(accion){
         let id = document.getElementById("idProducto")
         let descripcion = document.getElementById("descripcionProducto")
         let precio = document.getElementById("precioProducto")
+        let descuento = document.getElementById("descuentoProducto")
+        let cantidadDescuento = document.getElementById("cantidadDescuentoProducto")
         let stock = document.getElementById("stockProducto")
         let categoria_id = document.querySelector('select[name="categoria"]').selectedOptions[0]
 
@@ -177,6 +194,8 @@ async function AccionProducto(accion){
                 nombre: nombre.value,
                 descripcion: descripcion.value,
                 precio: parseFloat(precio.value.replace(',','.')),
+                descuento: parseFloat(descuento.value.replace(',','.')),
+                cantidad_descuento: parseInt(cantidadDescuento.value),
                 stock: parseInt(stock.value),
                 categoria_id: categoria_id.value,
                 estado: 'Activo'
@@ -194,6 +213,8 @@ async function AccionProducto(accion){
                 nombre.value = ''
                 descripcion.value = ''
                 precio.value = ''
+                descuento.value = ''
+                cantidadDescuento.value = ''
                 stock.value = ''
                 categoria_id.value = 1
                 mostrarNotificacion("Producto " + (accion === 'insertar' ? 'Registrado' : 'Modificado'), "linear-gradient(to right, #00b09b, #96c93d)"); 
@@ -216,7 +237,7 @@ const dataTableOptions = {
     scrollY: 'auto',  // Ajusta la altura automáticamente
     scrollCollapse: true,  // Permite colapsar la tabla si hay menos registros
     columnDefs: [
-        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6] }
+        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6, 7, 8] }
     ],
     pageLength: numeroPorPagona,
     destroy: true,
@@ -259,6 +280,8 @@ function listaDatos(datos) {
                     <td>${dato.nombre != null && typeof dato.nombre !== 'undefined' ? dato.nombre : ''}</td>
                     <td>${dato.descripcion != null && typeof dato.descripcion !== 'undefined' ? dato.descripcion : ''}</td>
                     <td>${dato.precio != null && typeof dato.precio !== 'undefined' ? dato.precio : ''}</td>
+                    <td>${dato.descuento != null && typeof dato.descuento !== 'undefined' ? dato.descuento + ' %' : ''}</td>
+                    <td>${dato.cantidad_descuento != null && typeof dato.cantidad_descuento !== 'undefined' ? dato.cantidad_descuento : ''}</td>
                     <td>${dato.stock != null && typeof dato.stock !== 'undefined' ? dato.stock : ''}</td>
                     <td>${dato.categoria != null && typeof dato.categoria !== 'undefined' ? dato.categoria : ''}</td>
                     <!-- <td><i class="fa-solid fa-check" style="color: green;"></i></td> -->

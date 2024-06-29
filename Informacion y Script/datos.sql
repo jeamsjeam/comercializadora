@@ -14,12 +14,12 @@ INSERT INTO personas (nombre, cedula, extrangero, telefono, direccion, tipo_pers
 ('Pedro Fernández', '99887766', 0, '04269988776', 'Calle Sol 202', 1);
 
 -- Inserción de datos en la tabla productos
-INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, estado) VALUES
-('Manzanas', 'Manzanas frescas', 1.50, 100, 1, 'Activo'),
-('Plátanos', 'Plátanos maduros', 0.80, 200, 1, 'Activo'),
-('Tomates', 'Tomates rojos', 1.20, 150, 2, 'Activo'),
-('Lechuga', 'Lechuga fresca', 0.90, 80, 2, 'Activo'),
-('Pollo', 'Pollo entero', 5.00, 50, 3, 'Activo');
+INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, estado, descuento, cantidad_descuento) VALUES
+('Manzanas', 'Manzanas frescas', 1.50, 100, 1, 'Activo', 20, 50),
+('Plátanos', 'Plátanos maduros', 0.80, 200, 1, 'Activo', 10, 60),
+('Tomates', 'Tomates rojos', 1.20, 150, 2, 'Activo', 15, 40),
+('Lechuga', 'Lechuga fresca', 0.90, 80, 2, 'Activo', 10, 30),
+('Pollo', 'Pollo entero', 5.00, 50, 3, 'Activo', 10, 10);
 
 INSERT INTO facturas (persona_id, estado, total, moneda_id, tasa_cambio, usuario_id, tipo_factura_id, fecha_creacion) VALUES
 (1, 'Pagada', 150.00, 1, 1, 2, 1,date_add(NOW(), INTERVAL -7 DAY)),

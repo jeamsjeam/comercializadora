@@ -1,7 +1,9 @@
 <?php
 
+    // Importar archivos php
     include 'Conexion.php';
 
+    // headers que evitan el error de cors para tener acceso desde cualquier sitio
     // Permitir solicitudes desde cualquier origen
     header("Access-Control-Allow-Origin: *");
     // Permitir los métodos de solicitud especificados
@@ -13,16 +15,21 @@
     // Establecer el tipo de contenido de la respuesta como JSON
     header("Content-Type: application/json");
 
+    // Funcion para consultar un unico registro
+    // Solo revise un string que es la consulta sql
     function obtenerUno($sql) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
         
         try{
             // Consulta a la base de datos
             $consulta = $db->consulta($sql);
-        
+            
+            // Variable resultado
             $resultado = null;
         
+            // Se pregunt si la consulta no es null y tiene registros
             if ($consulta !== null && $consulta->num_rows > 0) {
                 // Obtener el primer resultado
                 $fila = $consulta->fetch_assoc();
@@ -45,7 +52,10 @@
         }   
     }
 
+    // Funcion para consultar varios registros
+    // $sql: String que es la consulta sql
     function ObtenerVarios($sql) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
@@ -53,9 +63,12 @@
             // Consulta a la base de datos
             $consulta = $db->consulta($sql);
 
+            // Variable resultado
             $resultado = null;
 
+            // Se pregunt si la consulta no es null y tiene registros
             if ($consulta !== null && $consulta->num_rows > 0) {
+
                 // Almacenar la consulta en un diccionario
                 while($fila = $consulta->fetch_assoc()) {
                     $resultado[] = $fila;
@@ -76,11 +89,15 @@
         }   
     }
 
+    // Funcion para insertar un unico registro
+    // $sql: String que es la consulta sql
+    // $tabla: String que es el nombre de la tabla
     function insertarUno($sql,$tabla) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
         try {
-
+            // Consulta a la base de datos
             $resultado = $db->consulta($sql);
 
             // Verificar si la consulta se ejecutó correctamente
@@ -105,12 +122,17 @@
         }
     }
 
+    // Funcion para insertar varios registro
+    // $sql: String que es la consulta sql
+    // $datos: datos que se enviaron para ser insertados, se utilizan para saber la cantidad
+    // $tabla: String que es el nombre de la tabla
     function insertarVarios($sql,$datos,$tabla) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try {
-
+            // Consulta a la base de datos
             $resultado = $db->consulta($sql);
     
             /// Verificar si la consulta se ejecutó correctamente
@@ -122,6 +144,8 @@
 
                 // Consultar y devolver los registros insertados
                 $ids_insertados = range($primer_id, $ultimo_id);
+
+                // Consultar y devolver los registros insertados
                 return ObtenerPorListaId($ids_insertados,$tabla);
             } else {
                 $db->cerrar();
@@ -137,12 +161,17 @@
         }
     }
 
+    // Funcion para insertar varios registros
+    // $sql: String que es la consulta sql
+    // $datos: datos que se enviaron para ser insertados, se utilizan para saber la cantidad
+    // $tabla: String que es el nombre de la tabla
     function insertarVariosExtra($sql,$datos,$tabla) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try {
-
+            // Consulta a la base de datos
             $resultado = $db->consulta($sql);
     
             /// Verificar si la consulta se ejecutó correctamente
@@ -154,6 +183,8 @@
 
                 // Consultar y devolver los registros insertados
                 $ids_insertados = range($primer_id, $ultimo_id);
+
+                // Consultar y devolver los registros insertados
                 return ObtenerPorListaIdExtra($ids_insertados,$tabla);
             } else {
                 $db->cerrar();
@@ -169,12 +200,17 @@
         }
     }
 
+    // Funcion para actualizar un unico registro
+    // $datos: datos que se enviaron para ser insertados, se utilizan para ser enviados a la funcion que consulta por id
+    // $tabla: String que es el nombre de la tabla
+    // $sql: String que es la consulta sql
     function actualizarUno($datos,$tabla,$sql) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
         try {
-
+            // Consulta a la base de datos
             $resultado = $db->consulta($sql);
     
             // Verificar si la consulta se ejecutó correctamente
@@ -198,7 +234,11 @@
         }
     }
     
+    // Funcion para actualizar varios registros
+    // $datos: datos que se enviaron para ser insertados, se utilizan para ser enviados a la funcion que consulta por id
+    // $tabla: String que es el nombre de la tabla
     function actualizarVarios($datos,$tabla) {
+        
         // Crear instancia de la clase Conexion
         $db = new Conexion();        
     
@@ -209,7 +249,7 @@
             // Lista para almacenar los IDs actualizados
             $listaIds = [];
     
-            // Se recorre el objeto procesado y se construye la query
+            // Se recorre el objeto procesado
             foreach ($datos as $dato) {
                 // Consulta a la base de datos para verificar si el ID existe
                 $resultadoExiste = ObtenerPorId($dato,$tabla);
@@ -222,6 +262,7 @@
                     return ['error' => 'El ID '.$dato['id'].' no existe en la base de datos'];
                 }
  
+                // Consulta a la base de datos
                 $resultado_update = $db->consulta($dato["sql"]);
     
                 // Verificar si la consulta de actualización se ejecutó correctamente
@@ -252,20 +293,32 @@
         }
     }   
 
+    // Funcion para eliminar un unico registro
+    // $datos: datos que se enviaron para ser insertados, se utilizan para ser enviados a la funcion que consulta por id
+    // $tabla: String que es el nombre de la tabla
+    // $sql: String que es la consulta sql
     function eliminarUno($datos,$tabla,$sql) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
     
         try {
+            // Se busca el registro que se va a eliminar para poder retornarlo
             $registro = ObtenerPorId($datos,$tabla);
 
+            // Se verifica si existen los registros que seran eliminados
+            if($registro === null){
+                return ['error' => 'Al eliminar el registro, no se encontro'];
+            }
+
+            // Consulta a la base de datos
             $resultado = $db->consulta($sql);
     
             // Verificar si la consulta se ejecutó correctamente
             if ($resultado === true) {
                 $db->cerrar();
 
-                // Consultar y devolver el registro actualizado
+                // Devolver el registro actualizado
                 return $registro;
             } else {
                 $db->cerrar();
@@ -282,19 +335,26 @@
         }
     }
     
+    // Funcion para eliminar varios registros
+    // $datos: datos que se enviaron para ser insertados, se utilizan para ser enviados a la funcion que consulta por id
+    // $tabla: String que es el nombre de la tabla
+    // $sql: String que es la consulta sql
     function eliminarVarios($datos,$tabla,$sql) {
+
         // Crear instancia de la clase Conexion
         $db = new Conexion();
 
         try {
+            // Se buscan los registros que se van a eliminar para poder retornarlos
             $listaIds = [];
-
             $registros = obtenerPorListaId($listaIds,$tabla);
 
+            // Se verifica si existen los registros que seran eliminados
             if($registros === null || $registros[0] === null || $registros[0]['id']=== null){
-                return ['error' => 'Al eliminar los registros, no se encontraron registros'];
+                return ['error' => 'Al eliminar los registros, no se encontraron'];
             }
 
+            // Consulta a la base de datos
             $resultado = $db->consulta($sql);
     
             /// Verificar si la consulta se ejecutó correctamente
@@ -318,31 +378,35 @@
         }
     }
 
+    // Funcion para consultar una query de cualquier tipo
+    // $sql: String que es la consulta sql
     function ConsultaSQL($sql){
+
          // Crear instancia de la clase Conexion
          $db = new Conexion();
 
          try {
 
+            // Consulta a la base de datos
              $resultado = $db->consulta($sql);
      
              /// Verificar si la consulta se ejecutó correctamente
              if ($resultado === true) {
                  $db->cerrar();
  
-                 // Consultar y devolver los registros insertados
+                 // Si la consulta fue exitosa, se retorna true
                  return true;
              } else {
                  $db->cerrar();
  
-                 // Si la consulta falla, devolver un mensaje de error
+                 // Si la consulta falla, se retorna false
                  return false;
              }
          } catch (Exception $e) {
               // Cerrar la conexión manualmente
               $db->cerrar();
  
-             // Código que se ejecuta si se lanza una excepción
+             // Si la consulta falla, se retorna false
              return false;
          }
     }

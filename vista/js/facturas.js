@@ -36,7 +36,7 @@ var modalPersonas = null
 var persona = null
 var productos = []
 var contadorSeccionFactura = 0
-var banderaIntervalo = true
+var banderaIntervalo = false
 var banderaExisteStock = true
 var factura = null
 var detalleFactura = []
@@ -466,6 +466,7 @@ setInterval(async function() {
 async function VerificarStockProductos() {
     
     banderaExisteStock = false
+    await ConsultarTasas()
 
     // Selector para obtener todos los inputs cuyo id comience con 'productoid-'
     let inputs = document.querySelectorAll('input[id^="productoid-"]');
@@ -516,9 +517,22 @@ async function VerificarStockProductos() {
                 }
                 stockProducto.value = totalStock
 
-                let precioProducto = document.getElementById("monto-"+posicion).value
+                let precioProducto = document.getElementById("monto-"+posicion)
 
-                montoTotal += typeof precioProducto !== 'undefined' && precioProducto !== null && precioProducto !== '' ? parseFloat(precioProducto.replace(',','.')) : 0
+                if(valorCantidad !== ''){
+                    if(parseInt(valorCantidad) >= parseInt(data[i].cantidad_descuento)){
+                        let precioActual = parseInt(valorCantidad) * parseFloat(document.getElementById("precio-unitario-"+posicion).value) 
+
+                        precioProducto.value = formatoDecimalString(precioActual - (precioActual * (parseFloat(data[i].descuento)/100)))
+                        precioProducto.className = "form-control fondo-verde"
+                    }else{
+                        precioProducto.className = "form-control"
+                    }  
+                }else{
+                    precioProducto.className = "form-control"
+                }
+
+                montoTotal += typeof precioProducto.value !== 'undefined' && precioProducto.value !== null && precioProducto.value !== '' ? parseFloat(precioProducto.value.replace(',','.')) : 0
 
                 if(valorCantidad !== ''){
                     detalleFactura.push({
@@ -546,11 +560,11 @@ async function VerificarStockProductos() {
 }
 
 function BuscarTasaSeleccionada(monedaid){
-    if(monedas.find(x => x.id === monedaid).principal === '1'){
+    if(monedas.find(x => parseInt(x.id) === parseInt(monedaid)).principal === '1'){
         tasaSeleccionada = 1
     }
     else{
-        tasaSeleccionada = parseFloat(tasas.find(x => x.moneda_id === monedaid).tasa)
+        tasaSeleccionada = parseFloat(tasas.find(x => parseInt(x.moneda_id) === parseInt(monedaid)).tasa)
     }
 
     monedaSelecionada = parseInt(monedaid)
@@ -617,5 +631,29 @@ async function RegistrarFactura(){
             mostrarNotificacion("Error:", e,"#FF0000") 
             console.error('Error:', e);
         }
+    }
+}
+
+async function ConsultarTasas(){
+    try{
+        let auxTasa = []
+        for(let i = 0; i < monedas.length; i++){
+            if(monedas[i].principal !== '1'){
+                let tasa = await consultar('tasas_cambio', { accion: "obtenerPorUltimaFecha", datos: {moneda_id: monedas[i].id}});
+                if(typeof tasa !== 'undefined' && tasa !== null){
+                    auxTasa.push(tasa)
+                    
+                }
+            }
+        }
+
+        if(typeof auxTasa !== 'undefined' && auxTasa !== null && auxTasa.length > 0){
+            tasas = auxTasa
+            BuscarTasaSeleccionada(monedaSelecionada)
+    
+        }
+    }catch(e){
+        mostrarNotificacion("Error:", e,"#FF0000") 
+        console.error('Error:', e);
     }
 }

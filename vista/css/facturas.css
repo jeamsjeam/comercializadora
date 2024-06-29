@@ -63,9 +63,14 @@
 .borde-abajo {
     border-width: 1px;
     border-bottom: solid grey;
-    }
-  
+}
+
 .fondo-rojo{
     background-color: red !important;
+    color: white !important;
+}
+
+.fondo-verde{
+    background-color: green !important;
     color: white !important;
 }
