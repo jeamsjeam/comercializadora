@@ -1,31 +1,42 @@
 document.addEventListener("DOMContentLoaded", async function () {
+
+    // Se valida si la ruta no es index, registro o recuperacion
     if (window.location.href.indexOf('login.html') === -1 && 
         window.location.href.indexOf('registro.html') === -1 &&
         window.location.href.indexOf('recuperacion.html') === -1) {
 
+        // Se carga el navbar y se crea el html de los modales
         CargarNavbar(window.location.href);
         CrearModales();
 
+        // Se verifica si existe usuario en el sessionStorage
+        //En caso de no existir se redigire al login 
         let datosUsuario = sessionStorage.getItem('usuario');
         if (typeof datosUsuario === 'undefined' || datosUsuario === null) {
             window.location.href = "login.html";
         }
 
+        //Se verifica si no ex el index
         if (window.location.href.indexOf('index.html') !== -1) {
+
+            // Se verifica si existe usarioLogeado, para poder mostrar una notificacion en verde
             let usuarioLogeado = JSON.parse(localStorage.getItem('usuarioLogeado'));
             if (typeof usuarioLogeado !== 'undefined' &&  usuarioLogeado !== null && typeof usuarioLogeado.usuario !== 'undefined' && usuarioLogeado.usuario !== null) {
                 mostrarNotificacion("Usuario " + usuarioLogeado.usuario + " logeado!","linear-gradient(to right, #00b09b, #96c93d)"); 
             }
 
+            // Se verifica si existe tasaRegistrada, para poder mostrar una notificacion en verde
             let tasaRegistrada = JSON.parse(localStorage.getItem('tasa'));
             if (typeof tasaRegistrada !== 'undefined' &&  tasaRegistrada !== null && typeof tasaRegistrada.tasa !== 'undefined' && tasaRegistrada.tasa !== null) {
                 mostrarNotificacion("Tasas Registradas", "linear-gradient(to right, #00b09b, #96c93d)"); 
             }
         }
         
+        // Se eliminan los siguientes objetos del localStorage
         localStorage.removeItem('usuarioLogeado');
         localStorage.removeItem('tasa');
 
+        // Se llama a la funcion que verifica si existe tasa del dia actual
         await Loading(true)
         await VerificarTasa();
         // Despachar un evento personalizado indicando que tasas está llena
@@ -34,15 +45,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         await Loading(false)
 
     } else {
+        // Se elimina el objeto usuario en caso de estar en el login
         sessionStorage.removeItem('usuario');
     }
 });
 
+// Variables globales
 var monedas = null;
 var tasas = [];
 var modalTasas= null;
 var modalLoading = null;
 
+// Funcion que inserta el html de los modales en el body y activa el modal del loading
 function CrearModales() {
     const modalDivTasas = document.createElement('div');
     modalDivTasas.innerHTML = `
@@ -80,6 +94,7 @@ function CrearModales() {
     modalLoading = new bootstrap.Modal(document.getElementById('modalLoading'));
 }
 
+// Funcion que abre o cierra el modal del loading
 function Loading(bandera){
     return new Promise((resolve) => {
         const elementoModal = document.getElementById('modalLoading');
@@ -93,12 +108,18 @@ function Loading(bandera){
     });
 }
 
+// Funcion para consultar a los archivos php
+// tabla: el nombre de la tabla, que es el mismo que el archivo php respectivo
+// datos: son los datos que se van a enviar a la consulta
 async function consultar(tabla,datos) {
     try {    
+
+        // Se convierte los datos de entrada en un string y se asigna a la propiedad datos de otro objeto
         let envioDatos = {
 			datos: JSON.stringify(datos)
 		};
 
+        // Se crea la url y se consulta con fetch
         let url = 'http://localhost/comercializadora/controlador/' + tabla + '.php'
         const response = await fetch(url, {
             method: 'POST',
@@ -114,6 +135,9 @@ async function consultar(tabla,datos) {
     }
 }
 
+// Muestra notificaciones
+//texto: es el texto que se vera en la notificacion
+//color: es el color que tendra la notificacion
 function mostrarNotificacion(texto,color) {
     var notificacion = Toastify({
       text: texto,
@@ -126,9 +150,11 @@ function mostrarNotificacion(texto,color) {
     notificacion.showToast();
 }
 
-function formatoFechaString(dateString) {
+// Funcion que da un formato de DD-MM-YYYY a las fechas
+//fechaString: es el string que contiene la fecha
+function formatoFechaString(fechaString) {
     // Crea un objeto Date a partir de la cadena de fecha
-    const date = new Date(dateString);
+    const date = new Date(fechaString);
     
     if (isNaN(date.getTime())) {
         return "Fecha no válida"; // Maneja casos en los que la cadena de fecha no es válida
@@ -141,9 +167,13 @@ function formatoFechaString(dateString) {
     return `${day}-${month}-${year}`;
 }
 
+// Funcion que da un formato de dos decimales a los numeros
+//fechaString: es el string que contiene la fecha
 function formatoDecimalString(valor) {
 
     let decimal = 0;
+
+    // Se verifica si no es NaN, si es string o si es un numero para su respectiva accion
     if(isNaN(valor)){
         decimal = 0
     }else if(typeof valor === 'string'){
@@ -165,12 +195,19 @@ function formatoDecimalString(valor) {
     }
 }
 
+// Funcion que sirve para cargar los select
+// tabla: el nombre de la tabla, que es el mismo que el archivo php respectivo
+// idSelect: el id del select que se quiere llenar
+// error: mensaje personalizado en caso de que ocurra un error
+// datos: datos para llenar el select, son opcionales si se envian no se consulta la base de datos
 async function ObtenerSelect(tabla, idSelect, error, datos) {
 	try{
 
+        // Se obtiene el select y se limpia
         let select = document.getElementById(idSelect);
         select.innerHTML = ""
 
+        // Se verifica si se enviaron los datos, en caso de que no se consulta la base de datos
         if(typeof datos !== 'undefined' && datos !== null){
             datos.forEach(s => {
                 // Creamos una opción para cada select
@@ -209,13 +246,17 @@ async function ObtenerSelect(tabla, idSelect, error, datos) {
 	}
 }
 
+// Registra tasa del dia de hoy
 async function RegistrarVerificarTasa(){
+
     let usuario = JSON.parse(sessionStorage.getItem('usuario'))
     let exitoVerificarTasas = false;
     modalTasas.hide()
     try{
         await Loading(true)
 
+        // Se recorren las monedas y se consulta la casa para cada moneda que no sea principal
+        // Y se registra la tasa
         for(let i = 0; i < monedas.length; i++){
             if(monedas[i].principal !== "1" && document.getElementById("modalTasaVerificacionInput" + monedas[i].nombre.replace(' ', '')) != null){
                 let datos = {
@@ -265,6 +306,8 @@ async function RegistrarVerificarTasa(){
     }
 }
 
+// Funcion que carga el navbar
+// pagina: es la pagina actual, sirve para colocar como activo en el navbar
 function CargarNavbar(pagina){
     document.getElementById("navbar").innerHTML = `
                     <div  class="container-fluid">
@@ -292,14 +335,18 @@ function CargarNavbar(pagina){
                     </div>`;
 }
 
+// Funcion que verifica si existe tasa para el dia actual
 async function VerificarTasa(){
     try {
+
+        // Se consultan las monedas
         monedas = await consultar('monedas', { accion: "obtenerTodos", datos: {}});
         if(typeof monedas === 'undefined' || monedas === null){
             throw("Error al consultar la base de datos")
         }
         let contenido = ``;
 
+        // Se recorren las monedas y se consulta la tasa siempre que no sea la moneda principal
         for(let i = 0; i < monedas.length; i++){
             if(monedas[i].principal !== '1'){
                 let tasa = await consultar('tasas_cambio', { accion: "obtenerPorUltimaFecha", datos: {moneda_id: monedas[i].id}});
@@ -319,6 +366,7 @@ async function VerificarTasa(){
             }
         }
 
+        // Si no existe se abre un modal para registrar las tasas
         if(contenido !== ''){
             document.getElementById('modalTasaVerificacionDiv').innerHTML = `
                         <div class="modal-body">

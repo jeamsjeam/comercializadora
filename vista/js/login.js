@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', async function() {
+
+	// Se comprueba en que pantalla esta, para realizar diferentes acciones
+	// Como cargar el select de roles o 
+	// Verificar si existe usuarioRegistrado para mostrar una notificacion en verde
 	if (window.location.href.indexOf('registro.html') !== -1) {
         await ObtenerSelect("roles", "roles-select", "rol");
     }else if (window.location.href.indexOf('login.html') !== -1){
@@ -10,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	localStorage.removeItem('usuarioRegistrado');
 });
 
+// Funcion que valida los campos del formulario del login y registro
 (function () {
 	'use strict'
 
@@ -30,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		})
 })()
 
+// Funcion que verifica si existe el usuario
 async function verificarUsuario() {
 	try{
 		let datos = {
@@ -55,13 +61,14 @@ async function verificarUsuario() {
 				}
 			} else {
 				mostrarNotificacion("Usuario: " + data.usuario,"linear-gradient(to right, #00b09b, #96c93d)") 
+				
+				// Se crea en el sessionStorage el usuario y se redirige al index
 				let usuario = {
 					usuario: data.usuario,
 					rol: data.rolnombre,
 					rolId: data.rol_id,
 					id: data.id
 				}
-
 				sessionStorage.setItem('usuario', JSON.stringify(usuario))
 				localStorage.setItem('usuarioLogeado', JSON.stringify(usuario))
 				window.location.href = "index.html";
@@ -75,6 +82,7 @@ async function verificarUsuario() {
 	}
 }
 
+// Funcion para crear usuario
 async function crearUsuario() {
 	try{
 		let datos = {
@@ -109,6 +117,8 @@ async function crearUsuario() {
 					mostrarNotificacion(data.error,"#FF0000") 
 				}
 			} else {
+
+				// Se guarda en el localStorage el objeto usuarioRegistrado y se redirige al login
 				let usuarioRegistrado = {
 					usuario: data.usuario
 				}
