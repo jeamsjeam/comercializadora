@@ -1,7 +1,11 @@
 <?php
 
+    // Se importa el archivo utilidades.php
     include 'utilidades/utilidades.php';
 
+    // Funcion para obtener un registro por id
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerPorId($datos,$tabla) {
 
         try{
@@ -30,6 +34,9 @@
         }   
     }
 
+    // Funcion para obtener registros por tipo de factura
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerPorTipo($datos,$tabla) {
 
         try{
@@ -69,6 +76,9 @@
         }   
     }
 
+    // Funcion para obtener registros por persona
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerPorPersona($datos,$tabla) {
 
         try{
@@ -108,6 +118,9 @@
         }   
     }
 
+    // Funcion para obtener registros por moneda
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerPorMoneda($datos,$tabla) {
 
         try{
@@ -147,6 +160,9 @@
         }   
     }
 
+    // Funcion para obtener registros por cantidad de ventas y compras
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerCantidadVentas($datos,$tabla) {
 
         try{
@@ -175,6 +191,9 @@
         }   
     }
 
+    // Funcion para obtener registros por fechas
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerTodosPorFecha($datos,$tabla) {
 
         try{         
@@ -213,6 +232,9 @@
         }   
     }
 
+    // Funcion para obtener cantidad deregistros por fecha
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerCantidadPorTipo($datos,$tabla) {
 
         try{         
@@ -240,6 +262,8 @@
         }   
     }
 
+    // Funcion para obtener todos los registros
+    // $tabla: String que es el nombre de la tabla
     function ObtenerTodos($tabla) {
 
         try{         
@@ -273,6 +297,9 @@
         }   
     }
 
+    // Funcion para obtener registos por una lista de id
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabl
     function ObtenerPorListaId($datos,$tabla) {
         
         try{
@@ -295,6 +322,9 @@
         }  
     }
 
+    // Funcion para insertar un registro
+    // $datos: datos para ser insertados
+    // $tabla: String que es el nombre de la tabla
     function insertar($datos,$tabla) {
         
         try {
@@ -319,6 +349,9 @@
         }
     }
 
+    // Funcion para insertar varios registros
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function insertarLista($datos,$tabla) {
        
         try {
@@ -347,6 +380,9 @@
         }
     }
 
+    // Funcion para insertar registro de la factura con sus detalles
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function insertarConDetalles($datos,$tabla) {
        
         try {
@@ -379,6 +415,9 @@
         }
     }
 
+    // Funcion para insertar registro de la factura con sus detalles
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function insertarListaDetalles($datos,$tabla) {
        
         try {
@@ -404,6 +443,9 @@
         }
     }
 
+    // Funcion para obtener registros de los detalles de la factura
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function ObtenerPorListaIdExtra($datos,$tabla) {
         
         try{
@@ -423,6 +465,9 @@
         }  
     }
 
+    // Funcion para actualizar un registro
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function actualizar($datos,$tabla) {
         
         try {
@@ -446,6 +491,9 @@
         }
     }
     
+    // Funcion para actualizar varios registros
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
     function actualizarLista($datos,$tabla) {
         
         try {
