@@ -74,3 +74,10 @@
     background-color: green !important;
     color: white !important;
 }
+
+.scrollable-div {
+    height: 400px; /* Altura de la ventana gráfica */
+    overflow-y: auto; /* Scroll vertical */
+    overflow-x: hidden; /* Oculta el scroll horizontal */
+    margin: 0; /* Elimina los márgenes predeterminados */
+}

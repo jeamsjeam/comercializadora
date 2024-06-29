@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 var modalPersonas = null
+var modalFacturaRegistrada = null
 var persona = null
 var productos = []
 var contadorSeccionFactura = 0
@@ -52,6 +53,7 @@ async function LimpiarVariables(busqueda){
     persona = null
     document.getElementById("contenidoFactura").innerHTML = ''
     document.getElementById("contenidoPersonas").innerHTML = ''
+    document.getElementById("contenidoFacturaRegistrada").innerHTML = ''
     contadorSeccionFactura = 0
     document.getElementById("seccionFactura").className = "d-none"
     await SeccionesFacturaProducto(contadorSeccionFactura)
@@ -604,7 +606,6 @@ async function RegistrarFactura(){
         banderaIntervalo = true
     }else{
         try{
-            console.log(factura)
             let datos = {
                 accion: 'insertarConDetalles',
                 datos: { 
@@ -620,7 +621,7 @@ async function RegistrarFactura(){
                 } else if (data.error) {
                     mostrarNotificacion(data.error,"#FF0000") 
                 } else {
-                    await LimpiarVariables(true)
+                    ModalFacturaRegistrada(data[0],true)
                     mostrarNotificacion("Factura Registrada", "linear-gradient(to right, #00b09b, #96c93d)"); 
                 }
             }else{
@@ -634,6 +635,93 @@ async function RegistrarFactura(){
     }
 }
 
+async function ModalFacturaRegistrada(datos,bandera){
+    if(typeof modalFacturaRegistrada === 'undefined' || modalFacturaRegistrada === null){
+        modalFacturaRegistrada = new bootstrap.Modal(document.getElementById('modalFacturaRegistrada'));
+    }
+
+    if(bandera){
+        ContenidoFacturaRegistrada(datos)
+    }else{
+        await LimpiarVariables(true)
+    }
+
+    return new Promise((resolve) => {
+        const elementoModal = document.getElementById('modalFacturaRegistrada');
+        elementoModal.addEventListener(bandera ? 'shown.bs.modal' : 'hidden.bs.modal', () => {
+            resolve();
+        }, { once: true });
+        if(bandera)
+            modalFacturaRegistrada.show();
+        else
+        modalFacturaRegistrada.hide();
+    });
+}
+
+function ContenidoFacturaRegistrada(datos){
+    let contenido = `<h1 class="fs-4 card-title fw-bold mb-4">Detalles</h1>
+                    <div class="row p-4">
+                        <div class="col-2">
+                            <label class="mb-2 text-muted" for="facturaCedula">Cedula</label>
+                            <input id="facturaCedula" type="text" class="form-control" name="facturaCedula" value="${(datos.factura.extrangero === 0 ? 'V-' : 'E-') + datos.factura.cedula}" disabled>
+                        </div>
+                        <div class="col-4">
+                            <label class="mb-2 text-muted" for="facturaPersona">Persona</label>
+                            <input id="facturaPersona" type="text" class="form-control" name="facturaPersona" value="${datos.factura.persona}" disabled>
+                        </div>
+                        <div class="col-2">
+                            <label class="mb-2 text-muted" for="facturaMoneda">Moneda</label>
+                            <input id="facturaMoneda" type="text" class="form-control" name="facturaMoneda" value="${datos.factura.moneda}" disabled>
+                        </div>
+                        <div class="col-2">
+                            <label class="mb-2 text-muted" for="facturaTasa">Tasa</label>
+                            <input id="facturaTasa" type="text" class="form-control" name="facturaTasa" value="${formatoDecimalString(datos.factura.tasa_cambio)}" disabled>
+                        </div>
+                        <div class="col-2">
+                            <label class="mb-2 text-muted" for="Monto">Monto</label>
+                            <input id="facturaMonto" type="text" class="form-control" name="facturaMonto" value="${formatoDecimalString(datos.factura.monto)}" disabled>
+                        </div>
+                    </div>
+                     <div class="row mt-3">
+                        <div class="col-12 ">
+                            <h3 class="fs-4 card-title fw-bold mb-4">Detalles</h3>
+                            <div id="datosDetalleFactura">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-6">
+                            <button class="btn btn-primary ms-auto" onclick="ModalFacturaRegistrada(null,false)">Cerrar</button>
+                        </div>
+                    </div>`
+    document.getElementById("contenidoFacturaRegistrada").innerHTML = contenido
+    ContenidoDetalleProducto(datos.detalle_factura)
+}
+
+function ContenidoDetalleProducto(datos){
+    let contenido = ``
+    if(datos.length > 4){
+        document.getElementById("datosDetalleFactura").className = "scrollable-div"
+    }
+    for(let i = 0; i < datos.length; i++){
+        contenido += `<div class="row p-3">
+                            <div class="col-4">
+                                <label class="mb-2 text-muted" for="detalleProducto">Producto</label>
+                                <input id="detalleProducto" type="text" class="form-control" name="detalleProducto" value="${datos[i].producto}" disabled>
+                            </div>
+                            <div class="col-4">
+                                <label class="mb-2 text-muted" for="detalleCantidad">Cantidad</label>
+                                <input id="detalleCantidad" type="text" class="form-control" name="detalleCantidad" value="${formatoDecimalString(datos[i].cantidad)}" disabled>
+                            </div>
+                            <div class="col-4">
+                                <label class="mb-2 text-muted" for="detallePrecio">Precio</label>
+                                <input id="detallePrecio" type="text" class="form-control" name="detallePrecio" value="${formatoDecimalString(datos[i].precio_unitario)}" disabled>
+                            </div>
+                        </div>`
+    }
+    document.getElementById("datosDetalleFactura").innerHTML = contenido
+}
+
 async function ConsultarTasas(){
     try{
         let auxTasa = []
@@ -642,7 +730,6 @@ async function ConsultarTasas(){
                 let tasa = await consultar('tasas_cambio', { accion: "obtenerPorUltimaFecha", datos: {moneda_id: monedas[i].id}});
                 if(typeof tasa !== 'undefined' && tasa !== null){
                     auxTasa.push(tasa)
-                    
                 }
             }
         }

@@ -317,18 +317,22 @@ function CargarNavbar(pagina){
                             </button>
                             <div class="collapse navbar-collapse" id="navbarNav">
                                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item">
-                                    <a class="nav-link ${pagina.indexOf('index.html') !== -1 ? 'active' : ''}" href="index.html">Inicio</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link ${pagina.indexOf('productos.html') !== -1 ? 'active' : ''}" href="productos.html">Registrar Productos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link ${pagina.indexOf('personas.html') !== -1 ? 'active' : ''}" href="personas.html">Registrar Personas</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link ${pagina.indexOf('factura.html') !== -1 ? 'active' : ''}" href="factura.html">Registrar Factura</a>
-                                </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link ${pagina.indexOf('index.html') !== -1 ? 'active' : ''}" href="index.html">Inicio</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link ${pagina.indexOf('productos.html') !== -1 ? 'active' : ''}" href="productos.html">Registrar Productos</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link ${pagina.indexOf('personas.html') !== -1 ? 'active' : ''}" href="personas.html">Registrar Personas</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link ${pagina.indexOf('factura.html') !== -1 ? 'active' : ''}" href="factura.html">Registrar Factura</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link ${pagina.indexOf('facturadetalle.html') !== -1 ? 'active' : ''}" href="facturadetalle.html">Detalles Factura</a>
+                                    </li>
+                                </ul>
                                 </ul>
                                 <a type="button" class="btn btn-dark" href="login.html">Cerrar Sesion</a>
                             </div>
