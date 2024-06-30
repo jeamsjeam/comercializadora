@@ -33,7 +33,7 @@ async function DatosTabla(){
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -169,7 +169,7 @@ async function EliminarProducto(id){
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -230,7 +230,7 @@ async function AccionProducto(accion){
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }

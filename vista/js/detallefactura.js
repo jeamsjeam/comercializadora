@@ -1,39 +1,71 @@
 document.addEventListener("DOMContentLoaded", async function () {
+    InicializarFechasFacturas()
     document.addEventListener('eventLoading', async function(event) {
         if (typeof event.detail !== 'undefined' && event.detail !== null) {
-            await Loading(true)
             await DatosTabla()
-            await Loading(false)
         }
     });
 });
 
 var facturas = []
 var modalfacturas = null
+var modalFacturaRegistrada = null
+
+// Funcion que agrega fecha inicio y fecha fin de un rango de hace 7 dias hasta hoy
+function InicializarFechasFacturas(){
+    let fecha = new Date(); //Fecha actual
+    let mes = fecha.getMonth()+1; //obteniendo mes
+    let dia = fecha.getDate(); //obteniendo dia
+    let ano = fecha.getFullYear(); //obteniendo año
+    if(dia<10)
+        dia='0'+dia; //agrega cero si el menor de 10
+    if(mes<10)
+        mes='0'+mes //agrega cero si el menor de 10
+    document.getElementById('fechaFin').value=ano+"-"+mes+"-"+dia;
+
+    fecha.setDate(fecha.getDate()-7);
+    mes = fecha.getMonth()+1; //obteniendo mes
+    dia = fecha.getDate(); //obteniendo dia
+    ano = fecha.getFullYear(); //obteniendo año
+    if(dia<10)
+        dia='0'+dia; //agrega cero si el menor de 10
+    if(mes<10)
+        mes='0'+mes //agrega cero si el menor de 10
+    document.getElementById('fechaInicio').value=ano+"-"+mes+"-"+dia;
+}
 
 async function DatosTabla(){
     try{
-
+        await Loading(true)
         let datos = {
-            accion: "obtenerTodos"
+            accion: "obtenerTodosPorFecha",
+            datos:{
+                fecha_inicio: document.getElementById('fechaInicio').value,
+                fecha_fin: document.getElementById('fechaFin').value,
+            }
         };
 
         let data = await consultar("facturas",datos);
         if(data !== null && typeof data !== 'undefined'){
             if (data.message) {
+                await Loading(false)
                 mostrarNotificacion(data.message,"#FF0000") 
             } else if (data.error) {
+                await Loading(false)
                 mostrarNotificacion(data.error,"#FF0000") 
             } else {
                 facturas = data
                 initDataTable(data)
+                await Loading(false)
             }
         }else{
+            await Loading(false)
             mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+        await Loading(false)
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -42,20 +74,20 @@ async function Modalfacturas(datos,bandera,tipo){
     if(typeof modalfacturas === 'undefined' || modalfacturas === null){
         modalfacturas = new bootstrap.Modal(document.getElementById('modalfacturas'));
     }
-
+   
     if(bandera){
-        if(tipo === 'insertar' || tipo === 'actualizar'){
-            ContenidoPersona(tipo === 'insertar' ? null : facturas.find((x) => parseInt(x.id) === datos))
-            await ObtenerSelect("tipo_persona", "tipofacturas-select", "Tipo Persona");
+        if(tipo === 'verDetalle'){
+            ContenidoFactura(tipo === 'insertar' ? null : facturas.find((x) => parseInt(x.id) === datos))
+            await ObtenerSelect("tipo_Factura", "tipofacturas-select", "Tipo Factura");
         }else if(tipo === 'eliminar'){
             ContenidoConfirmacionEliminar(datos)
         }
     }else{
-        if(tipo === 'insertar' || tipo === 'actualizar'){
-            await AccionPersona(tipo)
+        if(tipo === 'verDetalle'){
+            await AccionFactura(tipo)
             await DatosTabla()
         }else if(tipo === 'eliminar'){
-            await EliminarPersona(datos)
+            await EliminarFactura(datos)
             await DatosTabla()
         }
     }
@@ -74,25 +106,25 @@ async function Modalfacturas(datos,bandera,tipo){
 
 function ContenidoConfirmacionEliminar(datos){
     let contenido = `<div class="row mt-4 mb-3">
-                        <h4>¿Esta seguro que desea eliminar este elemento?</h4>
+                        <h4>¿Esta seguro que desea cambiar el estado a cancelado de esta factura?</h4>
                         <div class="col-6">
-                             <button name="eliminarPersona" value="1" class="btn btn-danger" onclick="Modalfacturas(${datos},false,'eliminar')">Eliminar</button>
+                             <button name="eliminarFactura" value="1" class="btn btn-danger" onclick="Modalfacturas(${datos},false,'eliminar')">Cambiar estado</button>
                         </div>
                         <div class="col-6">
-                            <button name="cancelarEliminarPersona" value="2" class="btn btn-secondary" onclick="Modalfacturas(0,false,'cancelar')">Cancelar</button>
+                            <button name="cancelarEliminarFactura" value="2" class="btn btn-secondary" onclick="Modalfacturas(0,false,'cancelar')">Cancelar</button>
                         </div>
                     </div>`
     document.getElementById("contenidofacturas").innerHTML = contenido
 }
 
-function ContenidoPersona(datos){
+function ContenidoFactura(datos){
     let bandera = (typeof datos === 'undefined' || datos === null)
     let contenido = `<h1 class="fs-4 card-title fw-bold mb-4">${bandera ? 'Registrar' : 'Modificar'}</h1>
                         <form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); Modalfacturas(0,false,'${bandera ? 'insertar' : 'actualizar'}')">
 
                             <div class="mb-3">
-                                <label class="mb-2 text-muted" for="tipopersona">Tipo Persona</label>
-                                <select name="tipopersona" class="form-select" aria-label="Default select example" id="tipofacturas-select">
+                                <label class="mb-2 text-muted" for="tipoFactura">Tipo Factura</label>
+                                <select name="tipoFactura" class="form-select" aria-label="Default select example" id="tipofacturas-select">
                                     <!-- Agrega opciones del select si es necesario -->
                                 </select>
                             </div>
@@ -107,26 +139,26 @@ function ContenidoPersona(datos){
                                         </select>
                                     </div>
                                     <div class="col-9">
-                                        <label class="mb-2 text-muted" for="cedulaPersona">Cedula</label>
-                                        <input id="cedulaPersona" type="text" class="form-control" name="cedulaPersona" value="${bandera ? '' : datos.cedula}" ${bandera ? '' : 'disabled'} required>
+                                        <label class="mb-2 text-muted" for="cedulaFactura">Cedula</label>
+                                        <input id="cedulaFactura" type="text" class="form-control" name="cedulaFactura" value="${bandera ? '' : datos.cedula}" ${bandera ? '' : 'disabled'} required>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label class="mb-2 text-muted" for="nombrePersona">Nombre</label>
-                                <input id="nombrePersona" type="text" class="form-control" name="nombrePersona" value="${bandera ? '' : datos.nombre}" required >
-                                <input id="idPersona" type="text" class="form-control" name="idPersona" value="${bandera ? '0' : datos.id}" hidden>
+                                <label class="mb-2 text-muted" for="nombreFactura">Nombre</label>
+                                <input id="nombreFactura" type="text" class="form-control" name="nombreFactura" value="${bandera ? '' : datos.nombre}" required >
+                                <input id="idFactura" type="text" class="form-control" name="idFactura" value="${bandera ? '0' : datos.id}" hidden>
                             </div>
 
                             <div class="mb-3">
-                                <label class="mb-2 text-muted" for="telefonoPersona">Telefono</label>
-                                <input id="telefonoPersona" type="text" class="form-control" name="telefonoPersona" value="${bandera ? '' : datos.telefono}" required>
+                                <label class="mb-2 text-muted" for="telefonoFactura">Telefono</label>
+                                <input id="telefonoFactura" type="text" class="form-control" name="telefonoFactura" value="${bandera ? '' : datos.telefono}" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="mb-2 text-muted" for="direccionPersona">Direccion</label>
-                                <input id="direccionPersona" type="text" class="form-control" name="direccionPersona" value="${bandera ? '' : datos.direccion}" required>
+                                <label class="mb-2 text-muted" for="direccionFactura">Direccion</label>
+                                <input id="direccionFactura" type="text" class="form-control" name="direccionFactura" value="${bandera ? '' : datos.direccion}" required>
                             </div>
 
                             <div class="row mt-3">
@@ -141,7 +173,7 @@ function ContenidoPersona(datos){
     document.getElementById("contenidofacturas").innerHTML = contenido
 }
 
-async function EliminarPersona(id){
+async function EliminarFactura(id){
     try{
         let datos = {
             accion: "eliminar",
@@ -155,27 +187,27 @@ async function EliminarPersona(id){
             } else if (data.error) {
                 mostrarNotificacion(data.error,"#FF0000") 
             } else {
-                mostrarNotificacion("Persona Eliminado", "linear-gradient(to right, #00b09b, #96c93d)"); 
+                mostrarNotificacion("Factura cancelada", "linear-gradient(to right, #00b09b, #96c93d)"); 
             }
         }else{
-            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
+            mostrarNotificacion("No se encontro ningun registro","#FF0000") 
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
 
-async function AccionPersona(accion){
+async function AccionFactura(accion){
     try{
-        let nombre = document.getElementById("nombrePersona")
-        let id = document.getElementById("idPersona")
-        let cedula = document.getElementById("cedulaPersona")
-        let direccion = document.getElementById("direccionPersona")
-        let telefono = document.getElementById("telefonoPersona")
+        let nombre = document.getElementById("nombreFactura")
+        let id = document.getElementById("idFactura")
+        let cedula = document.getElementById("cedulaFactura")
+        let direccion = document.getElementById("direccionFactura")
+        let telefono = document.getElementById("telefonoFactura")
         let extrangero = document.querySelector('select[name="extrangero"]').selectedOptions[0]
-        let tipo_persona_id = document.querySelector('select[name="tipopersona"]').selectedOptions[0]
+        let tipo_Factura_id = document.querySelector('select[name="tipoFactura"]').selectedOptions[0]
 
         if(nombre.value === '' ||
             cedula.value === '' ||
@@ -193,7 +225,7 @@ async function AccionPersona(accion){
                 direccion: direccion.value,
                 telefono: telefono.value,
                 extrangero: parseInt(extrangero.value),
-                tipo_persona_id: parseInt(tipo_persona_id.value),
+                tipo_Factura_id: parseInt(tipo_Factura_id.value),
                 estado: 'Activo'
             }
         };
@@ -211,15 +243,15 @@ async function AccionPersona(accion){
                 direccion.value = ''
                 telefono.value = ''
                 extrangero.value = 0
-                tipo_persona_id.value = 1
-                mostrarNotificacion("Persona " + (accion === 'insertar' ? 'Registrado' : 'Modificado'), "linear-gradient(to right, #00b09b, #96c93d)"); 
+                tipo_Factura_id.value = 1
+                mostrarNotificacion("Factura " + (accion === 'insertar' ? 'Registrado' : 'Modificado'), "linear-gradient(to right, #00b09b, #96c93d)"); 
             }
         }else{
             mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -275,16 +307,16 @@ function listaDatos(datos) {
                     <td>${dato.tipofactura != null && typeof dato.tipofactura !== 'undefined' ?  dato.tipofactura : ''}</td>
                     <td>${dato.estado != null && typeof dato.estado !== 'undefined' ? dato.estado : ''}</td>
                     <td>${dato.cedula != null && typeof dato.cedula !== 'undefined' ? (dato.extrangero === '0' ? 'V-' : 'E-') + dato.cedula : ''}</td>
-                    <td>${dato.nombre != null && typeof dato.nombre !== 'undefined' ? dato.nombre : ''}</td>
+                    <td>${dato.persona != null && typeof dato.persona !== 'undefined' ? dato.persona : ''}</td>
                     <td>${dato.total != null && typeof dato.total !== 'undefined' ? formatoDecimalString(dato.total) : ''}</td>
                     <td>${dato.moneda != null && typeof dato.moneda !== 'undefined' ? dato.moneda : ''}</td>
                     <td>${dato.tasa_cambio != null && typeof dato.tasa_cambio !== 'undefined' ? formatoDecimalString(dato.tasa_cambio) : ''}</td>
                     <td>${dato.usuario != null && typeof dato.usuario !== 'undefined' ? dato.usuario : ''}</td>
                     <td>${dato.fecha_creacion != null && typeof dato.fecha_creacion !== 'undefined' ? dato.fecha_creacion : ''}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="Modalfacturas(${dato.id},true,'actualizar')"
+                        <button class="btn btn-sm btn-primary" onclick="ModalFacturaRegistrada(${dato.id},true,'verDetalle')"
                         ><i class="bi bi-eye"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="Modalfacturas(${dato.id},true,'eliminar')"
+                        <button class="btn btn-sm btn-danger" onclick="Modalfacturas(${dato.id},true,'eliminar')" ${dato.estado !== 'Pagada' ? 'disabled' : ''}
                         ><i class="bi bi-x-octagon"></i></button>
                     </td>
                 </tr>`;
@@ -293,4 +325,96 @@ function listaDatos(datos) {
     } catch (ex) {
         alert(ex);
     }
+}
+
+async function ModalFacturaRegistrada(facturaId,bandera){
+
+    let datos = []
+
+    if(bandera){
+        try{
+            datos = await consultar("detalles_factura",{accion: "obtenerPorFactura", datos:{ factura_id: parseInt(facturaId)}})
+            if(datos !== null && typeof datos !== 'undefined'){
+                if (datos.message) {
+                    mostrarNotificacion(datos.message,"#FF0000") 
+                    return
+                } else if (datos.error) {
+                    mostrarNotificacion(datos.error,"#FF0000") 
+                } 
+            }else{
+                mostrarNotificacion("No se encontro ningun registro","#FF0000") 
+                return
+            }
+            
+        }catch(e){
+            mostrarNotificacion("Error: " + e,"#FF0000")  
+            console.error('Error:', e);
+            return
+        }
+    }
+
+
+    if(typeof modalFacturaRegistrada === 'undefined' || modalFacturaRegistrada === null){
+        modalFacturaRegistrada = new bootstrap.Modal(document.getElementById('modalFacturaRegistrada'));
+    }
+
+    if(bandera){
+        ContenidoFacturaRegistrada(datos)
+    }
+
+    return new Promise((resolve) => {
+        const elementoModal = document.getElementById('modalFacturaRegistrada');
+        elementoModal.addEventListener(bandera ? 'shown.bs.modal' : 'hidden.bs.modal', () => {
+            resolve();
+        }, { once: true });
+        if(bandera)
+            modalFacturaRegistrada.show();
+        else
+        modalFacturaRegistrada.hide();
+    });
+}
+
+function ContenidoFacturaRegistrada(datos){
+    let contenido = `<div class="row mt-3">
+                        <div class="col-12 ">
+                            <h3 class="fs-4 card-title fw-bold mb-4">Detalles</h3>
+                            <div id="datosDetalleFactura">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-5 text-center">
+                        <div class="col-12">
+                            <button class="btn btn-primary ms-auto" onclick="ModalFacturaRegistrada(null,false)">Cerrar</button>
+                        </div>
+                    </div>`
+    document.getElementById("contenidoFacturaRegistrada").innerHTML = contenido
+    ContenidoDetalleProducto(datos)
+}
+
+function ContenidoDetalleProducto(datos){
+    let contenido = ``
+    if(datos.length > 4){
+        document.getElementById("datosDetalleFactura").className = "scrollable-div"
+    }
+    for(let i = 0; i < datos.length; i++){
+        contenido += `<div class="row p-3">
+                            <div class="col-1">
+                                <label class="mb-2 text-muted" for="detalleIndice"></label>
+                                <label class="form-control" for="detalleIndice" style="border: none !important;"># ${i+1}</label>
+                            </div>
+                            <div class="col-4">
+                                <label class="mb-2 text-muted" for="detalleProducto">Producto</label>
+                                <input id="detalleProducto" type="text" class="form-control" name="detalleProducto" value="${datos[i].producto}" disabled>
+                            </div>
+                            <div class="col-4">
+                                <label class="mb-2 text-muted" for="detalleCantidad">Cantidad</label>
+                                <input id="detalleCantidad" type="text" class="form-control" name="detalleCantidad" value="${formatoDecimalString(datos[i].cantidad)}" disabled>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2 text-muted" for="detallePrecio">Precio</label>
+                                <input id="detallePrecio" type="text" class="form-control" name="detallePrecio" value="${formatoDecimalString(datos[i].precio_unitario)}" disabled>
+                            </div>
+                        </div>`
+    }
+    document.getElementById("datosDetalleFactura").innerHTML = contenido
 }

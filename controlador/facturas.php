@@ -55,7 +55,7 @@
 
             $consulta = obtenerVarios($sql);
 
-            $facturas = null;
+            /*$facturas = null;
 
             foreach ($consulta as $factura) {
                 // Consulta a la base de datos
@@ -65,9 +65,9 @@
 
                 $factura["detallefactura"] = obtenerVarios($sql);
                 $facturas[] = $factura;
-            }
+            }*/
             
-            return $facturas;
+            return $consulta;
 
         }catch (Exception $e) {
             
@@ -97,7 +97,7 @@
 
             $consulta = obtenerVarios($sql);
 
-            $facturas = null;
+            /*$facturas = null;
 
             foreach ($consulta as $factura) {
                 // Consulta a la base de datos
@@ -107,9 +107,9 @@
 
                 $factura["detallefactura"] = obtenerVarios($sql);
                 $facturas[] = $factura;
-            }
+            }*/
             
-            return $facturas;
+            return $consulta;
 
         }catch (Exception $e) {
             
@@ -139,7 +139,7 @@
 
             $consulta = obtenerVarios($sql);
 
-            $facturas = null;
+            /*$facturas = null;
 
             foreach ($consulta as $factura) {
                 // Consulta a la base de datos
@@ -149,9 +149,9 @@
 
                 $factura["detallefactura"] = obtenerVarios($sql);
                 $facturas[] = $factura;
-            }
+            }*/
             
-            return $facturas;
+            return $consulta;
 
         }catch (Exception $e) {
             
@@ -208,10 +208,12 @@
                 $sql .= " WHERE p.fecha_creacion >= '".$datos["fecha_inicio"]." 00:00:00'";
                 $sql .= " AND p.fecha_creacion <= '".$datos["fecha_fin"]." 23:59:59'";
             }
+
+            $sql .= " ORDER BY fecha_creacion DESC";
        
             $consulta = obtenerVarios($sql);
 
-            $facturas = null;
+            /*$facturas = null;
 
             foreach ($consulta as $factura) {
                 // Consulta a la base de datos
@@ -221,9 +223,9 @@
 
                 $factura["detallefactura"] = obtenerVarios($sql);
                 $facturas[] = $factura;
-            }
+            }*/
             
-            return $facturas;
+            return $consulta;
 
         }catch (Exception $e) {
 
@@ -536,7 +538,7 @@
         try {
             
             // Consulta a la base de datos
-            $sql = "DELETE FROM ".$tabla." WHERE id = ".$datos['id'];
+            $sql = "UPDATE ".$tabla." SET estado = 'Cancelada' WHERE id = ".$datos['id'];
             
             return eliminarUno($datos,$tabla,$sql);
 

@@ -23,6 +23,25 @@
         }   
     }
 
+    // Funcion para obtener un registro por factura
+    // $datos: datos para ser consultados
+    // $tabla: String que es el nombre de la tabla
+    function ObtenerPorFactura($datos,$tabla) {
+
+        try{
+            $sql = "SELECT p.*, c.nombre as producto FROM ".$tabla." p";
+            $sql .= " JOIN productos c on c.id = p.producto_id ";
+            $sql .= " WHERE p.factura_id = ".$datos['factura_id'];
+
+            return obtenerVarios($sql);
+
+        }catch (Exception $e) {
+            
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }   
+    }
+
     // Funcion para obtener un registro por producto
     // $datos: datos para ser consultados
     // $tabla: String que es el nombre de la tabla
@@ -301,6 +320,15 @@
                     break;
                 }
                 echo json_encode(ObtenerPorId($datos,$tabla));
+
+                break;
+            case "obtenerPorFactura":
+                $datos = $data['datos'] ?? null;
+                if($datos === null){
+                    echo json_encode(['error' => 'No se envio datos']);
+                    break;
+                }
+                echo json_encode(ObtenerPorFactura($datos,$tabla));
 
                 break;
             case "obtenerPorProducto":

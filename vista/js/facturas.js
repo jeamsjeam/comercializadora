@@ -95,7 +95,7 @@ async function BuscarPersona(cedula, bandera){
         
 	}catch(e){
         await Loading(false)
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -241,7 +241,7 @@ async function AccionPersona(accion){
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -393,7 +393,7 @@ function SumarTotal(){
     });
 
     if(total >= 0)
-        document.getElementById("montoTotal").value = total
+        document.getElementById("montoTotal").value = formatoDecimalString(total)
 }
 
 async function AgregarSeccionFactura(){
@@ -557,7 +557,7 @@ async function VerificarStockProductos() {
             tipo_factura_id: parseInt(document.querySelector('select[name="tipofactura"]').selectedOptions[0].value)
         }
 
-        document.getElementById("montoTotal").value = montoTotal
+        document.getElementById("montoTotal").value = formatoDecimalString(montoTotal)
     }
 }
 
@@ -629,7 +629,7 @@ async function RegistrarFactura(){
             }
             
         }catch(e){
-            mostrarNotificacion("Error:", e,"#FF0000") 
+            mostrarNotificacion("Error: " + e,"#FF0000")  
             console.error('Error:', e);
         }
     }
@@ -659,7 +659,7 @@ async function ModalFacturaRegistrada(datos,bandera){
 }
 
 function ContenidoFacturaRegistrada(datos){
-    let contenido = `<h1 class="fs-4 card-title fw-bold mb-4">Detalles</h1>
+    let contenido = `<h1 class="fs-4 card-title fw-bold mb-4">Factura</h1>
                     <div class="row p-4">
                         <div class="col-2">
                             <label class="mb-2 text-muted" for="facturaCedula">Cedula</label>
@@ -689,7 +689,7 @@ function ContenidoFacturaRegistrada(datos){
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-5">
+                    <div class="row mt-5 text-center">
                         <div class="col-6">
                             <button class="btn btn-primary ms-auto" onclick="ModalFacturaRegistrada(null,false)">Cerrar</button>
                         </div>
@@ -705,6 +705,10 @@ function ContenidoDetalleProducto(datos){
     }
     for(let i = 0; i < datos.length; i++){
         contenido += `<div class="row p-3">
+                            <div class="col-1">
+                                <label class="mb-2 text-muted" for="detalleIndice"></label>
+                                <label class="form-control" for="detalleIndice" style="border: none !important;"># ${i+1}</label>
+                            </div>
                             <div class="col-4">
                                 <label class="mb-2 text-muted" for="detalleProducto">Producto</label>
                                 <input id="detalleProducto" type="text" class="form-control" name="detalleProducto" value="${datos[i].producto}" disabled>
@@ -713,7 +717,7 @@ function ContenidoDetalleProducto(datos){
                                 <label class="mb-2 text-muted" for="detalleCantidad">Cantidad</label>
                                 <input id="detalleCantidad" type="text" class="form-control" name="detalleCantidad" value="${formatoDecimalString(datos[i].cantidad)}" disabled>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <label class="mb-2 text-muted" for="detallePrecio">Precio</label>
                                 <input id="detallePrecio" type="text" class="form-control" name="detallePrecio" value="${formatoDecimalString(datos[i].precio_unitario)}" disabled>
                             </div>
@@ -740,7 +744,7 @@ async function ConsultarTasas(){
     
         }
     }catch(e){
-        mostrarNotificacion("Error:", e,"#FF0000") 
+        mostrarNotificacion("Error: " + e,"#FF0000")  
         console.error('Error:', e);
     }
 }

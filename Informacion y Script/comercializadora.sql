@@ -199,8 +199,7 @@ INSERT INTO tipo_factura (nombre) VALUES
 -- Inserción de datos en la tabla roles
 INSERT INTO roles (nombre, descripcion) VALUES
 ('Administrador', 'Usuario con acceso completo al sistema'),
-('Vendedor', 'Usuario que puede gestionar ventas'),
-('Cliente', 'Usuario que puede realizar compras');
+('Vendedor', 'Usuario que puede gestionar ventas');
 
 -- Inserción de datos en la tabla monedas
 INSERT INTO monedas (nombre, simbolo, principal) VALUES

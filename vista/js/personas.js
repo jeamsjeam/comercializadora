@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             await Loading(true)
             await DatosTabla()
             await Loading(false)
+
+            InicializarFechasFacturas()
         }
     });
 });
@@ -33,7 +35,7 @@ async function DatosTabla(){
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -162,7 +164,7 @@ async function EliminarPersona(id){
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -219,7 +221,7 @@ async function AccionPersona(accion){
         }
         
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }

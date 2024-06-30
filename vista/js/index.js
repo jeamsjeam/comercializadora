@@ -145,7 +145,7 @@ async function consultarFacturas() {
         await Loading(false)
 	}catch(e){
         await Loading(false)
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -217,7 +217,7 @@ async function DatosGrafica(fechaInicio, fechaFin){
 
         Grafica(etiquetas, dataTipo1,dataTipo2)
     } catch (e) {
-        mostrarNotificacion("Error:", e,"#FF0000") 
+        mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
     }
 
@@ -262,7 +262,7 @@ async function ModificarMoneda(id){
             mostrarNotificacion("No se pudo eliminar","#FF0000") 
         }
     }catch(e){
-        mostrarNotificacion("Error:", e,"#FF0000") 
+        mostrarNotificacion("Error: " + e,"#FF0000")  
         console.error('Error:', e);
     }
     
@@ -330,7 +330,7 @@ async function CrearTasa(){
             mostrarNotificacion("No se pudo registrar","#FF0000") 
         }
     } catch (e) {
-        mostrarNotificacion("Error:", e,"#FF0000") 
+        mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);  
     }
     

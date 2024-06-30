@@ -77,7 +77,7 @@ async function verificarUsuario() {
 			mostrarNotificacion("No se encontro ningun usuario","#FF0000") 
 		}
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -130,7 +130,7 @@ async function crearUsuario() {
 			mostrarNotificacion("No se encontro ningun usuario","#FF0000") 
 		}
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }

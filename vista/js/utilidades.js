@@ -244,7 +244,7 @@ async function ObtenerSelect(tabla, idSelect, error, datos) {
             }
         }
 	}catch(e){
-		mostrarNotificacion("Error:", e,"#FF0000") 
+		mostrarNotificacion("Error: " + e,"#FF0000")  
 		console.error('Error:', e);
 	}
 }
@@ -304,7 +304,7 @@ async function RegistrarVerificarTasa(){
         }
     }catch(e){
         Loading(false)
-        mostrarNotificacion("Error:", e,"#FF0000") 
+        mostrarNotificacion("Error: " + e,"#FF0000")  
         console.error('Error:', e);
     }
 }
