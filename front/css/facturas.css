@@ -1,0 +1,83 @@
+.searchbar{
+    max-width: 600px;
+    width: 100%;
+    margin: auto;
+    margin-bottom: auto;
+    margin-top: auto;
+    height: 60px;
+    background-color: #b7bfd0;
+    border-radius: 30px;
+    padding: 10px;
+    }
+  
+    .search_input{
+        color: white;
+        border: 0;
+        outline: 0;
+        width: 90%;
+        background: transparent !important;
+        caret-color:transparent;
+        line-height: 40px;
+        font-weight: bold;
+    }
+  
+    .searchbar:hover > .search_input{
+        caret-color:red;
+    }
+  
+    .searchbar:hover > .search_icon{
+        background: rgb(33, 137, 255);
+        color: white;
+    }
+  
+    .search_icon{
+    height: 40px;
+    width: 40px;
+    float: right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50% !important;
+    color:black;
+    text-decoration:none;
+    }
+  
+    /* Desactivar el sombreado de autocompletado y los estilos de sugerencia seleccionada */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+      -webkit-box-shadow: none !important;
+      background-color: inherit !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+  }
+
+  .input-personalizado:-webkit-autofill,
+    .input-personalizado:-webkit-autofill:hover,
+    .input-personalizado:-webkit-autofill:focus,
+    .input-personalizado:-webkit-autofill:active {
+
+        -webkit-text-fill-color: white !important;
+    }
+
+.borde-abajo {
+    border-width: 1px;
+    border-bottom: solid grey;
+}
+
+.fondo-rojo{
+    background-color: red !important;
+    color: white !important;
+}
+
+.fondo-verde{
+    background-color: green !important;
+    color: white !important;
+}
+
+.scrollable-div {
+    height: 400px; /* Altura de la ventana gráfica */
+    overflow-y: auto; /* Scroll vertical */
+    overflow-x: hidden; /* Oculta el scroll horizontal */
+    margin: 0; /* Elimina los márgenes predeterminados */
+}

@@ -1,0 +1,14 @@
+.borde{
+    /* -webkit-box-shadow: -10px 10px 10px -6px rgba(0,0,0,0.3);
+    -moz-box-shadow: -10px 10px 10px -6px rgba(0,0,0,0.3); */
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.3);
+    transition: box-shadow 0.5s ease; 
+}
+
+.borde:hover{
+    /* -webkit-box-shadow: -10px 10px 10px -6px rgba(13, 206, 39, 0.26);
+    -moz-box-shadow: -10px 10px 10px -6px rgba(13, 206, 39, 0.26); */
+    box-shadow: 0px 0px 15px 10px rgba(135, 218, 119, 0.801);
+    transition: box-shadow 0.5s ease;
+    
+}

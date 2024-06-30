@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/estilos.css">
+    <link rel="stylesheet" type="text/css" href="css/toastify.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-5/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap-icons/font/bootstrap-icons.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="bootstrap-5/css/bootstrap-icons.min.css"> -->
+    <title>Index</title>
+</head>
+<body>
+  <nav id="navbar" class="navbar navbar-expand-lg navbar-dark ht bg-dark">
+  </nav>
+
+  <div class="container">
+    <section class="mt-5">
+      <div class="row text-center px-5 mb-5">
+        <div class="col-12">
+          <div class="row p-3 borde">
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6">
+              <h3>Cantidad de Ventas/Compras</h3>
+                <div class="row mx-auto">
+                  <div class="col-12">
+                    <canvas id="myChart" style="max-height: 300px;"></canvas>
+                  </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 pt-5">
+              <form action="#" method="POST" class="needs-validation" novalidate="" autocomplete="off" onsubmit="event.preventDefault(); consultarFacturas()">
+								<div class="mb-3">
+                  <div class="row px-3">
+                    <div class="col-6 px-5">
+                      <label class="mb-2 text-muted" for="fechaInicio">Fecha Inicio</label>
+									    <input id="fechaInicio" type="date" class="form-control" name="fechaInicio" value="" required>
+                    </div>
+                    <div class="col-6 px-5">
+                      <label class="mb-2 text-muted" for="fechaFin">Fecha Fin</label>
+									    <input id="fechaFin" type="date" class="form-control" name="fechaFin" value="" required>
+                    </div>
+                  </div>
+								</div>
+								<div class="mb-3">
+									<ul class="list-group px-5">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-5">
+                      Ventas
+                      <span id="spanVentas" class="badge bg-danger rounded-pill" style="font-size: 1.2rem;">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-5">
+                      Compras
+                      <span id="spanCompras" class="badge bg-danger rounded-pill" style="font-size: 1.2rem;">0</span>
+                    </li>
+                  </ul>
+								</div>
+								<button type="submit" class="btn btn-success" onclick="">
+                  Consultar
+                </button>
+							</form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row text-center px-4">
+        <div class="col-12">
+          <div class="row p-3">
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 mb-5 mb-lg-0">
+              <div class="borde pt-4" style="width: 100%; height: 100%;">
+                <h3>Tasas</h3>
+                  <ul id="informacionTasas" class="list-group px-5">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-5">
+                      <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
+                    </li>
+                  </ul>
+                <button class="btn btn-success m-3" onclick="ModalCrearTasa(true)">Agregar tasa</button>
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-6 col-lx-6 col-xxl-6 mb-5 mb-lg-0">
+              <div class="borde pt-4 pb-4" style="width: 100%; height: 100%;">
+                <h3>Monedas</h3>
+                <ul id="informacionMonedas" class="list-group px-5">
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-5">
+                    <span class="badge bg-success rounded-pill" style="font-size: 1.2rem;"></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  <div class="modal fade" id="modalCrearTasa" tabindex="-1" aria-labelledby="modalCrearTasa" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-ls">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <form name="formularioCrearTasas" id="formularioCrearTasas" method="post" class="m-3" action="#" onsubmit="event.preventDefault(); CrearTasa()">
+            <div class="row">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="mb-2 text-muted" for="moneda">Moneda</label>
+                  <select name="moneda" class="form-select" aria-label="Default select example" id="monedas-select">
+                    <!-- Agrega opciones del select si es necesario -->
+                  </select>
+                </div>
+  
+                <div class="mb-3">
+                  <div class="col-12 mb-2">
+                    <label class="mb-2 text-muted" for="tasaNueva">Tasa</label>
+                    <input id="tasaNueva" type="text" class="form-control" name="tasaNueva" value="" pattern="^[0-9]+(\.[0-9]+)?$" required autofocus>
+                  </div>  
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4 mb-3">
+              <!-- Boton Registrar -->
+              <div class="col-6">
+                <button type="submit" name="botonRegistrarTasas" value="1" class="btn btn-primary">Registrar</button>
+              </div>
+              <div class="col-6">
+                <div name="cancelarTasas" value="1" class="btn btn-danger" onclick="ModalCrearTasa(false)">Cancelar</div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<script src="bootstrap-5/js/bootstrap.min.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/toastify.js"></script>
+	<script src="js/utilidades.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>
