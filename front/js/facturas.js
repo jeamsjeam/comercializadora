@@ -360,6 +360,9 @@ async function SeccionesFacturaProducto(indice){
 }
 
 function ValorCantidadProducto(valor, numero){
+    if(valor !== '' && parseInt(valor) < 0){
+        return
+    }
     let precioPrincipal = document.getElementById("precio-principal-" + numero).value
     if(typeof precioPrincipal === 'undefined' || precioPrincipal === null || precioPrincipal === ''){
         return
@@ -506,9 +509,14 @@ async function VerificarStockProductos() {
                 let posicion = parseInt(listaInfoProductos.find(x => x.id === parseInt(data[i].id)).index)
                 let valorCantidad = document.getElementById("cantidad-"+posicion).value
 
+                if(valorCantidad !== '' && parseInt(valorCantidad) < 1){
+                    document.getElementById("cantidad-"+posicion).value = '0'
+                    valorCantidad = '0'
+                }
+
                 let totalStock = parseInt(data[i].stock) - parseInt(valorCantidad !== '' ? parseInt(valorCantidad) : 0)
                 let stockProducto = document.getElementById("stock-" + posicion)
-                if(totalStock < 0 || valorCantidad === ''){
+                if(totalStock < 0 || valorCantidad === '' || (valorCantidad !== '' && parseInt(valorCantidad) < 1)){
                     if(totalStock < 0){
                         totalStock = 0
                         stockProducto.className = "form-control fondo-rojo"
@@ -521,7 +529,7 @@ async function VerificarStockProductos() {
 
                 let precioProducto = document.getElementById("monto-"+posicion)
 
-                if(valorCantidad !== ''){
+                if(valorCantidad !== '' && parseInt(valorCantidad) >= 0){
                     if(parseInt(valorCantidad) >= parseInt(data[i].cantidad_descuento)){
                         let precioActual = parseInt(valorCantidad) * parseFloat(document.getElementById("precio-unitario-"+posicion).value) 
 
@@ -534,9 +542,9 @@ async function VerificarStockProductos() {
                     precioProducto.className = "form-control"
                 }
 
-                montoTotal += typeof precioProducto.value !== 'undefined' && precioProducto.value !== null && precioProducto.value !== '' ? parseFloat(precioProducto.value.replace(',','.')) : 0
+                if((valorCantidad !== '' && parseInt(valorCantidad) > 0)){
 
-                if(valorCantidad !== ''){
+                    montoTotal += typeof precioProducto.value !== 'undefined' && precioProducto.value !== null && precioProducto.value !== '' ? parseFloat(precioProducto.value.replace(',','.')) : 0
                     detalleFactura.push({
                         factura_id: 0,
                         producto_id: parseInt(data[i].id),
@@ -679,7 +687,7 @@ function ContenidoFacturaRegistrada(datos){
                         </div>
                         <div class="col-2">
                             <label class="mb-2 text-muted" for="Monto">Monto</label>
-                            <input id="facturaMonto" type="text" class="form-control" name="facturaMonto" value="${formatoDecimalString(datos.factura.monto)}" disabled>
+                            <input id="facturaMonto" type="text" class="form-control" name="facturaMonto" value="${formatoDecimalString(datos.factura.total)}" disabled>
                         </div>
                     </div>
                      <div class="row mt-3">
