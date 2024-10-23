@@ -48,24 +48,20 @@
     function CrearConstancia($datos,$tabla){
         try{
             $datosConsulta = ObtenerPorId($datos, $tabla);
-        $rutaTemplate = __DIR__ . '/CONSTANCIA.docx';  // Ruta de la plantilla
+            $rutaTemplate = __DIR__ . '/PLANTILLA.docx';  // Ruta de la plantilla
 
-        $templateWord = new TemplateProcessor($rutaTemplate);
-        $nombre = $datosConsulta["nombres_apellidos"];
-        $cedula = $datosConsulta["numero_cedula"];
+            $templateWord = new TemplateProcessor($rutaTemplate);
+            $nombre = $datosConsulta["nombres_apellidos"];
+            $cedula = $datosConsulta["numero_cedula"];
 
-        $templateWord->setValue('nombre', $nombre);
-        $templateWord->setValue('cedula', $cedula);
+            $templateWord->setValue('nombre', $nombre);
+            $templateWord->setValue('cedula', $cedula);
 
-        // Ruta donde se guardará el archivo generado (en el sistema de archivos)
-        $rutaGuardada = __DIR__ . '/PRUEBAS.docx';
-        $templateWord->saveAs($rutaGuardada);
+            // Ruta donde se guardará el archivo generado (en el sistema de archivos)
+            $rutaGuardada = __DIR__ . '/constancia.docx';
+            $templateWord->saveAs($rutaGuardada);
 
-        // Convertir la ruta completa en una ruta accesible por el navegador
-        $rutaWeb = str_replace($_SERVER['DOCUMENT_ROOT'], '', $rutaGuardada);
-        $rutaWeb = str_replace('\\', '/', $rutaWeb);  // Cambiar \ por / en caso de Windows
-
-        return $rutaWeb;  // Retornar la ruta en formato web (relativa)
+            return "http://localhost/comercializadora/backend/constancia.docx";  // Retornar la ruta en formato web (relativa)
 
         }catch (Exception $e) {
 

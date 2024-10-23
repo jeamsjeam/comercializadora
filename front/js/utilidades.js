@@ -314,7 +314,7 @@ async function RegistrarVerificarTasa(){
 function CargarNavbar(pagina){
     document.getElementById("navbar").innerHTML = `
                     <div  class="container-fluid">
-                        <div class="navbar-brand">Comercializadora</div>
+                        <div class="navbar-brand">CLUB DEPORTIVO</div>
                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
@@ -324,11 +324,11 @@ function CargarNavbar(pagina){
                                         <a class="nav-link ${pagina.indexOf('index.html') !== -1 ? 'active' : ''}" href="index.html">Inicio</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link ${pagina.indexOf('personas.html') !== -1 ? 'active' : ''}" href="personas.html">Registrar Personas</a>
+                                        <a class="nav-link ${pagina.indexOf('personas.html') !== -1 ? 'active' : ''}" href="personas.html">Registrar Jugador</a>
                                     </li>
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a class="nav-link ${pagina.indexOf('productos.html') !== -1 ? 'active' : ''}" href="productos.html">Registrar Productos</a>
-                                    </li>
+                                    </li> -->
                                 </ul>
                                 <a type="button" class="btn btn-dark" href="login.html">Cerrar Sesion</a>
                             </div>

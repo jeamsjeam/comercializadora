@@ -74,6 +74,39 @@ async function ModalPersonas(datos,bandera,tipo){
     });
 }
 
+var constancia = ""
+
+async function generarConstancia(id){
+    try{
+        let datos = {
+            accion: "crearConstancia",
+            datos: { id: id }
+        };
+
+        let data = await consultar("jugadores",datos);
+        if(data !== null && typeof data !== 'undefined'){
+            if (data.message) {
+                mostrarNotificacion(data.message,"#FF0000") 
+            } else if (data.error) {
+                mostrarNotificacion(data.error,"#FF0000") 
+            } else {
+                constancia = data;
+                mostrarNotificacion("Constancia Creada", "linear-gradient(to right, #00b09b, #96c93d)"); 
+            }
+        }else{
+            mostrarNotificacion("No se encontro ningun " + error,"#FF0000") 
+        }
+        
+	}catch(e){
+		mostrarNotificacion("Error: " + e,"#FF0000")  
+		console.error('Error:', e);
+	}
+}
+
+function descargarConstancia(){
+    window.location.href=constancia
+}
+
 function ContenidoConfirmacionEliminar(datos){
     let contenido = `<div class="row mt-4 mb-3">
                         <h4>¿Esta seguro que desea eliminar este elemento?</h4>
@@ -199,9 +232,9 @@ function ContenidoPersona(datos) {
                                     <input id="instagramJugador" type="text" class="form-control" name="instagramJugador" value="${bandera ? '' : datos.instagram_jugador}">
                                 </div>
                             </div>`
-                            console.log(bandera)
+                          
         if(bandera == true){
-            console.log(bandera)
+
 
             contenido += `<div class="row mb-4">
                                     <h4 class="mt-4">Datos del Representante</h4>
@@ -353,7 +386,7 @@ async function AccionPersona(accion) {
                 representante: representante
             }
         };
-        console.log(datos)
+   
         // Llamada a la función para enviar los datos
         let data = await consultar("jugadores", datos);
         if (data !== null && typeof data !== 'undefined') {
@@ -437,7 +470,7 @@ function initDataTable(datos) {
 
 function listaDatos(datos) {
     try {
-        console.log(datos)
+
         let content = ``;
         datos.forEach((dato, index) => {
             content += `
@@ -453,6 +486,10 @@ function listaDatos(datos) {
                         ><i class="bi bi-pen"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="ModalPersonas(${dato.id},true,'eliminar')"
                         ><i class="bi bi-trash3"></i></button>
+                         <button class="btn btn-sm btn-info" onclick="generarConstancia(${dato.id})">
+                            <i class="bi bi-file-earmark-text"></i> <!-- Icono de generación, puedes cambiarlo si lo deseas -->
+                        </button>
+                       
                     </td>
                 </tr>`;
         });
