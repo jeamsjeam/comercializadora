@@ -130,6 +130,7 @@ CREATE table jugador (
     otras_actividades TEXT,
     lugar_actividades TEXT,
     personas_vive TEXT,
+    estado int,
 
     -- Redes sociales del Jugador
     facebook_jugador VARCHAR(255),

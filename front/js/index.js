@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
 
     // Se revisa si las tasas están listas para mostrarlas en el HTML
-    document.addEventListener('tasasListas', function(event) {
+    /*document.addEventListener('tasasListas', function(event) {
         // Se verifica si existe tasas
         if (typeof event.detail !== 'undefined' && event.detail !== null && event.detail.length > 0) {
             
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     InicializarFechasFacturas()
     
     // Se consultan las facturas
-    await consultarFacturas()
+    await consultarFacturas()*/
 });
 
 var modalCrearTasa = null

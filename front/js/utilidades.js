@@ -26,22 +26,22 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             // Se verifica si existe tasaRegistrada, para poder mostrar una notificacion en verde
-            let tasaRegistrada = JSON.parse(localStorage.getItem('tasa'));
+            /*let tasaRegistrada = JSON.parse(localStorage.getItem('tasa'));
             if (typeof tasaRegistrada !== 'undefined' &&  tasaRegistrada !== null && typeof tasaRegistrada.tasa !== 'undefined' && tasaRegistrada.tasa !== null) {
                 mostrarNotificacion("Tasas Registradas", "linear-gradient(to right, #00b09b, #96c93d)"); 
-            }
+            }*/
         }
         
         // Se eliminan los siguientes objetos del localStorage
         localStorage.removeItem('usuarioLogeado');
-        localStorage.removeItem('tasa');
+        //localStorage.removeItem('tasa');
 
         // Se llama a la funcion que verifica si existe tasa del dia actual
         await Loading(true)
-        await VerificarTasa();
+        /*await VerificarTasa();
         // Despachar un evento personalizado indicando que tasas está llena
         const event = new CustomEvent('tasasListas', { detail: tasas });
-        document.dispatchEvent(event);
+        document.dispatchEvent(event);*/
         await Loading(false)
 
         const eventLoading = new CustomEvent('eventLoading', { detail: modalLoading });
@@ -324,18 +324,11 @@ function CargarNavbar(pagina){
                                         <a class="nav-link ${pagina.indexOf('index.html') !== -1 ? 'active' : ''}" href="index.html">Inicio</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link ${pagina.indexOf('productos.html') !== -1 ? 'active' : ''}" href="productos.html">Registrar Productos</a>
-                                    </li>
-                                    <li class="nav-item">
                                         <a class="nav-link ${pagina.indexOf('personas.html') !== -1 ? 'active' : ''}" href="personas.html">Registrar Personas</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link ${pagina.indexOf('factura.html') !== -1 ? 'active' : ''}" href="factura.html">Registrar Factura</a>
+                                        <a class="nav-link ${pagina.indexOf('productos.html') !== -1 ? 'active' : ''}" href="productos.html">Registrar Productos</a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link ${pagina.indexOf('facturadetalle.html') !== -1 ? 'active' : ''}" href="facturadetalle.html">Detalles Factura</a>
-                                    </li>
-                                </ul>
                                 </ul>
                                 <a type="button" class="btn btn-dark" href="login.html">Cerrar Sesion</a>
                             </div>

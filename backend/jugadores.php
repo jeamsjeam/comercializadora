@@ -44,21 +44,42 @@
     require_once 'vendor/autoload.php';
 
     use PhpOffice\PhpWord\TemplateProcessor;
+
+    function CrearConstancia($datos,$tabla){
+        try{
+            $datosConsulta = ObtenerPorId($datos, $tabla);
+        $rutaTemplate = __DIR__ . '/CONSTANCIA.docx';  // Ruta de la plantilla
+
+        $templateWord = new TemplateProcessor($rutaTemplate);
+        $nombre = $datosConsulta["nombres_apellidos"];
+        $cedula = $datosConsulta["numero_cedula"];
+
+        $templateWord->setValue('nombre', $nombre);
+        $templateWord->setValue('cedula', $cedula);
+
+        // Ruta donde se guardará el archivo generado (en el sistema de archivos)
+        $rutaGuardada = __DIR__ . '/PRUEBAS.docx';
+        $templateWord->saveAs($rutaGuardada);
+
+        // Convertir la ruta completa en una ruta accesible por el navegador
+        $rutaWeb = str_replace($_SERVER['DOCUMENT_ROOT'], '', $rutaGuardada);
+        $rutaWeb = str_replace('\\', '/', $rutaWeb);  // Cambiar \ por / en caso de Windows
+
+        return $rutaWeb;  // Retornar la ruta en formato web (relativa)
+
+        }catch (Exception $e) {
+
+            // Código que se ejecuta si se lanza una excepción
+            return ['error' => 'Excepción capturada: ',  $e->getMessage(), "\n"];
+        }   
+    }
+
     // Funcion para obtener todos los registros
     // $tabla: String que es el nombre de la tabla
     function ObtenerTodos($tabla) {
 
         try{         
-            
-
-    $templateWord = new TemplateProcessor("CONSTANCIA.docx");
-    $nombre = "PRUEBA";
-    $cedula = "333333";
-
-    $templateWord->setValue('nombre',$nombre);
-    $templateWord->setValue('cedula',$cedula);
-
-    $templateWord->saveAS('PRUEBAS.docx');
+        
             // Consulta a la base de datos
             $sql = "SELECT p.* FROM ".$tabla." p where p.estado = 1";
        
@@ -420,7 +441,7 @@
         
         // Se guarda los datos enviados en una variable
         $data = json_decode($datosRecibidos, true);
-
+        
         // Se consulta la accion a tomar
         $accion = $data['accion'] ?? null;
 
@@ -434,6 +455,15 @@
                 echo json_encode(ObtenerPorId($datos,$tabla));
 
                 break;
+            case "crearConstancia":
+                    $datos = $data['datos'] ?? null;
+                    if($datos === null){
+                        echo json_encode(['error' => 'No se envio datos']);
+                        break;
+                    }
+                    echo json_encode(CrearConstancia($datos,$tabla));
+    
+                    break;
             case "obtenerPorCedula":
                 $datos = $data['datos'] ?? null;
                 if($datos === null){

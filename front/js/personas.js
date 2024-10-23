@@ -198,45 +198,49 @@ function ContenidoPersona(datos) {
                                     <label class="mb-2 text-muted" for="instagramJugador">Instagram</label>
                                     <input id="instagramJugador" type="text" class="form-control" name="instagramJugador" value="${bandera ? '' : datos.instagram_jugador}">
                                 </div>
-                            </div>
+                            </div>`
+                            console.log(bandera)
+        if(bandera == true){
+            console.log(bandera)
 
-                            <div class="row mb-4">
-                                <h4 class="mt-4">Datos del Representante</h4>
-                                <div class="col-md-6">
-                                    <label class="mb-2 text-muted" for="nombreRepresentante">Nombre del Representante</label>
-                                    <input id="nombreRepresentante" type="text" class="form-control" name="nombreRepresentante" value="${bandera ? '' : datos.representante?.nombre_apellidos}" required>
+            contenido += `<div class="row mb-4">
+                                    <h4 class="mt-4">Datos del Representante</h4>
+                                    <div class="col-md-6">
+                                        <label class="mb-2 text-muted" for="nombreRepresentante">Nombre del Representante</label>
+                                        <input id="nombreRepresentante" type="text" class="form-control" name="nombreRepresentante" value="${bandera ? '' : datos.representante?.nombre_apellidos}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-2 text-muted" for="tipoRepresentante">Tipo de Representante</label>
+                                        <select id="tipoRepresentante" class="form-select" name="tipoRepresentante" required>
+                                            <option value="padre" ${bandera ? '' : (datos.representante?.parentesco === 'padre' ? 'selected' : '')}>Padre</option>
+                                            <option value="madre" ${bandera ? '' : (datos.representante?.parentesco === 'madre' ? 'selected' : '')}>Madre</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="mb-2 text-muted" for="tipoRepresentante">Tipo de Representante</label>
-                                    <select id="tipoRepresentante" class="form-select" name="tipoRepresentante" required>
-                                        <option value="padre" ${bandera ? '' : (datos.representante?.parentesco === 'padre' ? 'selected' : '')}>Padre</option>
-                                        <option value="madre" ${bandera ? '' : (datos.representante?.parentesco === 'madre' ? 'selected' : '')}>Madre</option>
-                                    </select>
+    
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="mb-2 text-muted" for="telefonoRepresentante">Teléfono del Representante</label>
+                                        <input id="telefonoRepresentante" type="text" class="form-control" name="telefonoRepresentante" value="${bandera ? '' : datos.representante?.telefono}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-2 text-muted" for="direccionRepresentante">Dirección del Representante</label>
+                                        <input id="direccionRepresentante" type="text" class="form-control" name="direccionRepresentante" value="${bandera ? '' : datos.representante?.direccion}">
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="mb-2 text-muted" for="cedulaRepresentante">Cédula del Representante</label>
+                                        <input id="cedulaRepresentante" type="text" class="form-control" name="cedulaRepresentante" value="${bandera ? '' : datos.representante?.cedula}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-2 text-muted" for="correoRepresentante">Correo del Representante</label>
+                                        <input id="correoRepresentante" type="email" class="form-control" name="correoRepresentante" value="${bandera ? '' : datos.representante?.correo}">
+                                    </div>
+                                </div>`
+        }
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="mb-2 text-muted" for="telefonoRepresentante">Teléfono del Representante</label>
-                                    <input id="telefonoRepresentante" type="text" class="form-control" name="telefonoRepresentante" value="${bandera ? '' : datos.representante?.telefono}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="mb-2 text-muted" for="direccionRepresentante">Dirección del Representante</label>
-                                    <input id="direccionRepresentante" type="text" class="form-control" name="direccionRepresentante" value="${bandera ? '' : datos.representante?.direccion}">
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label class="mb-2 text-muted" for="cedulaRepresentante">Cédula del Representante</label>
-                                    <input id="cedulaRepresentante" type="text" class="form-control" name="cedulaRepresentante" value="${bandera ? '' : datos.representante?.cedula}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="mb-2 text-muted" for="correoRepresentante">Correo del Representante</label>
-                                    <input id="correoRepresentante" type="email" class="form-control" name="correoRepresentante" value="${bandera ? '' : datos.representante?.correo}">
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between mt-4">
+    contenido += `<div class="d-flex justify-content-between mt-4">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                 <button type="submit" class="btn btn-primary">${bandera ? 'Registrar' : 'Modificar'}</button>
                             </div>
@@ -292,21 +296,37 @@ async function AccionPersona(accion) {
         let lugarActividades = document.getElementById("lugarActividades");
         let personasVive = document.getElementById("personasVive");
 
-        // Datos del representante
-        let nombreRepresentante = document.getElementById("nombreRepresentante");
-        let tipoRepresentante = document.getElementById("tipoRepresentante").value;
-        let telefonoRepresentante = document.getElementById("telefonoRepresentante");
-        let direccionRepresentante = document.getElementById("direccionRepresentante");
-        let numeroCedulaRepresentante = document.getElementById("cedulaRepresentante"); // Cambiado de numeroCedulaRepresentante a cedulaRepresentante
-        let parentesco = document.getElementById("tipoRepresentante").value; // Suponiendo que el parentesco es el tipo de representante
-        let trabajoRepresentante = document.getElementById("trabajoRepresentante");
-        let facebookRepresentante = document.getElementById("facebookJugador"); // Cambiado de facebookRepresentante a facebookJugador
-        let instagramRepresentante = document.getElementById("instagramJugador"); // Cambiado de instagramRepresentante a instagramJugador
+        let representante = {}
+        if(accion !== 'actualizar'){
 
-        // Validación de campos obligatorios
-        if (nombre.value === '' || cedula.value === '' || nombreRepresentante.value === '') {
-            mostrarNotificacion("Todos los campos obligatorios deben ser llenados", "#FF0000");
-            return;
+            // Datos del representante
+            let nombreRepresentante = document.getElementById("nombreRepresentante");
+            let tipoRepresentante = document.getElementById("tipoRepresentante").value;
+            let telefonoRepresentante = document.getElementById("telefonoRepresentante");
+            let direccionRepresentante = document.getElementById("direccionRepresentante");
+            let numeroCedulaRepresentante = document.getElementById("cedulaRepresentante"); // Cambiado de numeroCedulaRepresentante a cedulaRepresentante
+            let parentesco = document.getElementById("tipoRepresentante").value; // Suponiendo que el parentesco es el tipo de representante
+            let trabajoRepresentante = document.getElementById("trabajoRepresentante");
+            let facebookRepresentante = document.getElementById("facebookJugador"); // Cambiado de facebookRepresentante a facebookJugador
+            let instagramRepresentante = document.getElementById("instagramJugador"); // Cambiado de instagramRepresentante a instagramJugador
+            representante = {
+                nombre_apellidos: nombreRepresentante.value,
+                tipo_representante: tipoRepresentante,
+                telefono: telefonoRepresentante.value,
+                direccion: direccionRepresentante.value,
+                numero_cedula: numeroCedulaRepresentante.value, // Asegúrate de que este ID sea correcto
+                parentesco: parentesco, // Se asume que este campo es el mismo tipo de representante
+                //trabajo: trabajoRepresentante.value,
+                trabajo: "",
+                facebook: facebookRepresentante.value,
+                instagram: instagramRepresentante.value
+            }
+    
+            // Validación de campos obligatorios
+            if (nombre.value === '' || cedula.value === '' || nombreRepresentante.value === '') {
+                mostrarNotificacion("Todos los campos obligatorios deben ser llenados", "#FF0000");
+                return;
+            }
         }
 
         // Recopilación de datos
@@ -330,18 +350,7 @@ async function AccionPersona(accion) {
                 otras_actividades: otrasActividades.value,
                 lugar_actividades: lugarActividades.value,
                 personas_vive: personasVive.value,
-                representante: {
-                    nombre_apellidos: nombreRepresentante.value,
-                    tipo_representante: tipoRepresentante,
-                    telefono: telefonoRepresentante.value,
-                    direccion: direccionRepresentante.value,
-                    numero_cedula: numeroCedulaRepresentante.value, // Asegúrate de que este ID sea correcto
-                    parentesco: parentesco, // Se asume que este campo es el mismo tipo de representante
-                    //trabajo: trabajoRepresentante.value,
-                    trabajo: "",
-                    facebook: facebookRepresentante.value,
-                    instagram: instagramRepresentante.value
-                }
+                representante: representante
             }
         };
         console.log(datos)
@@ -369,13 +378,18 @@ async function AccionPersona(accion) {
 
 function limpiarCampos() {
     let campos = ["idPersona", "cedulaPersona", "nombrePersona", "fechaNacimiento", "celular", "direccionExacta", "lugarEstudio", "grado", "seccion", 
-                  "enfermedadesAlergias", "tipoSangre", "historialDeportivo", "perfil", "posicion", "otrasActividades", "lugarActividades", "personasVive", 
-                  "nombreRepresentante", "telefonoRepresentante", "celularRepresentante", "direccionRepresentante", "numeroCedulaRepresentante", 
-                  "parentesco", "trabajoRepresentante", "facebookRepresentante", "instagramRepresentante"];
+        "enfermedadesAlergias", "tipoSangre", "historialDeportivo", "perfil", "posicion", "otrasActividades", "lugarActividades", "personasVive", 
+        "nombreRepresentante", "telefonoRepresentante", "celularRepresentante", "direccionRepresentante", "numeroCedulaRepresentante", 
+        "parentesco", "trabajoRepresentante", "facebookRepresentante", "instagramRepresentante","direccionPersona",
+        "tipoRepresentante","facebookJugador","instagramJugador"];
 
-    campos.forEach(campo => {
-        document.getElementById(campo).value = '';
-    });
+    for(const campo of campos){
+        try{
+            document.getElementById(campo).value = '';
+        }catch{
+            continue;
+        }
+    }
 }
 
 
@@ -388,7 +402,7 @@ const dataTableOptions = {
     scrollY: 'auto',  // Ajusta la altura automáticamente
     scrollCollapse: true,  // Permite colapsar la tabla si hay menos registros
     columnDefs: [
-        { className: "centered", targets: [0, 1, 2, 3, 4, 5, 6] }
+        { className: "centered", targets: [0, 1, 2, 3, 4, 5] }
     ],
     pageLength: numeroPorPagona,
     destroy: true,
@@ -423,17 +437,16 @@ function initDataTable(datos) {
 
 function listaDatos(datos) {
     try {
+        console.log(datos)
         let content = ``;
         datos.forEach((dato, index) => {
             content += `
                  <tr>
                     <td>${index + 1}</td>
-                    <td>${dato.extrangero != null && typeof dato.extrangero !== 'undefined' ? (dato.extrangero === '0' ? 'V' : 'E') : ''}</td>
-                    <td>${dato.cedula != null && typeof dato.cedula !== 'undefined' ? dato.cedula : ''}</td>
-                    <td>${dato.nombre != null && typeof dato.nombre !== 'undefined' ? dato.nombre : ''}</td>
-                    <td>${dato.telefono != null && typeof dato.telefono !== 'undefined' ? dato.telefono : ''}</td>
-                    <td>${dato.direccion != null && typeof dato.direccion !== 'undefined' ? dato.direccion : ''}</td>
-                    <td>${dato.tipopersona != null && typeof dato.tipopersona !== 'undefined' ? dato.tipopersona : ''}</td>
+                    <td>${dato.numero_cedula != null && typeof dato.numero_cedula !== 'undefined' ? dato.numero_cedula : ''}</td>
+                    <td>${dato.nombres_apellidos != null && typeof dato.nombres_apellidos !== 'undefined' ? dato.nombres_apellidos : ''}</td>
+                    <td>${dato.celular != null && typeof dato.celular !== 'undefined' ? dato.celular : ''}</td>
+                    <td>${dato.direccion_exacta != null && typeof dato.direccion_exacta !== 'undefined' ? dato.direccion_exacta : ''}</td>
                     <!-- <td><i class="fa-solid fa-check" style="color: green;"></i></td> -->
                     <td>
                         <button class="btn btn-sm btn-primary" onclick="ModalPersonas(${dato.id},true,'actualizar')"
