@@ -109,6 +109,56 @@ CREATE TABLE tasas_cambio (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación del registro
 );
 
+-- Tabla jugador
+-- Tabla jugador
+CREATE table jugador (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    numero_cedula VARCHAR(20) NOT NULL,
+    -- Datos del Jugador
+    nombres_apellidos VARCHAR(255) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    celular VARCHAR(20) NOT NULL,
+    direccion_exacta TEXT,
+    lugar_estudio VARCHAR(255),
+    grado VARCHAR(50),
+    seccion VARCHAR(50),
+    enfermedades_alergias TEXT,
+    tipo_sangre VARCHAR(10),
+    historial_deportivo TEXT,
+    perfil VARCHAR(100),
+    posicion VARCHAR(100),
+    otras_actividades TEXT,
+    lugar_actividades TEXT,
+    personas_vive TEXT,
+
+    -- Redes sociales del Jugador
+    facebook_jugador VARCHAR(255),
+    instagram_jugador VARCHAR(255)
+);
+
+-- Tabla parientes
+CREATE TABLE parientes (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    jugadorId BIGINT,
+    
+    -- Datos del Pariente
+    nombre_apellidos VARCHAR(255) NOT NULL,
+    fecha_nacimiento DATE,
+    numero_cedula VARCHAR(20),
+    celular VARCHAR(20),
+    parentesco VARCHAR(50),
+    trabajo TEXT,
+
+    -- Redes sociales del Pariente
+    facebook VARCHAR(255),
+    instagram VARCHAR(255),
+
+    -- Clave foránea
+    FOREIGN KEY (jugadorId) REFERENCES jugador(Id) ON DELETE CASCADE
+);
+
+
+
 -- Agregar clave foránea a la tabla productos
 ALTER TABLE productos
 ADD CONSTRAINT fk_productos_categorias
